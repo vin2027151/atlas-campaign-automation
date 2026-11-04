@@ -1,0 +1,265 @@
+# Next month's paid build, as data. Edit this file; nothing else.
+# Every number traces to plan-final.md (findings F1-F7, section 2).
+# Budgets are MONTHLY dollars. Daily budgets are derived (monthly / days_in_month).
+
+account:
+  name: "AgentStack"            # B2B SaaS, trial signup
+  month: "2026-11"
+  days_in_month: 30
+  landing_url: "https://www.agentstack.example/trial"
+  display_url: "agentstack.example"
+  total_budget: 120000          # brief: ~$120K/month
+  cpa_band: [250, 280]          # brief: trial CPA target $250-280
+  campaign_cpa_ceiling: 350     # no single campaign may target/cap above this
+  reserve: 8000                 # held back, released week 3 (section 2)
+
+platforms:
+  meta:
+    declared_total: 60000       # must equal the sum of meta campaign budgets
+    ceiling: 65000              # brief: ~$65K Meta
+    conversion_event: "StartTrial"
+    pixel_id: "PIXEL_ID_HERE"
+    page_id: "PAGE_ID_HERE"
+  google:
+    declared_total: 52000       # must equal the sum of google campaign budgets
+    ceiling: 55000              # brief: ~$55K Google
+
+# Entities deliberately removed. The validator refuses to build if any of these
+# reappear as a campaign, ad set, ad group, ad or shared budget name.
+cut:
+  - "Search_NonBrand_UK"        # F2: $15,090 / 4,944 clicks / 0 conversions
+  - "Google_Main_Shared"        # F3: one shared budget cut the US 30.9%
+
+# ---------------------------------------------------------------- Meta creative
+# Proven = ran in the account with a readable true CPA (F5). Unproven = new.
+meta_ads:
+  UGC_Founder_v2:
+    proven: true
+    true_cpa: 215
+    title: "Stop stitching agents together by hand"
+    body: "Our founder built AgentStack after wiring the same five tools together for the tenth time. 14-day trial, no card."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_UGC_FOUNDER_V2"
+  UGC_Agency_Owner:
+    proven: true
+    true_cpa: 234
+    title: "How a 12-person agency ships agents in a week"
+    body: "Not a demo reel. The owner walks through the actual build. 14-day trial, no card."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_UGC_AGENCY_OWNER"
+  Static_AgentStack_Benefits:
+    proven: true
+    true_cpa: 261
+    title: "One stack for every agent you ship"
+    body: "Build, deploy and monitor production agents without gluing six vendors together."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "IMAGE"
+    asset_ref: "IMAGE_HASH_STATIC_BENEFITS"
+  Demo_Screen_Walkthrough:
+    proven: true
+    true_cpa: 265
+    title: "90 seconds inside AgentStack"
+    body: "Screen recording, no voiceover over stock footage. See the build, then try it."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_DEMO_WALKTHROUGH"
+  UGC_Founder_v3:
+    proven: false               # the refresh: goes in the test campaign, not Core
+    title: "The tenth time I wired the same five tools together"
+    body: "Founder cut of the v2 concept, new hook. 14-day trial, no card."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_UGC_FOUNDER_V3"
+  Retargeting_Testimonial:
+    proven: true
+    true_cpa: 367               # control only; worst true CPA in the account (F5)
+    title: "\"We shipped three agents in the first month\""
+    body: "You looked at AgentStack. Here is what happened to the team that didn't wait."
+    link_description: "Finish your signup"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_RETARGETING_TESTIMONIAL"
+  Retargeting_Objection_Handler:
+    proven: false
+    title: "Migrating off your current stack takes a weekend"
+    body: "The part everyone asks about, answered in 40 seconds."
+    link_description: "Finish your signup"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_RETARGETING_OBJECTION"
+  Retargeting_Pricing_Clarity:
+    proven: false
+    title: "What AgentStack costs after the trial"
+    body: "No seat math, no surprise usage bill. Here is the whole price list."
+    link_description: "Finish your signup"
+    cta: "SIGN_UP"
+    creative_type: "IMAGE"
+    asset_ref: "IMAGE_HASH_PRICING_CLARITY"
+
+# ------------------------------------------------------------- Meta campaigns
+# One ad set per campaign. Budget sits on the AD SET, and each campaign has
+# exactly one, so no campaign shares a budget with another (F3).
+meta_campaigns:
+  - name: "Prospecting_Core"
+    objective: "OUTCOME_LEADS"
+    budget: 45000               # the four proven ads, +8% on their own run-rate
+    expected_cpa: 265           # central case, F5 blend
+    cap: 300                    # 7-day true-CPA trigger introduces a $300 cap
+    unproven_slot: false
+    launch_at_pct: 70           # steps to 100% within 48h of the event fix (F1)
+    ad_set:
+      name: "US_AdvantagePlus_Broad"
+      optimization_goal: "OFFSITE_CONVERSIONS"
+      bid_strategy: "LOWEST_COST_WITHOUT_CAP"
+      countries: ["US"]
+      age_min: 18
+      age_max: 65
+      gender: "All"
+      audience: "Advantage+ Audience (no interest stacking)"
+      excluded_audiences: ["Customers_All", "Trial_Starters_90d"]
+    ads:
+      - "UGC_Founder_v2"        # F6: relaunched; cheapest ad in the account
+      - "UGC_Agency_Owner"
+      - "Static_AgentStack_Benefits"
+      - "Demo_Screen_Walkthrough"
+
+  - name: "Prospecting_Test"
+    objective: "OUTCOME_LEADS"
+    budget: 9000
+    expected_cpa: 300
+    cap: 330
+    unproven_slot: true         # one unproven ad at a time, so its result is readable
+    ad_set:
+      name: "US_AdvantagePlus_Test"
+      optimization_goal: "OFFSITE_CONVERSIONS"
+      bid_strategy: "LOWEST_COST_WITHOUT_CAP"
+      countries: ["US"]
+      age_min: 18
+      age_max: 65
+      gender: "All"
+      audience: "Advantage+ Audience (no interest stacking)"
+      excluded_audiences: ["Customers_All", "Trial_Starters_90d"]
+    ads:
+      - "UGC_Founder_v3"
+    queue:                      # not built; next occupants of the single slot
+      - "New_Concept_TBD_1"
+
+  - name: "Retargeting_30d"
+    objective: "OUTCOME_LEADS"
+    budget: 6000                # cut from ~$9,750 (F5)
+    expected_cpa: 330
+    cap: 330                    # cost cap above target on purpose: it underspends
+    unproven_slot: false
+    # Declared exception to rule 7: retargeting runs two challengers against the
+    # old control on purpose (one creative unchanged since 2026-05-05, F5). The
+    # exception is written here, in the plan, not hidden inside the validator.
+    allow_unproven_without_slot: true
+    ad_set:
+      name: "US_Retargeting_30d"
+      optimization_goal: "OFFSITE_CONVERSIONS"
+      bid_strategy: "COST_CAP"
+      countries: ["US"]
+      age_min: 18
+      age_max: 65
+      gender: "All"
+      audience: "Site_Visitors_30d + Video_Viewers_50pct"
+      custom_audiences: ["Site_Visitors_30d", "Video_Viewers_50pct"]
+      excluded_audiences: ["Customers_All", "Trial_Starters_90d"]
+    ads:
+      - "Retargeting_Objection_Handler"
+      - "Retargeting_Pricing_Clarity"
+      - "Retargeting_Testimonial"   # control
+
+# ----------------------------------------------------------- Google campaigns
+# Every campaign carries its own daily budget. There is no shared budget (F3).
+google_campaigns:
+  - name: "Search_Brand_US"
+    type: "Search"
+    budget: 6000                # capped, not grown (F7: $148 is the least incremental number)
+    expected_cpa: 155
+    bid_strategy: "Maximize conversions"
+    max_cpc: 4.00
+    networks: "Google search"
+    locations: ["United States"]
+    languages: ["English"]
+    ad_groups:
+      - name: "Brand_Core"
+        keywords:
+          - { text: "agentstack", match: "Exact" }
+          - { text: "agent stack", match: "Exact" }
+          - { text: "agentstack pricing", match: "Phrase" }
+          - { text: "agentstack login", match: "Phrase" }
+        ads:
+          - headlines: ["AgentStack - Official Site", "Ship Production Agents", "Free 14-Day Trial"]
+            descriptions: ["Build, deploy and monitor agents in one stack. No card required.", "Start free. Invite your team. Ship this week."]
+            path1: "trial"
+            path2: ""
+    negatives:
+      - { text: "free", match: "Negative Phrase" }
+      - { text: "jobs", match: "Negative Phrase" }
+
+  - name: "Search_NonBrand_US"
+    type: "Search"
+    budget: 29000               # +18% on the pre-starvation $811/day (F3/F4)
+    expected_cpa: 310
+    bid_strategy: "Target CPA"
+    target_cpa: 280
+    networks: "Google search"
+    locations: ["United States"]
+    languages: ["English"]
+    ad_groups:
+      - name: "Category_AgentPlatform"
+        keywords:
+          - { text: "ai agent platform", match: "Phrase" }
+          - { text: "build ai agents", match: "Phrase" }
+          - { text: "agent orchestration tool", match: "Exact" }
+          - { text: "deploy ai agents", match: "Phrase" }
+        ads:
+          - headlines: ["One Platform For AI Agents", "Build, Deploy, Monitor", "Free 14-Day Trial"]
+            descriptions: ["Stop gluing six vendors together. One stack for production agents.", "Start free. No card. Your first agent ships this week."]
+            path1: "ai-agents"
+            path2: "platform"
+      - name: "Competitor_Alternatives"
+        keywords:
+          - { text: "langchain alternative", match: "Phrase" }
+          - { text: "crewai alternative", match: "Phrase" }
+          - { text: "agent framework comparison", match: "Exact" }
+        ads:
+          - headlines: ["A Simpler Agent Stack", "Switch In A Weekend", "Free 14-Day Trial"]
+            descriptions: ["Migrate off your framework without rewriting your agents.", "See the side-by-side. Start free, no card."]
+            path1: "compare"
+            path2: ""
+    negatives:                  # the 40 negatives from 10-06, extended weekly (F7)
+      - { text: "free", match: "Negative Phrase" }
+      - { text: "course", match: "Negative Phrase" }
+      - { text: "tutorial", match: "Negative Phrase" }
+      - { text: "github", match: "Negative Phrase" }
+      - { text: "open source", match: "Negative Phrase" }
+      - { text: "jobs", match: "Negative Phrase" }
+      - { text: "salary", match: "Negative Phrase" }
+      - { text: "reddit", match: "Negative Phrase" }
+
+  - name: "PMax_US"
+    type: "Performance Max"
+    budget: 17000               # flat; tCPA honest about where it is (F4)
+    expected_cpa: 330
+    bid_strategy: "Target CPA"
+    target_cpa: 330
+    networks: "All"
+    locations: ["United States"]
+    languages: ["English"]
+    asset_groups:
+      - name: "PMax_US_Core"
+        headlines: ["Ship Production AI Agents", "One Stack, Not Six Vendors", "Free 14-Day Trial"]
+        long_headline: "Build, deploy and monitor production AI agents in one platform"
+        descriptions: ["Start free. No card required. Your first agent ships this week.", "Trusted by agencies and product teams shipping agents in production."]
+        business_name: "AgentStack"
+    negatives:                  # account-level brand negatives (hypothesis, F7)
+      - { text: "agentstack", match: "Negative Phrase" }

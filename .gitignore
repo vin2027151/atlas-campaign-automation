@@ -1,0 +1,6 @@
+# Generated output — rebuild with `python3 build.py`
+out/
+
+__pycache__/
+*.pyc
+.DS_Store
