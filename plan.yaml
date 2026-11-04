@@ -184,8 +184,10 @@ google_campaigns:
     type: "Search"
     budget: 6000                # capped, not grown (F7: $148 is the least incremental number)
     expected_cpa: 155
+    # Maximize Conversions does not accept a CPC cap in Google Ads; the
+    # $6,000 monthly budget is the control. Brand volume is supply-limited
+    # at 17-19% CTR, so the budget binds before any bid would.
     bid_strategy: "Maximize conversions"
-    max_cpc: 4.00
     networks: "Google search"
     locations: ["United States"]
     languages: ["English"]
