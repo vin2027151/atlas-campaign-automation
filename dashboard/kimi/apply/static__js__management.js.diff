@@ -1,0 +1,87 @@
+--- a/static/js/management.js
++++ b/static/js/management.js
+@@ -3,7 +3,13 @@
+ // lessons update the UI immediately, then reconcile with the server response.
+-import { api, fmt, toast, esc, badge, cptTone, platformChip, $ } from "/static/js/common.js";
++import { api, fmt, toast, esc, badge, cptTone, platformChip, confirmButton, $, $$ } from "/static/js/common.js";
++
++/* Account decisions precede checklist administration in visual and keyboard order. */
++(function prioritizeInPlay() {
++  const checklist = $("#mg-checklist");
++  const inPlay = $("#mg-inplay");
++  if (checklist && inPlay) checklist.parentNode.insertBefore(inPlay, checklist);
++})();
+ 
+ const S = { data: null, selectedDay: null, tag: null, newLesson: null };
+@@ -153,11 +159,12 @@
+     rows.push(`<tr class="mg-group-row"><td>${platformChip(g.platform)} ${esc(g.label)} <span class="muted">&middot; ${g.campaigns.length} active</span></td>
+       <td class="num">${fmt.money(t.daily_budget)}</td><td class="num">${fmt.money(t.spend_7d)}</td>
+-      <td class="num ${cptTone(t.cpt_7d, band)}">${fmt.cpt(t.cpt_7d)}</td><td class="num">${fmt.int(t.trials_7d)}</td><td></td><td></td></tr>`);
+-    if (!g.campaigns.length) rows.push(`<tr><td colspan="7" class="muted">No active campaigns.</td></tr>`);
++      <td class="num ${cptTone(t.cpt_7d, band)}">${fmt.cpt(t.cpt_7d)}</td><td class="num">${fmt.int(t.trials_7d)}</td><td></td><td></td><td></td></tr>`);
++    if (!g.campaigns.length) rows.push(`<tr><td colspan="8" class="muted">No active campaigns.</td></tr>`);
+     g.campaigns.forEach((c) => {
+       const tags = [c.legacy ? `<span class="tag" title="Legacy campaign running at reduced budget alongside the new build">legacy</span>` : "",
+         c.country && c.country !== "US" ? `<span class="tag">${esc(c.country)}</span>` : ""].join("");
++      const thin = c.trials_7d < 3 ? `<div class="caveat">${c.trials_7d === 0 ? "0 trials: CPT undefined" : `n=${c.trials_7d}: thin read`}</div>` : "";
+       rows.push(`<tr>
+         <td class="mg-camp">${platformChip(c.platform)} ${campLink(c.id, c.name)}${tags} <span class="muted small">${esc(c.type || "")}</span></td>
+         <td class="num">${fmt.money(c.daily_budget)}</td>
+         <td class="num">${fmt.money(c.spend_7d)}</td>
+-        <td class="num strong ${cptTone(c.cpt_7d, band)}">${fmt.cpt(c.cpt_7d)}</td>
++        <td class="num strong ${cptTone(c.cpt_7d, band)}" title="${fmt.money(c.spend_7d)} divided by ${c.trials_7d} PostHog trials">${fmt.cpt(c.cpt_7d)}${thin}</td>
+         <td class="num">${fmt.int(c.trials_7d)}</td>
+         <td>${readPill(c.read, c.why)}</td>
+-        <td class="mg-why">${esc(c.why)}</td></tr>`);
++        <td class="mg-why">${esc(c.why)}</td>
++        <td class="actions"><span class="row-actions">
++          ${c.read === "scaling" ? `<button class="btn btn-sm" type="button" data-mg-scale="${esc(c.id)}" title="Raise daily budget from ${fmt.money(c.daily_budget)} to ${fmt.money(Math.round(c.daily_budget * 110) / 100)}">+10% / day</button>` : ""}
++          <button class="btn btn-sm btn-danger" type="button" data-mg-pause="${esc(c.id)}" data-name="${esc(c.name)}" data-confirm-label="Confirm pause?">Pause</button>
++          <a class="btn btn-sm" href="/campaigns#${encodeURIComponent(c.id)}">Controls</a>
++        </span></td></tr>`);
+     });
+   });
+   $("#mg-inplay-body").innerHTML = rows.join("");
++  $$("#mg-inplay-body [data-mg-pause]").forEach((button) => confirmButton(button, async (el) => {
++    await api(`/api/campaigns/${encodeURIComponent(el.dataset.mgPause)}/status`, { body: { status: "PAUSED" } });
++    toast(`${el.dataset.name} paused`);
++    await load({ quiet: true });
++  }));
+@@ -236,6 +243,43 @@
+ $("#mg-refresh").addEventListener("click", async () => { await load({ quiet: true }); toast("Refreshed", "info"); });
++
++$("#mg-inplay").addEventListener("click", async (event) => {
++  const button = event.target.closest("[data-mg-scale]");
++  if (!button) return;
++  const id = button.dataset.mgScale;
++  const campaign = S.data.in_play.groups.flatMap((g) => g.campaigns).find((c) => c.id === id);
++  if (!campaign) return;
++  const next = Math.round(Number(campaign.daily_budget) * 110) / 100;
++  button.disabled = true;
++  try {
++    await api(`/api/campaigns/${encodeURIComponent(id)}/budget`, { body: { daily_budget: next } });
++    toast(`${campaign.name}: daily budget ${fmt.money(campaign.daily_budget)} → ${fmt.money(next)}`);
++    await load({ quiet: true });
++  } catch (e) {
++    toast("Could not scale budget: " + e.message, "error");
++    button.disabled = false;
++  }
++});
++
++$("#mg-rail").addEventListener("keydown", (event) => {
++  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
++  const days = S.data.checklist.days;
++  if (!days.length) return;
++  event.preventDefault();
++  let index = days.findIndex((d) => d.day === S.selectedDay);
++  if (event.key === "Home") index = 0;
++  else if (event.key === "End") index = days.length - 1;
++  else index = Math.max(0, Math.min(days.length - 1, index + (event.key === "ArrowRight" ? 1 : -1)));
++  S.selectedDay = days[index].day;
++  renderChecklist();
++  scrollRailTo(S.selectedDay, true);
++  const selected = $(`#mg-rail [data-day="${S.selectedDay}"]`);
++  if (selected) selected.focus();
++});
+ 
+ load().then(() => S.data && scrollRailTo(S.selectedDay, false));

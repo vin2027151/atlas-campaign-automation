@@ -17,7 +17,7 @@ const S = {
   lastSeenTs: null,
 };
 
-const COLS = 14;
+const COLS = 10;
 const fmtBudget = (v) => fmt.money(v);
 
 // ------------------------------------------------------------------ data
@@ -66,6 +66,8 @@ function render() {
 function renderSummary() {
   const s = S.summary;
   if (!s) return;
+  const pendingNeg = S.campaigns.reduce((sum, c) => sum + (c.recommended_negatives || 0), 0);
+  const negCampaigns = S.campaigns.filter((c) => c.recommended_negatives).length;
   const plat = (pl, label) => {
     const p = s.platforms[pl];
     const pct = p.pct_of_target || 0;
@@ -84,8 +86,8 @@ function renderSummary() {
       <div class="kpi-sub">${s.legacy} legacy in the account</div></div>
     ${plat("google", "Google")}
     ${plat("meta", "Meta")}
-    <div class="kpi"><div class="kpi-label">Changes this session</div><div class="kpi-value num">${fmt.int(s.changes_this_session)}</div>
-      <div class="kpi-sub" title="Activity entries since the server started (${esc(s.session_start)})">since ${esc(fmt.datetime(s.session_start))}</div></div>`;
+    <div class="kpi"><div class="kpi-label">Negative keywords to review</div><div class="kpi-value num ${pendingNeg ? "tone-watch" : "tone-good"}">${fmt.int(pendingNeg)}</div>
+      <div class="kpi-sub">recommended search terms not yet negated${negCampaigns ? ` &middot; ${negCampaigns} campaign${negCampaigns === 1 ? "" : "s"}` : ""}</div></div>`;
 }
 
 function renderCounts() {
@@ -123,24 +125,26 @@ function renderTable() {
   }
   body.innerHTML = rows.map((c) => {
     const open = S.open.has(c.id);
-    const recs = c.recommended_negatives ? ` <span class="tag" title="Recommended negatives waiting">${c.recommended_negatives} neg</span>` : "";
+    const thin = c.trials_7d < 3 ? `<div class="caveat">${c.trials_7d === 0 ? "0 trials: CPT undefined" : `n=${c.trials_7d}: thin read`}</div>` : "";
+    const negatives = c.platform !== "google"
+      ? `<span class="muted" title="Meta has no search terms">n/a</span>`
+      : c.recommended_negatives
+        ? `<button class="btn btn-sm" type="button" data-review-neg="${esc(c.id)}" aria-label="Review ${c.recommended_negatives} recommended negatives for ${esc(c.name)}">${c.recommended_negatives} recommendation${c.recommended_negatives === 1 ? "" : "s"}</button>`
+        : `<span class="tone-good">None pending</span>`;
     const main = `<tr class="${c.status === "PAUSED" ? "is-paused" : ""}${open ? " is-open" : ""}" data-cid="${esc(c.id)}">
       <td>${platformChip(c.platform)}</td>
-      <td class="name">${esc(c.name)}${c.legacy ? ' <span class="tag">legacy</span>' : ""}${recs}</td>
-      <td>${esc(c.country)}</td>
-      <td>${esc(c.type)}</td>
+      <td class="name">${esc(c.name)}${c.legacy ? ' <span class="tag">legacy</span>' : ""}
+        <div class="small muted cmp-meta">${esc(c.country)} &middot; ${esc(c.type)} &middot; ${esc(c.bid_strategy)} &middot; started ${fmt.date(c.start_date)}</div></td>
       <td>${badge(c.status)}</td>
       <td class="num" data-budget-cell="${esc(c.id)}"><button class="budget-btn" data-budget="${esc(c.id)}" title="Click to edit daily budget">${fmtBudget(c.daily_budget)}</button></td>
-      <td class="num muted" title="Derived: daily x days in month">${fmt.money(c.monthly_budget)}</td>
       <td class="num">${fmt.money(c.spend_7d)}</td>
       <td class="num">${fmt.int(c.trials_7d)}</td>
-      <td class="num ${cptTone(c.cpt_7d, S.cpa)}">${fmt.cpt(c.cpt_7d)}</td>
+      <td class="num ${cptTone(c.cpt_7d, S.cpa)}" title="${fmt.money(c.spend_7d)} divided by ${fmt.int(c.trials_7d)} trials">${fmt.cpt(c.cpt_7d)}${thin}</td>
       <td class="num ${cptTone(c.cpt_3d, S.cpa)}">${fmt.cpt(c.cpt_3d)}</td>
-      <td class="bid" title="${esc(c.bid_strategy)}">${esc(c.bid_strategy)}</td>
-      <td class="muted">${fmt.date(c.start_date)}</td>
+      <td>${negatives}</td>
       <td class="actions"><span class="row-actions">
         ${statusBtn("campaign", c.id, c.status, c.name)}
-        <button class="btn btn-sm expand-btn" data-expand="${esc(c.id)}" aria-expanded="${open}">${open ? "Close" : "Expand"}</button>
+        <button class="btn btn-sm expand-btn" data-expand="${esc(c.id)}" aria-expanded="${open}" aria-label="${open ? "Close" : "Expand"} ${esc(c.name)}">${open ? "Close" : "Expand"}</button>
       </span></td></tr>`;
     return main + (open ? `<tr class="panel-row"><td colspan="${COLS}">${panelHtml(c)}</td></tr>` : "");
   }).join("");
@@ -333,6 +337,16 @@ function wire() {
     const t = e.target;
     const budget = t.closest("[data-budget]");
     if (budget) return startBudgetEdit(budget);
+    const reviewNeg = t.closest("[data-review-neg]");
+    if (reviewNeg) {
+      const id = reviewNeg.dataset.reviewNeg;
+      S.open.add(id);
+      S.panelTab[id] = "terms";
+      renderTable();
+      await loadDetail(id);
+      renderTable();
+      return;
+    }
     const exp = t.closest("[data-expand]");
     if (exp) {
       const id = exp.dataset.expand;
@@ -372,8 +386,41 @@ function wire() {
   });
 }
 
+// Deep link: /campaigns#<campaign_id> clears filters, opens and scrolls to it.
+async function openFromHash({ smooth = true } = {}) {
+  let id = window.location.hash.replace(/^#/, "");
+  try { id = decodeURIComponent(id); } catch (_) { /* keep raw */ }
+  if (!id) return;
+  if (!S.campaigns.find((c) => c.id === id)) {
+    toast(`Campaign "${id}" is not in the current account state.`, "warn");
+    return;
+  }
+  S.platform = "all";
+  S.filters.clear();
+  S.q = "";
+  $("#cmp-search").value = "";
+  $$("#cmp-platform-tabs .tab").forEach((tab) => {
+    const on = tab.dataset.platform === "all";
+    tab.classList.toggle("active", on);
+    tab.setAttribute("aria-selected", on);
+  });
+  $$(".fchip").forEach((chip) => chip.setAttribute("aria-pressed", "false"));
+  S.open.add(id);
+  render();
+  if (!S.details[id]) await loadDetail(id);
+  render();
+  const row = $(`#cmp-body tr[data-cid="${CSS.escape(id)}"]`);
+  if (row) {
+    // First load: "auto" (follows the page scroll-behavior); in-page hashchange: smooth.
+    row.scrollIntoView({ block: "center", behavior: smooth ? "smooth" : "auto" });
+    const expand = row.querySelector("[data-expand]");
+    if (expand) expand.focus({ preventScroll: true });
+  }
+}
+
 wire();
-loadAll().catch((e) => {
+window.addEventListener("hashchange", () => { openFromHash().catch((e) => toast(e.message, "error")); });
+loadAll().then(() => openFromHash({ smooth: false }).catch((e) => toast(e.message, "error")), (e) => {
   toast(e.message, "error");
   $("#cmp-body").innerHTML = `<tr><td colspan="${COLS}" class="table-empty">Could not load campaigns: ${esc(e.message)}</td></tr>`;
 });

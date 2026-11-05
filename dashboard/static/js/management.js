@@ -1,7 +1,7 @@
 // Management page: the media buyer's morning cockpit.
 // One GET (/api/management/) renders every section; checklist toggles and new
 // lessons update the UI immediately, then reconcile with the server response.
-import { api, fmt, toast, esc, badge, cptTone, platformChip, $ } from "/static/js/common.js";
+import { api, fmt, toast, esc, badge, cptTone, platformChip, confirmButton, $, $$ } from "/static/js/common.js";
 
 const S = { data: null, selectedDay: null, tag: null, newLesson: null };
 const TONE_BADGE = { good: "good", watch: "watch", bad: "bad", idle: "idle" };
@@ -72,7 +72,7 @@ function renderChecklist() {
     const pct = d.total ? Math.round((d.done / d.total) * 100) : 0;
     const open = d.when === "past" && d.done < d.total;
     const cls = ["mg-day", d.when, open ? "has-open" : "", d.day === S.selectedDay ? "selected" : ""].join(" ");
-    return `<button type="button" class="${cls}" data-day="${d.day}" role="option" aria-selected="${d.day === S.selectedDay}"
+    return `<button type="button" class="${cls}" data-day="${d.day}" role="option" aria-selected="${d.day === S.selectedDay}" tabindex="${d.day === S.selectedDay ? 0 : -1}"
       title="Day ${d.day}, ${esc(fmt.date(d.date, { dow: true }))}: ${d.done} of ${d.total} done${d.when === "today" ? " (today)" : ""}">
       <span class="d-date">${d.when === "today" ? "Today" : esc(fmt.date(d.date))}</span>
       <span class="d-num">${d.day}</span>
@@ -165,6 +165,9 @@ async function toggleItem(input) {
 }
 
 // ------------------------------------------------------------- 3. in play
+// "+10% / day": current daily budget x 1.10, rounded to cents.
+const scaledBudget = (v) => Math.round(Number(v || 0) * 110) / 100;
+
 function readPill(read, why) {
   return `<span class="read ${esc(read)}" title="${esc(why + " Rule: " + S.data.in_play.rule.reads[read])}">${esc(read)}</span>`;
 }
@@ -172,6 +175,7 @@ function readPill(read, why) {
 function renderInPlay() {
   const ip = S.data.in_play;
   const band = S.data.band;
+  const minTrials = Number(ip.rule.min_trials) || 3;
   $("#mg-read-counts").innerHTML = ["scaling", "holding", "watching", "failing"].map((r) =>
     `<span class="read ${r}" title="${esc(ip.rule.reads[r])}"><span class="n">${ip.counts[r]}</span> ${r}</span>`).join("");
   const rows = [];
@@ -179,22 +183,35 @@ function renderInPlay() {
     const t = g.totals;
     rows.push(`<tr class="mg-group-row"><td>${platformChip(g.platform)} ${esc(g.label)} <span class="muted">&middot; ${g.campaigns.length} active</span></td>
       <td class="num">${fmt.money(t.daily_budget)}</td><td class="num">${fmt.money(t.spend_7d)}</td>
-      <td class="num ${cptTone(t.cpt_7d, band)}">${fmt.cpt(t.cpt_7d)}</td><td class="num">${fmt.int(t.trials_7d)}</td><td></td><td></td></tr>`);
-    if (!g.campaigns.length) rows.push(`<tr><td colspan="7" class="muted">No active campaigns.</td></tr>`);
+      <td class="num ${cptTone(t.cpt_7d, band)}">${fmt.cpt(t.cpt_7d)}</td><td class="num">${fmt.int(t.trials_7d)}</td><td></td><td></td><td></td></tr>`);
+    if (!g.campaigns.length) rows.push(`<tr><td colspan="8" class="muted">No active campaigns.</td></tr>`);
     g.campaigns.forEach((c) => {
       const tags = [c.legacy ? `<span class="tag" title="Legacy campaign running at reduced budget alongside the new build">legacy</span>` : "",
         c.country && c.country !== "US" ? `<span class="tag">${esc(c.country)}</span>` : ""].join("");
+      const n = Number(c.trials_7d) || 0;
+      const thin = n < minTrials ? `<div class="caveat">${n === 0 ? "0 trials: CPT undefined" : `n=${n}: thin read`}</div>` : "";
+      const scaleTo = scaledBudget(c.daily_budget);
       rows.push(`<tr>
         <td class="mg-camp">${platformChip(c.platform)} ${campLink(c.id, c.name)}${tags} <span class="muted small">${esc(c.type || "")}</span></td>
         <td class="num">${fmt.money(c.daily_budget)}</td>
         <td class="num">${fmt.money(c.spend_7d)}</td>
-        <td class="num strong ${cptTone(c.cpt_7d, band)}">${fmt.cpt(c.cpt_7d)}</td>
+        <td class="num strong mg-cpt ${cptTone(c.cpt_7d, band)}" title="${esc(`${fmt.money(c.spend_7d)} over ${n} PostHog trial${n === 1 ? "" : "s"}`)}">${fmt.cpt(c.cpt_7d)}${thin}</td>
         <td class="num">${fmt.int(c.trials_7d)}</td>
         <td>${readPill(c.read, c.why)}</td>
-        <td class="mg-why">${esc(c.why)}</td></tr>`);
+        <td class="mg-why">${esc(c.why)}</td>
+        <td class="actions"><span class="mg-row-actions">
+          ${c.read === "scaling" ? `<button class="btn btn-sm" type="button" data-mg-scale="${esc(c.id)}" aria-label="${esc(`+10% / day for ${c.name}`)}" title="${esc(`Raise daily budget from ${fmt.money(c.daily_budget)} to ${fmt.money(scaleTo)}`)}">+10% / day</button>` : ""}
+          <button class="btn btn-sm btn-danger" type="button" data-mg-pause="${esc(c.id)}" data-name="${esc(c.name)}" data-confirm-label="Confirm pause?" aria-label="${esc(`Pause ${c.name}`)}">Pause</button>
+          <a class="btn btn-sm btn-ghost" href="/campaigns#${encodeURIComponent(c.id)}" aria-label="${esc(`Controls for ${c.name}`)}">Controls</a>
+        </span></td></tr>`);
     });
   });
   $("#mg-inplay-body").innerHTML = rows.join("");
+  $$("#mg-inplay-body [data-mg-pause]").forEach((button) => confirmButton(button, async (el) => {
+    await api(`/api/campaigns/${encodeURIComponent(el.dataset.mgPause)}/status`, { body: { status: "PAUSED" } });
+    toast(`${el.dataset.name} paused`);
+    await load({ quiet: true });
+  }));
 
   const paused = ip.paused;
   const det = $("#mg-paused");
@@ -354,5 +371,41 @@ $("#mg-lesson-text").addEventListener("keydown", (ev) => {
   if (ev.key === "Enter" && (ev.metaKey || ev.ctrlKey)) submitLesson(ev);
 });
 $("#mg-refresh").addEventListener("click", async () => { await load({ quiet: true }); toast("Refreshed", "info"); });
+
+$("#mg-inplay").addEventListener("click", async (ev) => {
+  const button = ev.target.closest("[data-mg-scale]");
+  if (!button || button.disabled) return;
+  const id = button.dataset.mgScale;
+  const campaign = S.data.in_play.groups.flatMap((g) => g.campaigns).find((c) => String(c.id) === id);
+  if (!campaign || campaign.read !== "scaling") return;
+  const next = scaledBudget(campaign.daily_budget);
+  if (!(next > 0)) return;
+  button.disabled = true; button.classList.add("is-busy");
+  try {
+    await api(`/api/campaigns/${encodeURIComponent(id)}/budget`, { body: { daily_budget: next } });
+    toast(`${campaign.name}: daily budget ${fmt.money(campaign.daily_budget)} → ${fmt.money(next)}`);
+    await load({ quiet: true });
+  } catch (e) {
+    toast("Could not scale budget: " + e.message, "error");
+    button.disabled = false; button.classList.remove("is-busy");
+  }
+});
+
+// Listbox keyboard: arrows move the selection, Home/End jump to the ends.
+$("#mg-rail").addEventListener("keydown", (ev) => {
+  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(ev.key) || !S.data) return;
+  const days = S.data.checklist.days;
+  if (!days.length) return;
+  ev.preventDefault();
+  let i = days.findIndex((d) => d.day === S.selectedDay);
+  if (ev.key === "Home") i = 0;
+  else if (ev.key === "End") i = days.length - 1;
+  else i = Math.max(0, Math.min(days.length - 1, i + (ev.key === "ArrowRight" ? 1 : -1)));
+  S.selectedDay = days[i].day;
+  renderChecklist();
+  scrollRailTo(S.selectedDay, true);
+  const sel = $(`#mg-rail [data-day="${S.selectedDay}"]`);
+  if (sel) sel.focus({ preventScroll: true });
+});
 
 load().then(() => S.data && scrollRailTo(S.selectedDay, false));

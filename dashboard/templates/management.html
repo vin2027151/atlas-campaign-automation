@@ -70,9 +70,13 @@
   .mg-camp a { color: var(--ink); font-weight: 500; }
   .mg-camp a:hover { color: var(--accent); }
   .mg-camp .tag { margin-left: 4px; }
-  .mg-why { color: var(--muted); font-size: var(--fs-sm); white-space: normal; min-width: 200px; }
+  .table td.mg-why { color: var(--muted); font-size: var(--fs-sm); white-space: normal; min-width: 180px; }
+  .table td.mg-camp { white-space: normal; min-width: 220px; }
+  #mg-inplay thead th { white-space: normal; vertical-align: bottom; }
   .mg-rule { margin: 0; padding: var(--s3) var(--s4); display: grid; grid-template-columns: max-content 1fr; gap: 6px var(--s3); font-size: var(--fs-sm); color: var(--ink-2); }
   .mg-rule dd { margin: 0; }
+  .mg-row-actions { display: inline-flex; gap: 4px; align-items: center; justify-content: flex-end; white-space: nowrap; }
+  .mg-cpt .caveat { white-space: nowrap; }
   details.mg-fold > summary { cursor: pointer; list-style: none; padding: var(--s2) var(--s4); color: var(--ink-2); font-size: var(--fs-sm); font-weight: 500; border-top: 1px solid var(--line); }
   details.mg-fold > summary::-webkit-details-marker { display: none; }
   details.mg-fold > summary::before { content: "\25B8"; display: inline-block; width: 14px; color: var(--muted); }
@@ -163,6 +167,21 @@
   <div class="mg-loading"><div class="skeleton" style="width:220px"></div></div>
 </section>
 
+<section class="card" id="mg-inplay" aria-labelledby="mg-inplay-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-inplay-title">In play</h2><span class="card-sub">active campaigns, trailing 7 days</span></div>
+    <div class="mg-reads" id="mg-read-counts"></div>
+  </div>
+  <div class="table-wrap">
+    <table class="table compact">
+      <thead><tr><th>Campaign</th><th class="num">Budget / day</th><th class="num">Spend (7d)</th><th class="num">Cost / trial (7d)</th><th class="num">PostHog trials (7d)</th><th>Read</th><th>Evidence</th><th class="actions"><span class="sr-only">Actions</span></th></tr></thead>
+      <tbody id="mg-inplay-body"><tr><td colspan="8" class="table-empty">Loading&hellip;</td></tr></tbody>
+    </table>
+  </div>
+  <details class="mg-fold" id="mg-paused"><summary>Paused campaigns</summary><div id="mg-paused-body"></div></details>
+  <details class="mg-fold"><summary>How the read is computed</summary><dl class="mg-rule" id="mg-rule"></dl></details>
+</section>
+
 <section class="card" id="mg-checklist" aria-labelledby="mg-checklist-title">
   <div class="card-head">
     <div class="mg-section-title"><h2 class="card-title" id="mg-checklist-title">Daily checklist</h2><span class="card-sub" id="mg-checklist-sub"></span></div>
@@ -179,21 +198,6 @@
       <ul class="mg-items" id="mg-carry"></ul>
     </div>
   </div>
-</section>
-
-<section class="card" id="mg-inplay" aria-labelledby="mg-inplay-title">
-  <div class="card-head">
-    <div class="mg-section-title"><h2 class="card-title" id="mg-inplay-title">In play</h2><span class="card-sub">active campaigns, trailing 7 days</span></div>
-    <div class="mg-reads" id="mg-read-counts"></div>
-  </div>
-  <div class="table-wrap">
-    <table class="table compact">
-      <thead><tr><th>Campaign</th><th class="num">Daily budget</th><th class="num">7d spend</th><th class="num">7d CPT</th><th class="num">Trials 7d</th><th>Read</th><th>Why</th></tr></thead>
-      <tbody id="mg-inplay-body"><tr><td colspan="7" class="table-empty">Loading&hellip;</td></tr></tbody>
-    </table>
-  </div>
-  <details class="mg-fold" id="mg-paused"><summary>Paused campaigns</summary><div id="mg-paused-body"></div></details>
-  <details class="mg-fold"><summary>How the read is computed</summary><dl class="mg-rule" id="mg-rule"></dl></details>
 </section>
 
 <section class="card" id="mg-tests" aria-labelledby="mg-tests-title">

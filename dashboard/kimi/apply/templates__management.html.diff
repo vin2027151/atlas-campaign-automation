@@ -1,0 +1,15 @@
+--- a/templates/management.html
++++ b/templates/management.html
+@@ -116,9 +116,9 @@
+   <div class="table-wrap">
+     <table class="table compact">
+-      <thead><tr><th>Campaign</th><th class="num">Daily budget</th><th class="num">7d spend</th><th class="num">7d CPT</th><th class="num">Trials 7d</th><th>Read</th><th>Why</th></tr></thead>
+-      <tbody id="mg-inplay-body"><tr><td colspan="7" class="table-empty">Loading&hellip;</td></tr></tbody>
++      <thead><tr><th>Campaign</th><th class="num">Budget / day</th><th class="num">Spend (7d)</th><th class="num">Cost / trial (7d)</th><th class="num">PostHog trials (7d)</th><th>Read</th><th>Evidence</th><th class="actions">Actions</th></tr></thead>
++      <tbody id="mg-inplay-body"><tr><td colspan="8" class="table-empty">Loading&hellip;</td></tr></tbody>
+     </table>
+   </div>
+@@ -128,6 +128,7 @@
+ <section class="card" id="mg-tests" aria-labelledby="mg-tests-title">
++  <span id="mg-tests-anchor"></span>
+   <div class="card-head">

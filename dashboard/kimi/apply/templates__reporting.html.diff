@@ -1,0 +1,11 @@
+--- a/templates/reporting.html
++++ b/templates/reporting.html
+@@ -78,7 +78,7 @@
+     body { background: #fff; font-size: 11px; display: block; min-height: 0; }
+-    .topbar, .footer, .page-actions, .toast-stack { display: none !important; }
++    .sidebar, .footer, .page-actions, .toast-stack, .theme-toggle { display: none !important; }
+@@ -111,7 +111,7 @@
+ <section class="grid kpi-grid rp-kpis" id="rp-kpis" aria-label="Headline numbers">
+-  {% for i in range(8) %}<div class="kpi"><div class="skeleton" style="height:58px"></div></div>{% endfor %}
++  {% for i in range(4) %}<div class="kpi"><div class="skeleton" style="height:58px"></div></div>{% endfor %}
+ </section>

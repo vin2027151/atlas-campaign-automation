@@ -1,4 +1,4 @@
-// Calendar page: content pipeline board, month calendar, next-14-days list, tests panel.
+// Calendar page: action queue, content pipeline board, month calendar, next-14-days list, tests panel.
 import { api, fmt, toast, badge, platformChip, esc, $, $$, tabs, modal, withBusy, parseDate, isoDate } from "/static/js/common.js";
 
 const API = "/api/calendar";
@@ -20,9 +20,11 @@ async function load() {
   } catch (e) {
     toast("Could not load calendar: " + e.message, "error");
     $("#board").innerHTML = `<div class="empty">Could not load the calendar.</div>`;
+    $("#cal-action-list").innerHTML = `<div class="action-empty">Could not load the action queue: ${esc(e.message)}</div>`;
     return;
   }
   renderSummary();
+  renderActionQueue();
   renderBoard();
   renderCalendar();
   renderTests();
@@ -34,6 +36,59 @@ function renderSummary() {
   const ov = c.overdue ? `<span class="tone-bad"><b>${c.overdue}</b> overdue</span> · ` : "";
   $("#cal-summary").innerHTML = `${ov}<b>${c.by_status.running}</b> running · <b>${c.by_status.pending_feedback}</b> waiting on Vin · <b>${c.by_status.final_pending_approval}</b> awaiting approval · <b>${c.tests_running}</b> tests live`;
 }
+
+function renderActionQueue() {
+  const actions = [];
+  const seen = new Set();
+  data.overdue.forEach((item) => {
+    seen.add(item.id);
+    actions.push({ item, kind: "Overdue", tone: "bad", approve: item.status === "final_pending_approval" });
+  });
+  data.content.filter((item) => item.status === "final_pending_approval" && !seen.has(item.id)).forEach((item) => {
+    seen.add(item.id);
+    actions.push({ item, kind: "Final approval", tone: "watch", approve: true });
+  });
+  data.content.filter((item) => item.status === "pending_feedback" && !seen.has(item.id)).forEach((item) => {
+    actions.push({ item, kind: "Vin feedback", tone: "watch", approve: false });
+  });
+  const nFinal = data.counts.by_status.final_pending_approval;
+  $("#cal-action-sub").textContent = `${data.overdue.length} overdue · ${nFinal} final approval${nFinal === 1 ? "" : "s"} · ${data.counts.by_status.pending_feedback} feedback`;
+  if (!actions.length) {
+    $("#cal-action-list").innerHTML = `<div class="action-empty">Nothing overdue or waiting for review. Use the board to inspect scheduled and running work.</div>`;
+    return;
+  }
+  const shown = actions.slice(0, 8);
+  const more = actions.length - shown.length;
+  $("#cal-action-list").innerHTML = `<ul class="action-list">${shown.map(({ item, kind, tone, approve }) => `
+    <li class="action-item">
+      ${badge(tone, kind)}
+      <div class="action-copy">
+        <div class="action-title">${platformChip(item.platform)} ${esc(item.name)}</div>
+        <div class="action-meta">${esc(item.owner)} · due ${esc(fmt.date(item.due))} · ${esc(item.format)} / ${esc(item.segment)}${item.campaign_name ? ` · ${esc(item.campaign_name)}` : ""}</div>
+      </div>
+      <div class="action-controls">
+        ${approve ? `<button class="btn btn-sm btn-primary" type="button" data-cal-approve="${esc(item.id)}">Approve</button>` : ""}
+        <button class="btn btn-sm" type="button" data-cal-open="${esc(item.id)}">Open on board</button>
+      </div>
+    </li>`).join("")}</ul>${more > 0 ? `<div class="action-empty">${more} more on the board.</div>` : ""}`;
+}
+
+$("#cal-actions").addEventListener("click", async (event) => {
+  const approve = event.target.closest("[data-cal-approve]");
+  if (approve) {
+    await moveItem(approve.dataset.calApprove, "approved", approve);
+    return;
+  }
+  const open = event.target.closest("[data-cal-open]");
+  if (!open) return;
+  tabsCtl.select("board");
+  const card = $(`.ccard[data-id="${CSS.escape(open.dataset.calOpen)}"]`);
+  if (card) {
+    card.scrollIntoView({ block: "center", behavior: "smooth" });
+    const edit = card.querySelector("[data-edit]");
+    if (edit) edit.focus({ preventScroll: true });
+  }
+});
 
 // ------------------------------------------------------------------ board
 function cardHtml(item) {

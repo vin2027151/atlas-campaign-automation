@@ -30,7 +30,7 @@ PAGES = [
      "The November launch checklist, content pipeline and test schedule by day."),
     ("reporting", "/reporting", "Reporting", "Reporting",
      "Cost per trial and paid conversion by campaign, PostHog truth vs platform claims."),
-    ("management", "/management", "Management", "Tests & lessons",
+    ("management", "/management", "Management", "Management",
      "Running tests against their benchmarks, results, and the lessons log."),
     ("campaigns", "/campaigns", "Campaigns", "Campaigns",
      "Campaigns, ad sets and ads: pause, resume, budgets, search terms and negatives."),

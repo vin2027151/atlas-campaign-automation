@@ -6,6 +6,16 @@
   <meta name="color-scheme" content="dark light">
   <title>{% block title %}{{ title }}{% endblock %} · Advertising Command Center</title>
   <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("atlas.theme");
+        /* Brand default is dark (searchatlas.com); a saved choice wins. */
+        document.documentElement.setAttribute("data-theme", (saved === "light" || saved === "dark") ? saved : "dark");
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+    })();
+  </script>
+  <script type="module" src="/static/js/preloader.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap">
@@ -26,9 +36,13 @@
         <span class="brand-title-main">Advertising Command Center</span>
         <span class="brand-title-by">by Vincent J. Guarino III</span>
       </div>
-      <button class="sidebar-toggle" id="sidebar-toggle" aria-expanded="false" aria-controls="sidebar-nav" aria-label="Open navigation">
-        <span></span><span></span><span></span>
-      </button>
+      <span class="pill pill-sample mobile-sample" title="Every number is generated sample data; no ad account is connected.">Sample data</span>
+      <div class="sidebar-tools">
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch color theme" title="Switch color theme">◐</button>
+        <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-expanded="false" aria-controls="sidebar-nav" aria-label="Open navigation">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
 
     <nav class="sidebar-nav" id="sidebar-nav" aria-label="Pages">
@@ -48,7 +62,7 @@
   </aside>
 
   <div class="shell">
-    <main class="main" id="main">
+    <main class="main" id="main" tabindex="-1">
       {% block header %}
       <div class="page-head">
         <div>
@@ -71,16 +85,76 @@
   </div>
 
   <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
   <script>
     (function () {
-      var t = document.getElementById('sidebar-toggle'), s = document.getElementById('sidebar');
-      if (!t || !s) return;
-      t.addEventListener('click', function () {
-        var open = s.classList.toggle('open');
-        t.setAttribute('aria-expanded', open ? 'true' : 'false');
-        t.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+      var toggle = document.getElementById("sidebar-toggle");
+      var sidebar = document.getElementById("sidebar");
+      var nav = document.getElementById("sidebar-nav");
+
+      function setNav(open) {
+        if (!toggle || !sidebar) return;
+        sidebar.classList.toggle("open", open);
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+      }
+
+      if (toggle && sidebar) {
+        toggle.addEventListener("click", function () {
+          setNav(!sidebar.classList.contains("open"));
+        });
+      }
+      if (nav) {
+        nav.addEventListener("click", function (event) {
+          if (event.target.closest("a")) setNav(false);
+        });
+      }
+
+      var themeButton = document.getElementById("theme-toggle");
+      function currentTheme() {
+        var explicit = document.documentElement.getAttribute("data-theme");
+        if (explicit === "light" || explicit === "dark") return explicit;
+        return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      function updateThemeLabel() {
+        if (!themeButton) return;
+        var next = currentTheme() === "dark" ? "light" : "dark";
+        themeButton.setAttribute("aria-label", "Switch to " + next + " theme");
+        themeButton.setAttribute("title", "Switch to " + next + " theme");
+      }
+      if (themeButton) {
+        updateThemeLabel();
+        themeButton.addEventListener("click", function () {
+          var next = currentTheme() === "dark" ? "light" : "dark";
+          document.documentElement.setAttribute("data-theme", next);
+          try { localStorage.setItem("atlas.theme", next); } catch (e) { /* non-fatal */ }
+          updateThemeLabel();
+          if (window.atlas && window.atlas.chartDefaults) window.atlas.chartDefaults();
+          if (window.Chart && window.Chart.instances) {
+            Object.values(window.Chart.instances).forEach(function (chart) { chart.update("none"); });
+          }
+        });
+      }
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") setNav(false);
       });
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { s.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); } });
+
+      /* Arrow-key behavior for every tab list, including platform filters. */
+      document.addEventListener("keydown", function (event) {
+        var tab = event.target.closest && event.target.closest('[role="tablist"] .tab');
+        if (!tab || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        var list = Array.from(tab.closest('[role="tablist"]').querySelectorAll(".tab:not(:disabled)"));
+        var index = list.indexOf(tab);
+        if (index < 0 || !list.length) return;
+        event.preventDefault();
+        var nextIndex;
+        if (event.key === "Home") nextIndex = 0;
+        else if (event.key === "End") nextIndex = list.length - 1;
+        else nextIndex = (index + (event.key === "ArrowRight" ? 1 : -1) + list.length) % list.length;
+        list[nextIndex].focus();
+        list[nextIndex].click();
+      });
     })();
   </script>
   {% block scripts %}{% endblock %}

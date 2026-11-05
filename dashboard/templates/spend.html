@@ -12,7 +12,7 @@
   .split-legend { display: flex; justify-content: space-between; gap: var(--s3); margin-top: var(--s2); font-size: var(--fs-sm); color: var(--ink-2); flex-wrap: wrap; }
   .plat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .plat-card .card-head { min-height: 40px; }
-  .plat-stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s3); }
+  .plat-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: var(--s3); }
   .plat-stat .kpi-label { font-size: var(--fs-xs); }
   .plat-stat .stat-value { font-size: var(--fs-lg); font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
   .plat-card .card-foot { display: flex; justify-content: space-between; gap: var(--s2); flex-wrap: wrap; }
@@ -51,9 +51,6 @@
     .funnel-step { flex-direction: row; gap: var(--s2); min-width: 0; }
     .funnel-step .arrow { transform: rotate(90deg); }
   }
-  @media (max-width: 640px) {
-    .plat-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  }
 </style>
 {% endblock %}
 
@@ -77,12 +74,32 @@
   <div class="card"><div class="card-body"><div class="skeleton"></div></div></div>
 </section>
 
-<section class="card" aria-labelledby="funnel-title">
+<section class="card" aria-labelledby="table-title">
   <div class="card-head">
-    <h2 class="card-title" id="funnel-title">Account funnel <span class="card-sub" id="funnel-sub"></span></h2>
+    <h2 class="card-title" id="table-title">Campaigns <span class="card-sub" id="table-sub"></span></h2>
+    <span class="card-sub">Click a header to sort, a row to see its ad sets</span>
   </div>
-  <div class="card-body"><div class="funnel" id="funnel"></div></div>
-  <div class="card-foot" id="funnel-note"></div>
+  <div class="table-wrap">
+    <table class="table" id="camp-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="sortable" data-key="name">Campaign</th>
+          <th class="sortable" data-key="status">Status</th>
+          <th class="sortable num" data-key="daily_budget">Budget / day</th>
+          <th class="sortable num" data-key="spend">Spend (window)</th>
+          <th class="sortable num" data-key="trials">PostHog trials</th>
+          <th class="sortable num monitor-head" data-key="cpt_3d" title="Trailing 3 days ending today, whatever the window">Cost / trial (3d)</th>
+          <th class="sortable num" data-key="cpt_7d" title="Trailing 7 days ending today">Cost / trial (7d)</th>
+          <th class="sortable num" data-key="paid">Paid</th>
+          <th class="sortable num" data-key="cost_per_paid">Cost / paid</th>
+          <th class="sortable num" data-key="platform_vs_posthog_pct" title="Platform-reported conversions, and as % of PostHog trials. Flagged outside 80-120%.">Platform conv. vs PostHog</th>
+        </tr>
+      </thead>
+      <tbody id="camp-body"><tr><td colspan="11" class="table-empty">Loading&hellip;</td></tr></tbody>
+    </table>
+  </div>
+  <div class="card-foot" id="table-note"></div>
 </section>
 
 <section class="card" aria-labelledby="daily-title">
@@ -101,35 +118,12 @@
   <div class="card-body"><div class="chart-box lg"><canvas id="cpt-chart" aria-label="Rolling 3-day cost per trial by campaign"></canvas></div></div>
 </section>
 
-<section class="card" aria-labelledby="table-title">
+<section class="card" aria-labelledby="funnel-title">
   <div class="card-head">
-    <h2 class="card-title" id="table-title">Campaigns <span class="card-sub" id="table-sub"></span></h2>
-    <span class="card-sub">Click a header to sort, a row to see its ad sets</span>
+    <h2 class="card-title" id="funnel-title">Account funnel <span class="card-sub" id="funnel-sub"></span></h2>
   </div>
-  <div class="table-wrap">
-    <table class="table" id="camp-table">
-      <thead>
-        <tr>
-          <th></th>
-          <th class="sortable" data-key="name">Campaign</th>
-          <th class="sortable" data-key="country">Country</th>
-          <th class="sortable" data-key="status">Status</th>
-          <th class="sortable num" data-key="daily_budget">Budget / day</th>
-          <th class="sortable num" data-key="spend">Spend</th>
-          <th class="sortable num" data-key="spend_per_day">Spend / day</th>
-          <th class="sortable num" data-key="trials">Trials</th>
-          <th class="sortable num monitor-head" data-key="cpt_3d" title="Trailing 3 days ending today, whatever the window">CPT 3d</th>
-          <th class="sortable num" data-key="cpt_7d" title="Trailing 7 days ending today">CPT 7d</th>
-          <th class="sortable num" data-key="paid">Paid</th>
-          <th class="sortable num" data-key="trial_to_paid">Trial&rarr;paid</th>
-          <th class="sortable num" data-key="cost_per_paid">Cost / paid</th>
-          <th class="sortable num" data-key="platform_vs_posthog_pct" title="Platform-reported conversions, and as % of PostHog trials. Flagged outside 80-120%.">Platform conv. vs PostHog</th>
-        </tr>
-      </thead>
-      <tbody id="camp-body"><tr><td colspan="14" class="table-empty">Loading&hellip;</td></tr></tbody>
-    </table>
-  </div>
-  <div class="card-foot" id="table-note"></div>
+  <div class="card-body"><div class="funnel" id="funnel"></div></div>
+  <div class="card-foot" id="funnel-note"></div>
 </section>
 {% endblock %}
 

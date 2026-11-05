@@ -1,0 +1,92 @@
+--- a/static/js/spend.js
++++ b/static/js/spend.js
+@@ -287,75 +287,71 @@
+   let html = "";
+   GROUPS.forEach((g) => {
+@@ -297,10 +297,9 @@
+     const t = sumRows(rows);
+     html += `<tr class="group-row${g.legacy ? " legacy" : ""}">
+-      <td colspan="4">${g.legacy ? "&#9888; " : ""}${esc(g.label)} · ${rows.length} campaign${rows.length === 1 ? "" : "s"}</td>
++      <td colspan="3">${g.legacy ? "&#9888; " : ""}${esc(g.label)} · ${rows.length} campaign${rows.length === 1 ? "" : "s"}</td>
+       <td class="num">${fmt.money(t.daily_budget)}</td>
+       <td class="num">${fmt.money(t.spend)}</td>
+-      <td class="num">${fmt.money(t.spend_per_day)}</td>
+       <td class="num">${fmt.int(t.trials)}</td>
+       <td class="num ${cptTone(t.cpt_3d, target)}">${fmt.cpt(t.cpt_3d)}</td>
+       <td class="num"></td>
+       <td class="num">${fmt.int(t.paid)}</td>
+-      <td class="num">${fmt.pct(t.trial_to_paid)}</td>
+       <td class="num">${fmt.cpt(t.cost_per_paid)}</td>
+       <td class="num">${fmt.int(t.platform_conversions)} · ${fmt.pct(t.ratio, 0)}</td>
+     </tr>`;
+@@ -308,27 +307,25 @@
+       const open = state.open.has(c.id);
+       const paused = c.status !== "ACTIVE";
++      const caveat = c.trials_3d < 3 ? `<div class="caveat">${c.trials_3d === 0 ? "0 trials in 3d" : `n=${c.trials_3d}: thin read`}</div>` : "";
+       html += `<tr class="camp-row${c.legacy ? " legacy" : ""}${open ? " is-open" : ""}${paused ? " is-paused" : ""}" data-id="${esc(c.id)}" tabindex="0" aria-expanded="${open}">
+         <td><span class="caret" aria-hidden="true">&#9656;</span> ${platformChip(c.platform)}</td>
+-        <td><span class="strong">${esc(c.name)}</span>${c.legacy ? '<span class="tag legacy-tag">legacy</span>' : ""}<div class="small muted">${esc(c.type)} · ${esc(c.bid_strategy || "")}${c.start_date && c.start_date > d.window.start ? ` · live ${fmt.date(c.start_date)}` : ""}</div></td>
+-        <td>${esc(c.country)}</td>
++        <td><span class="strong">${esc(c.name)}</span>${c.legacy ? '<span class="tag legacy-tag">legacy</span>' : ""}<div class="small muted">${esc(c.country)} · ${esc(c.type)} · ${esc(c.bid_strategy || "")}${c.start_date && c.start_date > d.window.start ? ` · live ${fmt.date(c.start_date)}` : ""}</div></td>
+         <td>${badge(c.status)}</td>
+         <td class="num">${fmt.money(c.daily_budget)}</td>
+-        <td class="num">${fmt.money(c.spend)}</td>
+-        <td class="num" title="${c.active_days} live day${c.active_days === 1 ? "" : "s"} in window">${fmt.money(c.spend_per_day)}</td>
++        <td class="num" title="${fmt.money(c.spend_per_day)} per live day across ${c.active_days} live day${c.active_days === 1 ? "" : "s"} in this window">${fmt.money(c.spend)}</td>
+         <td class="num">${fmt.int(c.trials)}</td>
+-        <td class="num monitor ${cptTone(c.cpt_3d, target)}" title="${fmt.money(c.spend_3d)} / ${c.trials_3d} trials, last 3 days">${fmt.cpt(c.cpt_3d)}</td>
++        <td class="num monitor ${cptTone(c.cpt_3d, target)}" title="${fmt.money(c.spend_3d)} / ${c.trials_3d} trials, last 3 days">${fmt.cpt(c.cpt_3d)}${caveat}</td>
+         <td class="num ${cptTone(c.cpt_7d, target)}">${fmt.cpt(c.cpt_7d)}</td>
+-        <td class="num">${fmt.int(c.paid)}</td>
+-        <td class="num">${fmt.pct(c.trial_to_paid)}</td>
++        <td class="num" title="Trial to paid: ${fmt.pct(c.trial_to_paid)}. Recent cohorts are still maturing.">${fmt.int(c.paid)}</td>
+         <td class="num">${fmt.cpt(c.cost_per_paid)}</td>
+         <td class="num" title="${fmt.int(c.platform_conversions)} platform-reported conversions vs ${c.trials} PostHog trials"><span class="muted">${fmt.int(c.platform_conversions)} ·</span> ${ratioCell(c, band)}</td>
+       </tr>`;
+@@ -336,7 +333,7 @@
+     });
+   });
+-  $("#camp-body").innerHTML = html || `<tr><td colspan="14" class="table-empty">No campaigns.</td></tr>`;
++  $("#camp-body").innerHTML = html || `<tr><td colspan="11" class="table-empty">No campaigns.</td></tr>`;
+@@ -345,9 +342,9 @@
+ 
+ function adsetRows(c, target) {
+-  if (!c.adsets.length) return `<tr class="adset-row"><td></td><td colspan="13" class="muted">No ad sets.</td></tr>`;
++  if (!c.adsets.length) return `<tr class="adset-row"><td></td><td colspan="10" class="muted">No ad sets.</td></tr>`;
+   const kind = c.adsets[0].kind || "ad set";
+-  let html = `<tr class="adset-row"><td></td><td colspan="13" class="small muted">${c.adsets.length} ${esc(kind)}${c.adsets.length === 1 ? "" : "s"} · window totals, estimated split by ${c.adsets[0].allocation === "budget_share" ? "ad set budget" : "even share (no ad group budgets)"}</td></tr>`;
++  let html = `<tr class="adset-row"><td></td><td colspan="10" class="small muted">${c.adsets.length} ${esc(kind)}${c.adsets.length === 1 ? "" : "s"} · window totals, estimated split by ${c.adsets[0].allocation === "budget_share" ? "ad set budget" : "even share (no ad group budgets)"}</td></tr>`;
+   c.adsets.forEach((a) => {
+@@ -356,17 +353,14 @@
+       <td></td>
+       <td class="adset-name"><span>${esc(a.name)}</span><div class="small muted truncate" title="${esc(a.targeting || "")}">${esc(a.targeting || "")}</div></td>
+-      <td class="muted">${esc(kind)}</td>
+       <td>${badge(a.status)}</td>
+       <td class="num">${a.daily_budget ? fmt.money(a.daily_budget) : fmt.none}</td>
+-      <td class="num">${fmt.money(a.spend)}</td>
+-      <td class="num muted">${fmt.pct(a.share_pct, 0)}</td>
++      <td class="num" title="${fmt.pct(a.share_pct, 0)} apportioned share">${fmt.money(a.spend)}</td>
+       <td class="num">${fmt.int(a.trials)}</td>
+       <td class="num"></td>
+       <td class="num"></td>
+       <td class="num">${fmt.int(a.paid)}</td>
+-      <td class="num">${fmt.pct(a.trial_to_paid)}</td>
+       <td class="num">${fmt.cpt(a.cost_per_paid)}</td>
+       <td class="num ${cptTone(a.cost_per_trial, target)}" title="Window cost per trial">${fmt.cpt(a.cost_per_trial)} / trial</td>
+@@ -410,5 +404,19 @@
+   });
+ }
+ 
++/* Put the operational monitor before exploratory charts; retain DOM/tab order. */
++(function orderSections() {
++  const table = $("#table-title").closest("section");
++  const funnel = $("#funnel-title").closest("section");
++  const daily = $("#daily-title").closest("section");
++  if (!table || !funnel || !daily) return;
++  const main = table.parentNode;
++  main.insertBefore(table, daily);
++  main.appendChild(funnel);
++})();
++
+ wire();
+ load(state.window);

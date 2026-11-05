@@ -1,0 +1,27 @@
+--- a/templates/calendar.html
++++ b/templates/calendar.html
+@@ -74,6 +74,9 @@
+   @media (max-width: 720px) {
++    #upcoming-card { order: -1; }
++    #cal-actions .action-controls { width: 100%; justify-content: flex-start; }
+     .board { grid-template-columns: minmax(0, 1fr); }
+@@ -157,6 +160,14 @@
+ </section>
+ 
++<section class="card" id="cal-actions" aria-labelledby="cal-actions-title">
++  <div class="card-head">
++    <h2 class="card-title" id="cal-actions-title">Needs action</h2>
++    <span class="card-sub" id="cal-action-sub">Overdue, final approvals and Vin feedback</span>
++  </div>
++  <div id="cal-action-list"><div class="card-body"><div class="skeleton" style="height:64px"></div></div></div>
++</section>
++
+ <section id="views">
+@@ -188,7 +199,7 @@
+-      <section class="card">
++      <section class="card" id="upcoming-card">
+         <div class="card-head"><h2 class="card-title">Next 14 days</h2><span class="card-sub" id="upcoming-range"></span></div>
+@@ -202,7 +213,7 @@
+ <section class="card" id="tests-card">
+-  <div class="card-head"><h2 class="card-title">Tests</h2><span class="card-sub">Benchmark, progress to the minimum read, and today's verdict</span></div>
++  <div class="card-head"><h2 class="card-title">Test schedule context</h2><a class="card-sub" href="/management#mg-tests">Full scoreboard and win/loss ledger in Management →</a></div>

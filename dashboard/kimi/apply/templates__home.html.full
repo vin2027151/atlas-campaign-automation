@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block subtitle %}
+<p class="page-sub">Morning brief for {{ today }}. Trials are PostHog-attributed signups; cost-per-trial decisions use the {{ "${:,.0f}".format(meta.cpa_target[0]) }}–{{ "${:,.0f}".format(meta.cpa_target[1]) }} target band.</p>
+{% endblock %}
+{% block content %}
+{% set cpa = meta.cpa_target %}
+<section class="grid kpi-grid" aria-label="Headline numbers">
+  <div class="kpi">
+    <div class="kpi-label">Cost / PostHog trial (7d)</div>
+    {% set c7 = kpis.cpt_7d %}
+    <div class="kpi-value num {% if c7 is none %}{% elif c7 <= cpa[1] %}tone-good{% elif c7 <= cpa[1] * 1.15 %}tone-watch{% else %}tone-bad{% endif %}">
+      {% if c7 is none %}&mdash;{% else %}{{ "${:,.0f}".format(c7) }}{% endif %}
+    </div>
+    <div class="kpi-sub">{{ kpis.trials_7d }} trials · target {{ "${:,.0f}".format(cpa[0]) }}–{{ "${:,.0f}".format(cpa[1]) }}</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">PostHog trials (MTD)</div>
+    <div class="kpi-value num">{{ "{:,}".format(kpis.trials_mtd) }}</div>
+    <div class="kpi-sub">{{ kpis.trials_7d }} in the trailing 7 days</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Spend, USD (MTD)</div>
+    <div class="kpi-value num">{{ "${:,.0f}".format(kpis.mtd_spend) }}</div>
+    <div class="kpi-sub">of {{ "${:,.0f}".format(kpis.monthly_budget) }} monthly budget</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Projected spend / budget</div>
+    {% set pp = kpis.pace_pct %}
+    <div class="kpi-value num {% if pp is none %}{% elif 95 <= pp <= 105 %}tone-good{% elif 90 <= pp <= 110 %}tone-watch{% else %}tone-bad{% endif %}">
+      {% if pp is none %}&mdash;{% else %}{{ "{:.1f}%".format(pp) }}{% endif %}
+    </div>
+    <div class="kpi-sub">{{ "${:,.0f}".format(kpis.projected) }} projected at the 7-day daily rate</div>
+  </div>
+</section>
+
+<div class="home-ops">
+  <section class="card" aria-labelledby="home-queue-title">
+    <div class="card-head">
+      <h2 class="card-title" id="home-queue-title">Needs a decision</h2>
+      <span class="card-sub" id="home-queue-sub">Checking account state…</span>
+    </div>
+    <div id="home-queue" aria-live="polite">
+      <div class="card-body"><div class="skeleton" style="height:180px"></div></div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="home-pacing-title">
+    <div class="card-head">
+      <h2 class="card-title" id="home-pacing-title">Pacing by platform</h2>
+      <span class="card-sub">day {{ kpis.days_elapsed }} of {{ kpis.days_in_month }}</span>
+    </div>
+    <div class="table-wrap">
+      <table class="table compact">
+        <thead>
+          <tr>
+            <th>Platform</th>
+            <th class="num">Spent MTD</th>
+            <th class="num">7d spend / day</th>
+            <th class="num">Projected</th>
+            <th class="num">Proj. / budget</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for pl, p in kpis.platforms.items() %}
+          <tr>
+            <td><span class="chip chip-{{ pl }}">{{ "G" if pl == "google" else "M" }}</span> {{ "Google" if pl == "google" else "Meta" }}</td>
+            <td class="num" title="Monthly budget {{ "${:,.0f}".format(p.monthly_budget) }}">{{ "${:,.0f}".format(p.month_to_date_spend) }}</td>
+            <td class="num">{{ "${:,.0f}".format(p.daily_rate_7d) }}</td>
+            <td class="num">{{ "${:,.0f}".format(p.projected_month_end) }}</td>
+            <td class="num">{% if p.pace_pct is none %}&mdash;{% else %}{{ "{:.1f}%".format(p.pace_pct) }}{% endif %}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-foot">Projection = MTD spend + trailing-7-day daily spend × days remaining. <a href="/reporting">Detailed pacing →</a></div>
+  </section>
+</div>
+
+<section class="grid page-grid" aria-label="Pages">
+  {% for item in nav if item.name != "home" %}
+  <a class="card card-link" href="{{ item.path }}">
+    <div class="card-body">
+      <div class="card-link-head"><h2 class="card-title">{{ item.title }}</h2><span class="arrow" aria-hidden="true">&rarr;</span></div>
+      <p class="muted">{{ item.description }}</p>
+    </div>
+  </a>
+  {% endfor %}
+</section>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/home.js"></script>
+{% endblock %}

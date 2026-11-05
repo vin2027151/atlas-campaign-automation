@@ -1,0 +1,8 @@
+{
+ "model": "kimi-k3.1-pro",
+ "usage": null,
+ "seconds": 950,
+ "finish": "stop",
+ "reasoning_chars": 38431,
+ "content_chars": 95074
+}

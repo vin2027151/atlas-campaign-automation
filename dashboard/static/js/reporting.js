@@ -40,27 +40,21 @@ function tile({ label, value, tone = "", sub = "", bar = null, title = "" }) {
 function renderKpis(d) {
   const k = d.kpis, tgt = d.cpa_target;
   const vsMonth = `vs ${range(k.prior_window)}`;
+  const thin = k.cpt_7d.trials < 3 ? ` · <span class="caveat">thin read</span>` : "";
+  // Four headline measures. Matured-cohort paid economics live in the account
+  // table beside their cohort label (renderAccounts); MTD cost per trial is the
+  // account table's Total row.
   const html = [
+    tile({ label: "Cost / PostHog trial (7d)", value: fmt.cpt(k.cpt_7d.value), tone: cptTone(k.cpt_7d.value, tgt),
+      title: `${fmt.money(k.cpt_7d.spend)} / ${k.cpt_7d.trials} trials, ${range(d.kpis.w7_window)}`,
+      sub: `${deltaHtml(k.cpt_7d.delta, { goodWhen: "down", vs: `vs prior 7d (${fmt.cpt(k.cpt_7d.prev)})` })}<br><span class="muted">n=${fmt.int(k.cpt_7d.trials)} trials${thin}</span>` }),
+    tile({ label: "PostHog trials (MTD)", value: fmt.int(k.trials_mtd.value),
+      sub: deltaHtml(k.trials_mtd.delta, { goodWhen: "up", vs: vsMonth }) }),
     tile({ label: "Spend, month to date", value: fmt.money(k.mtd_spend.value),
       sub: deltaHtml(k.mtd_spend.delta, { goodWhen: "neutral", vs: vsMonth }) }),
-    tile({ label: "Projected month end", value: fmt.money(k.projected.value),
+    tile({ label: "Projected spend / budget", value: fmt.money(k.projected.value),
       tone: paceTone(k.projected.pace_pct), bar: k.projected.pace_pct,
       sub: `<span class="${paceTone(k.projected.pace_pct)} strong">${fmt.pct(k.projected.pace_pct)}</span> of ${fmt.moneyShort(k.projected.budget)} budget` }),
-    tile({ label: "Trials, month to date", value: fmt.int(k.trials_mtd.value),
-      sub: deltaHtml(k.trials_mtd.delta, { goodWhen: "up", vs: vsMonth }) }),
-    tile({ label: "Cost per trial, MTD", value: fmt.cpt(k.cpt_mtd.value), tone: cptTone(k.cpt_mtd.value, tgt),
-      sub: deltaHtml(k.cpt_mtd.delta, { goodWhen: "down", vs: vsMonth }) }),
-    tile({ label: "Cost per trial, last 7 days", value: fmt.cpt(k.cpt_7d.value), tone: cptTone(k.cpt_7d.value, tgt),
-      title: `${fmt.money(k.cpt_7d.spend)} / ${k.cpt_7d.trials} trials, ${range(d.kpis.w7_window)}`,
-      sub: deltaHtml(k.cpt_7d.delta, { goodWhen: "down", vs: `vs prior 7d (${fmt.cpt(k.cpt_7d.prev)})` }) }),
-    tile({ label: "Paid memberships, MTD trials", value: fmt.int(k.paid_mtd.value),
-      title: "Paid is credited to the trial's signup date; November trials have not had time to convert yet.",
-      sub: `still maturing (${k.paid_mtd.lag_days}-day lag) · ${fmt.int(k.paid_mtd.paid_30d)} paid from last-30-day trials` }),
-    tile({ label: "Cost per paid (matured cohort)", value: fmt.cpt(k.cost_per_paid.value),
-      title: `Trials ${range(k.cohort_window)}: ${k.cost_per_paid.paid} paid of ${k.cost_per_paid.trials} trials`,
-      sub: deltaHtml(k.cost_per_paid.delta, { goodWhen: "down", vs: `trials ${range(k.cohort_window)}` }) }),
-    tile({ label: "Trial → paid (matured cohort)", value: fmt.pct(k.trial_to_paid.value),
-      sub: deltaHtml(k.trial_to_paid.delta, { goodWhen: "up", points: true, vs: `vs ${range(k.cohort_prior_window)}` }) }),
   ];
   $("#rp-kpis").innerHTML = html.join("");
 }
@@ -183,6 +177,17 @@ function renderCharts(d) {
 function renderAccounts(d) {
   const tgt = d.cpa_target;
   $("#rp-acct-sub").textContent = `month to date, ${range(d.kpis.mtd_window)}`;
+  const k = d.kpis;
+  const prior = `vs prior cohort, trials ${range(k.cohort_prior_window)}`;
+  // Total row carries the matured-cohort comparison that used to sit in the KPI tiles.
+  const cohDelta = (a, which) => {
+    if (a.key !== "total") return "";
+    const chip = which === "cpp"
+      ? deltaHtml(k.cost_per_paid.delta, { goodWhen: "down" })
+      : deltaHtml(k.trial_to_paid.delta, { goodWhen: "up", points: true });
+    return `<span class="rp-cell-delta" title="${esc(prior)}">${chip}</span>`;
+  };
+  $("#rp-coh-head").textContent = `Matured trial cohort*, trials ${range(k.cohort_window)}`;
   $("#rp-acct").innerHTML = d.accounts.map((a) => `
     <tr class="${a.key === "total" ? "total" : ""}">
       <td>${a.key === "total" ? "Total" : `${platformChip(a.key)} ${esc(a.label)}`}</td>
@@ -190,13 +195,12 @@ function renderAccounts(d) {
       <td class="num">${fmt.int(a.trials)}</td>
       <td class="num ${cptTone(a.cost_per_trial, tgt)}">${fmt.cpt(a.cost_per_trial)}</td>
       <td class="num">${fmt.int(a.cohort_paid)}</td>
-      <td class="num">${fmt.cpt(a.cohort_cost_per_paid)}</td>
-      <td class="num">${fmt.pct(a.cohort_trial_to_paid)}</td>
+      <td class="num"${a.key === "total" ? ` title="${esc(`${k.cost_per_paid.paid} paid of ${k.cost_per_paid.trials} trials`)}"` : ""}>${fmt.cpt(a.cohort_cost_per_paid)}${cohDelta(a, "cpp")}</td>
+      <td class="num">${fmt.pct(a.cohort_trial_to_paid)}${cohDelta(a, "t2p")}</td>
       <td class="num">${fmt.pct(a.share_spend)}</td>
       <td class="num">${fmt.pct(a.share_trials)}</td>
     </tr>`).join("");
-  const k = d.kpis;
-  $("#rp-acct-foot").textContent = `* Paid columns use the matured trial cohort (trials ${range(k.cohort_window)}); trials need 7–14 days to convert, so November trials show 0 paid so far.`;
+  $("#rp-acct-foot").textContent = `* Paid columns use the matured trial cohort (trials ${range(k.cohort_window)}); Total-row changes are ${prior}. Trials need 7–14 days to convert, so month-to-date trials are still maturing (${k.paid_mtd.lag_days}-day lag): ${fmt.int(k.paid_mtd.value)} paid so far, ${fmt.int(k.paid_mtd.paid_30d)} paid from last-30-day trials.`;
 }
 
 // ----------------------------------------------------------------- trust

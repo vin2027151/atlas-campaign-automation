@@ -1,0 +1,26 @@
+--- a/templates/spend.html
++++ b/templates/spend.html
+@@ -117,17 +117,14 @@
+         <tr>
+           <th></th>
+           <th class="sortable" data-key="name">Campaign</th>
+-          <th class="sortable" data-key="country">Country</th>
+           <th class="sortable" data-key="status">Status</th>
+           <th class="sortable num" data-key="daily_budget">Budget / day</th>
+-          <th class="sortable num" data-key="spend">Spend</th>
+-          <th class="sortable num" data-key="spend_per_day">Spend / day</th>
+-          <th class="sortable num" data-key="trials">Trials</th>
+-          <th class="sortable num monitor-head" data-key="cpt_3d" title="Trailing 3 days ending today, whatever the window">CPT 3d</th>
+-          <th class="sortable num" data-key="cpt_7d" title="Trailing 7 days ending today">CPT 7d</th>
++          <th class="sortable num" data-key="spend">Spend (window)</th>
++          <th class="sortable num" data-key="trials">PostHog trials</th>
++          <th class="sortable num monitor-head" data-key="cpt_3d" title="Trailing 3 days ending today, whatever the window">Cost / trial (3d)</th>
++          <th class="sortable num" data-key="cpt_7d" title="Trailing 7 days ending today">Cost / trial (7d)</th>
+           <th class="sortable num" data-key="paid">Paid</th>
+-          <th class="sortable num" data-key="trial_to_paid">Trial&rarr;paid</th>
+           <th class="sortable num" data-key="cost_per_paid">Cost / paid</th>
+           <th class="sortable num" data-key="platform_vs_posthog_pct" title="Platform-reported conversions, and as % of PostHog trials. Flagged outside 80-120%.">Platform conv. vs PostHog</th>
+         </tr>
+       </thead>
+-      <tbody id="camp-body"><tr><td colspan="14" class="table-empty">Loading&hellip;</td></tr></tbody>
++      <tbody id="camp-body"><tr><td colspan="11" class="table-empty">Loading&hellip;</td></tr></tbody>

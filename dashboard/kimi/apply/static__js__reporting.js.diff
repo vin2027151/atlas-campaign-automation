@@ -1,0 +1,48 @@
+--- a/static/js/reporting.js
++++ b/static/js/reporting.js
+@@ -45,47 +45,35 @@
+ function renderKpis(d) {
+   const k = d.kpis, tgt = d.cpa_target;
+   const vsMonth = `vs ${range(k.prior_window)}`;
++  const thin = k.cpt_7d.trials < 3 ? ` · <span class="caveat">thin read</span>` : "";
+   const html = [
++    tile({ label: "Cost / PostHog trial (7d)", value: fmt.cpt(k.cpt_7d.value), tone: cptTone(k.cpt_7d.value, tgt),
++      title: `${fmt.money(k.cpt_7d.spend)} / ${k.cpt_7d.trials} trials, ${range(d.kpis.w7_window)}`,
++      sub: `${deltaHtml(k.cpt_7d.delta, { goodWhen: "down", vs: `vs prior 7d (${fmt.cpt(k.cpt_7d.prev)})` })}<br><span class="muted">n=${fmt.int(k.cpt_7d.trials)} trials${thin}</span>` }),
++    tile({ label: "PostHog trials (MTD)", value: fmt.int(k.trials_mtd.value),
++      sub: deltaHtml(k.trials_mtd.delta, { goodWhen: "up", vs: vsMonth }) }),
+     tile({ label: "Spend, month to date", value: fmt.money(k.mtd_spend.value),
+       sub: deltaHtml(k.mtd_spend.delta, { goodWhen: "neutral", vs: vsMonth }) }),
+-    tile({ label: "Projected month end", value: fmt.money(k.projected.value),
++    tile({ label: "Projected spend / budget", value: fmt.money(k.projected.value),
+       tone: paceTone(k.projected.pace_pct), bar: k.projected.pace_pct,
+       sub: `<span class="${paceTone(k.projected.pace_pct)} strong">${fmt.pct(k.projected.pace_pct)}</span> of ${fmt.moneyShort(k.projected.budget)} budget` }),
+-    tile({ label: "Trials, month to date", value: fmt.int(k.trials_mtd.value),
+-      sub: deltaHtml(k.trials_mtd.delta, { goodWhen: "up", vs: vsMonth }) }),
+-    tile({ label: "Cost per trial, MTD", value: fmt.cpt(k.cpt_mtd.value), tone: cptTone(k.cpt_mtd.value, tgt),
+-      sub: deltaHtml(k.cpt_mtd.delta, { goodWhen: "down", vs: vsMonth }) }),
+-    tile({ label: "Cost per trial, last 7 days", value: fmt.cpt(k.cpt_7d.value), tone: cptTone(k.cpt_7d.value, tgt),
+-      title: `${fmt.money(k.cpt_7d.spend)} / ${k.cpt_7d.trials} trials, ${range(d.kpis.w7_window)}`,
+-      sub: deltaHtml(k.cpt_7d.delta, { goodWhen: "down", vs: `vs prior 7d (${fmt.cpt(k.cpt_7d.prev)})` }) }),
+-    tile({ label: "Paid memberships, MTD trials", value: fmt.int(k.paid_mtd.value),
+-      title: "Paid is credited to the trial's signup date; November trials have not had time to convert yet.",
+-      sub: `still maturing (${k.paid_mtd.lag_days}-day lag) · ${fmt.int(k.paid_mtd.paid_30d)} paid from last-30-day trials` }),
+-    tile({ label: "Cost per paid (matured cohort)", value: fmt.cpt(k.cost_per_paid.value),
+-      title: `Trials ${range(k.cohort_window)}: ${k.cost_per_paid.paid} paid of ${k.cost_per_paid.trials} trials`,
+-      sub: deltaHtml(k.cost_per_paid.delta, { goodWhen: "down", vs: `trials ${range(k.cohort_window)}` }) }),
+-    tile({ label: "Trial → paid (matured cohort)", value: fmt.pct(k.trial_to_paid.value),
+-      sub: deltaHtml(k.trial_to_paid.delta, { goodWhen: "up", points: true, vs: `vs ${range(k.cohort_prior_window)}` }) }),
+   ];
+@@ -248,4 +236,15 @@
+ $("#rp-export").addEventListener("click", () => toast("CSV export downloading", "info"));
+ 
++/* Exceptions immediately follow the headline read; matured paid economics stay
++   beside their cohort explanation in the account table. */
++(function prioritizeChanges() {
++  const kpis = $("#rp-kpis");
++  const pacing = $("#rp-pace-title").closest("section");
++  const changes = $("#rp-chg-title").closest("section");
++  if (kpis && pacing && changes) pacing.parentNode.insertBefore(changes, pacing);
++})();
++
+ load();

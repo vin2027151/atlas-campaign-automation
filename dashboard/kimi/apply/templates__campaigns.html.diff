@@ -1,0 +1,21 @@
+--- a/templates/campaigns.html
++++ b/templates/campaigns.html
+@@ -58,17 +58,15 @@
+         <thead>
+           <tr>
+-            <th></th><th>Campaign</th><th>Ctry</th><th>Type</th><th>Status</th>
++            <th></th><th>Campaign</th><th>Status</th>
+             <th class="num" title="Click to edit">Daily budget</th>
+-            <th class="num" title="Daily budget x days in month">Monthly</th>
+-            <th class="num">7d spend</th><th class="num">7d trials</th><th class="num">7d CPT</th><th class="num">3d CPT</th>
+-            <th>Bid strategy</th><th>Start</th><th class="actions"></th>
++            <th class="num">Spend (7d)</th><th class="num">PostHog trials (7d)</th><th class="num">Cost / trial (7d)</th><th class="num">Cost / trial (3d)</th>
++            <th>Search-term waste</th><th class="actions"></th>
+           </tr>
+         </thead>
+-        <tbody id="cmp-body"><tr><td colspan="14" class="table-empty">Loading campaigns&hellip;</td></tr></tbody>
++        <tbody id="cmp-body"><tr><td colspan="10" class="table-empty">Loading campaigns&hellip;</td></tr></tbody>
+       </table>
+@@ -63,5 +61,5 @@
+-    <div class="card-foot" id="cmp-foot">CPT = PostHog-attributed cost per trial. Target {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }}.</div>
++    <div class="card-foot" id="cmp-foot">CPT = spend ÷ PostHog-attributed trials. Target {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }}. Country, type, bid strategy and start date sit under the campaign name.</div>
