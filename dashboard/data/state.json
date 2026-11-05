@@ -1,0 +1,8805 @@
+{
+ "meta": {
+  "today": "2026-11-05",
+  "generated_at": "2026-11-05T06:00:00Z",
+  "monthly_budget": 120000,
+  "platform_budgets": {
+   "google": 55000,
+   "meta": 65000
+  },
+  "cpa_target": [
+   250,
+   280
+  ],
+  "history_start": "2026-08-10",
+  "new_build_start": "2026-11-01",
+  "sample_data": true,
+  "adapter": "local"
+ },
+ "campaigns": [
+  {
+   "id": "g_search_brand_us",
+   "platform": "google",
+   "name": "Search_Brand_US",
+   "country": "US",
+   "type": "Brand",
+   "status": "ACTIVE",
+   "daily_budget": 200.0,
+   "monthly_budget": 6000,
+   "objective": "Trial signup",
+   "bid_strategy": "Target impression share 95%",
+   "segment": "brand",
+   "start_date": "2026-08-10",
+   "legacy": false
+  },
+  {
+   "id": "g_search_nonbrand_us",
+   "platform": "google",
+   "name": "Search_NonBrand_US",
+   "country": "US",
+   "type": "Search",
+   "status": "ACTIVE",
+   "daily_budget": 966.67,
+   "monthly_budget": 29000,
+   "objective": "Trial signup",
+   "bid_strategy": "Target CPA $280",
+   "segment": "mixed",
+   "start_date": "2026-08-10",
+   "legacy": false
+  },
+  {
+   "id": "g_pmax_us",
+   "platform": "google",
+   "name": "PMax_US",
+   "country": "US",
+   "type": "PMax",
+   "status": "ACTIVE",
+   "daily_budget": 400.0,
+   "monthly_budget": 12000,
+   "objective": "Trial signup",
+   "bid_strategy": "Target CPA $300",
+   "segment": "mixed",
+   "start_date": "2026-08-10",
+   "legacy": false
+  },
+  {
+   "id": "g_search_nonbrand_uk",
+   "platform": "google",
+   "name": "Search_NonBrand_UK",
+   "country": "UK",
+   "type": "Search",
+   "status": "ACTIVE",
+   "daily_budget": 200.0,
+   "monthly_budget": 6000,
+   "objective": "Trial signup",
+   "bid_strategy": "Maximize conversions",
+   "segment": "mixed",
+   "start_date": "2026-08-10",
+   "legacy": false
+  },
+  {
+   "id": "g_search_brand_uk",
+   "platform": "google",
+   "name": "Search_Brand_UK",
+   "country": "UK",
+   "type": "Brand",
+   "status": "ACTIVE",
+   "daily_budget": 66.67,
+   "monthly_budget": 2000,
+   "objective": "Trial signup",
+   "bid_strategy": "Target impression share 90%",
+   "segment": "brand",
+   "start_date": "2026-11-01",
+   "legacy": false
+  },
+  {
+   "id": "m_prospecting_core",
+   "platform": "meta",
+   "name": "Prospecting_Core",
+   "country": "US",
+   "type": "Prospecting",
+   "status": "ACTIVE",
+   "daily_budget": 733.33,
+   "monthly_budget": 22000,
+   "objective": "Trial signup",
+   "bid_strategy": "Lowest cost",
+   "segment": "mixed",
+   "start_date": "2026-11-01",
+   "legacy": false
+  },
+  {
+   "id": "m_prospecting_test",
+   "platform": "meta",
+   "name": "Prospecting_Test",
+   "country": "US",
+   "type": "Prospecting",
+   "status": "ACTIVE",
+   "daily_budget": 266.67,
+   "monthly_budget": 8000,
+   "objective": "Trial signup",
+   "bid_strategy": "Lowest cost",
+   "segment": "mixed",
+   "start_date": "2026-11-01",
+   "legacy": false
+  },
+  {
+   "id": "m_retargeting_agency_14d",
+   "platform": "meta",
+   "name": "Retargeting_Agency_14d",
+   "country": "US",
+   "type": "Retargeting",
+   "status": "ACTIVE",
+   "daily_budget": 200.0,
+   "monthly_budget": 6000,
+   "objective": "Trial signup",
+   "bid_strategy": "Cost cap $220",
+   "segment": "agency",
+   "start_date": "2026-11-01",
+   "legacy": false
+  },
+  {
+   "id": "m_retargeting_individual_14d",
+   "platform": "meta",
+   "name": "Retargeting_Individual_14d",
+   "country": "US",
+   "type": "Retargeting",
+   "status": "ACTIVE",
+   "daily_budget": 166.67,
+   "monthly_budget": 5000,
+   "objective": "Trial signup",
+   "bid_strategy": "Cost cap $240",
+   "segment": "individual",
+   "start_date": "2026-11-01",
+   "legacy": false
+  },
+  {
+   "id": "m_retargeting_lapsed_15to30d",
+   "platform": "meta",
+   "name": "Retargeting_Lapsed_15to30d",
+   "country": "US",
+   "type": "Retargeting",
+   "status": "ACTIVE",
+   "daily_budget": 100.0,
+   "monthly_budget": 3000,
+   "objective": "Trial signup",
+   "bid_strategy": "Lowest cost",
+   "segment": "mixed",
+   "start_date": "2026-11-01",
+   "legacy": false
+  },
+  {
+   "id": "m_prospecting_advantageplus",
+   "platform": "meta",
+   "name": "Prospecting_AdvantagePlus",
+   "country": "US",
+   "type": "Prospecting",
+   "status": "ACTIVE",
+   "daily_budget": 300.0,
+   "monthly_budget": 9000,
+   "objective": "Trial signup",
+   "bid_strategy": "Lowest cost",
+   "segment": "mixed",
+   "start_date": "2026-08-10",
+   "legacy": true
+  },
+  {
+   "id": "m_prospecting_broad",
+   "platform": "meta",
+   "name": "Prospecting_Broad",
+   "country": "US",
+   "type": "Prospecting",
+   "status": "ACTIVE",
+   "daily_budget": 233.33,
+   "monthly_budget": 7000,
+   "objective": "Trial signup",
+   "bid_strategy": "Lowest cost",
+   "segment": "individual",
+   "start_date": "2026-08-10",
+   "legacy": true
+  },
+  {
+   "id": "m_retargeting_30d",
+   "platform": "meta",
+   "name": "Retargeting_30d",
+   "country": "US",
+   "type": "Retargeting",
+   "status": "ACTIVE",
+   "daily_budget": 166.67,
+   "monthly_budget": 5000,
+   "objective": "Trial signup",
+   "bid_strategy": "Lowest cost",
+   "segment": "mixed",
+   "start_date": "2026-08-10",
+   "legacy": true
+  }
+ ],
+ "adsets": [
+  {
+   "id": "g_search_brand_us__as1",
+   "campaign_id": "g_search_brand_us",
+   "name": "Brand_Core",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "Exact + phrase: search atlas, searchatlas",
+   "kind": "ad group"
+  },
+  {
+   "id": "g_search_brand_us__as2",
+   "campaign_id": "g_search_brand_us",
+   "name": "Brand_Product",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "search atlas otto, search atlas pricing, search atlas review",
+   "kind": "ad group"
+  },
+  {
+   "id": "g_search_nonbrand_us__as1",
+   "campaign_id": "g_search_nonbrand_us",
+   "name": "Category_SEO_Software",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "seo software, seo platform, all in one seo tool",
+   "kind": "ad group"
+  },
+  {
+   "id": "g_search_nonbrand_us__as2",
+   "campaign_id": "g_search_nonbrand_us",
+   "name": "Rank_Tracking",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "rank tracker, keyword rank checker, serp tracker",
+   "kind": "ad group"
+  },
+  {
+   "id": "g_search_nonbrand_us__as3",
+   "campaign_id": "g_search_nonbrand_us",
+   "name": "Agency_SEO",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "seo software for agencies, white label seo, client seo reporting",
+   "kind": "ad group"
+  },
+  {
+   "id": "g_search_nonbrand_us__as4",
+   "campaign_id": "g_search_nonbrand_us",
+   "name": "Competitor_Alternatives",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "semrush alternative, ahrefs alternative, moz alternative",
+   "kind": "ad group"
+  },
+  {
+   "id": "g_pmax_us__as1",
+   "campaign_id": "g_pmax_us",
+   "name": "PMax_Agencies",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "Audience signal: agency site visitors + customer list",
+   "kind": "asset group"
+  },
+  {
+   "id": "g_pmax_us__as2",
+   "campaign_id": "g_pmax_us",
+   "name": "PMax_InHouse",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "Audience signal: in-house marketer interests",
+   "kind": "asset group"
+  },
+  {
+   "id": "g_search_nonbrand_uk__as1",
+   "campaign_id": "g_search_nonbrand_uk",
+   "name": "UK_Category_SEO_Software",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "seo software uk, seo tools uk",
+   "kind": "ad group"
+  },
+  {
+   "id": "g_search_nonbrand_uk__as2",
+   "campaign_id": "g_search_nonbrand_uk",
+   "name": "UK_Agency_SEO",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "seo agency software uk, white label seo uk",
+   "kind": "ad group"
+  },
+  {
+   "id": "g_search_brand_uk__as1",
+   "campaign_id": "g_search_brand_uk",
+   "name": "UK_Brand_Core",
+   "status": "ACTIVE",
+   "daily_budget": null,
+   "targeting": "Exact + phrase: search atlas (UK geo)",
+   "kind": "ad group"
+  },
+  {
+   "id": "m_prospecting_core__as1",
+   "campaign_id": "m_prospecting_core",
+   "name": "US_AdvantagePlus_Agency",
+   "status": "ACTIVE",
+   "daily_budget": 366.67,
+   "targeting": "Advantage+ audience, agency-owner signal, US 25-60",
+   "kind": "ad set"
+  },
+  {
+   "id": "m_prospecting_core__as2",
+   "campaign_id": "m_prospecting_core",
+   "name": "US_Interest_Marketing_Mgr",
+   "status": "ACTIVE",
+   "daily_budget": 366.67,
+   "targeting": "Interests: SEO, content marketing, HubSpot; US 25-55",
+   "kind": "ad set"
+  },
+  {
+   "id": "m_prospecting_test__as1",
+   "campaign_id": "m_prospecting_test",
+   "name": "Test_Hook_Agency_WhiteLabel",
+   "status": "ACTIVE",
+   "daily_budget": 133.33,
+   "targeting": "Advantage+ audience, US; hook A",
+   "kind": "ad set"
+  },
+  {
+   "id": "m_prospecting_test__as2",
+   "campaign_id": "m_prospecting_test",
+   "name": "Test_Hook_Individual_DIY",
+   "status": "ACTIVE",
+   "daily_budget": 133.33,
+   "targeting": "Advantage+ audience, US; hook B",
+   "kind": "ad set"
+  },
+  {
+   "id": "m_retargeting_agency_14d__as1",
+   "campaign_id": "m_retargeting_agency_14d",
+   "name": "RT_Agency_Pages_14d",
+   "status": "ACTIVE",
+   "daily_budget": 200.0,
+   "targeting": "Visited /agency or /white-label in last 14 days",
+   "kind": "ad set"
+  },
+  {
+   "id": "m_retargeting_individual_14d__as1",
+   "campaign_id": "m_retargeting_individual_14d",
+   "name": "RT_Individual_Pages_14d",
+   "status": "ACTIVE",
+   "daily_budget": 166.67,
+   "targeting": "Visited /pricing or /features, not agency pages, last 14 days",
+   "kind": "ad set"
+  },
+  {
+   "id": "m_retargeting_lapsed_15to30d__as1",
+   "campaign_id": "m_retargeting_lapsed_15to30d",
+   "name": "RT_Lapsed_15to30d",
+   "status": "ACTIVE",
+   "daily_budget": 100.0,
+   "targeting": "Site visitors 15-30 days ago, excl. trials",
+   "kind": "ad set"
+  },
+  {
+   "id": "m_prospecting_advantageplus__as1",
+   "campaign_id": "m_prospecting_advantageplus",
+   "name": "Legacy_AdvantagePlus_US",
+   "status": "ACTIVE",
+   "daily_budget": 300.0,
+   "targeting": "Advantage+ audience, US 18-65+",
+   "kind": "ad set"
+  },
+  {
+   "id": "m_prospecting_broad__as1",
+   "campaign_id": "m_prospecting_broad",
+   "name": "Legacy_Broad_US",
+   "status": "ACTIVE",
+   "daily_budget": 233.33,
+   "targeting": "Broad US 25-55, no interests",
+   "kind": "ad set"
+  },
+  {
+   "id": "m_retargeting_30d__as1",
+   "campaign_id": "m_retargeting_30d",
+   "name": "Legacy_RT_All_30d",
+   "status": "ACTIVE",
+   "daily_budget": 166.67,
+   "targeting": "All site visitors 30 days, excl. trials",
+   "kind": "ad set"
+  }
+ ],
+ "ads": [
+  {
+   "id": "g_search_brand_us__as1_ad1",
+   "adset_id": "g_search_brand_us__as1",
+   "name": "RSA_Core_Core",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "All-in-one SEO platform | Start a 7-day trial",
+   "cta": "Start trial",
+   "launched": "2026-08-12"
+  },
+  {
+   "id": "g_search_brand_us__as1_ad2",
+   "adset_id": "g_search_brand_us__as1",
+   "name": "RSA_Agency_Core",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "SEO software built for agencies | White-label reports",
+   "cta": "Start trial",
+   "launched": "2026-08-15"
+  },
+  {
+   "id": "g_search_brand_us__as2_ad1",
+   "adset_id": "g_search_brand_us__as2",
+   "name": "RSA_Agency_Product",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "SEO software built for agencies | White-label reports",
+   "cta": "Start trial",
+   "launched": "2026-08-19"
+  },
+  {
+   "id": "g_search_brand_us__as2_ad2",
+   "adset_id": "g_search_brand_us__as2",
+   "name": "RSA_Price_Product",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "Replace 4 SEO tools with one | See pricing",
+   "cta": "See pricing",
+   "launched": "2026-08-20"
+  },
+  {
+   "id": "g_search_nonbrand_us__as1_ad1",
+   "adset_id": "g_search_nonbrand_us__as1",
+   "name": "RSA_Core_Software",
+   "status": "PAUSED",
+   "format": "rsa",
+   "hook": "All-in-one SEO platform | Start a 7-day trial",
+   "cta": "Start trial",
+   "launched": "2026-08-15"
+  },
+  {
+   "id": "g_search_nonbrand_us__as1_ad2",
+   "adset_id": "g_search_nonbrand_us__as1",
+   "name": "RSA_Agency_Software",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "SEO software built for agencies | White-label reports",
+   "cta": "Start trial",
+   "launched": "2026-08-30"
+  },
+  {
+   "id": "g_search_nonbrand_us__as2_ad1",
+   "adset_id": "g_search_nonbrand_us__as2",
+   "name": "RSA_Agency_Tracking",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "SEO software built for agencies | White-label reports",
+   "cta": "Start trial",
+   "launched": "2026-08-27"
+  },
+  {
+   "id": "g_search_nonbrand_us__as2_ad2",
+   "adset_id": "g_search_nonbrand_us__as2",
+   "name": "RSA_Price_Tracking",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "Replace 4 SEO tools with one | See pricing",
+   "cta": "See pricing",
+   "launched": "2026-08-13"
+  },
+  {
+   "id": "g_search_nonbrand_us__as3_ad1",
+   "adset_id": "g_search_nonbrand_us__as3",
+   "name": "RSA_Price_SEO",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "Replace 4 SEO tools with one | See pricing",
+   "cta": "See pricing",
+   "launched": "2026-08-27"
+  },
+  {
+   "id": "g_search_nonbrand_us__as3_ad2",
+   "adset_id": "g_search_nonbrand_us__as3",
+   "name": "RSA_Competitor_SEO",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "A faster semrush alternative | Try it free",
+   "cta": "Start trial",
+   "launched": "2026-08-22"
+  },
+  {
+   "id": "g_search_nonbrand_us__as4_ad1",
+   "adset_id": "g_search_nonbrand_us__as4",
+   "name": "RSA_Competitor_Alternatives",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "A faster semrush alternative | Try it free",
+   "cta": "Start trial",
+   "launched": "2026-08-29"
+  },
+  {
+   "id": "g_search_nonbrand_us__as4_ad2",
+   "adset_id": "g_search_nonbrand_us__as4",
+   "name": "RSA_Core_Alternatives",
+   "status": "PAUSED",
+   "format": "rsa",
+   "hook": "All-in-one SEO platform | Start a 7-day trial",
+   "cta": "Start trial",
+   "launched": "2026-08-18"
+  },
+  {
+   "id": "g_pmax_us__as1_ad1",
+   "adset_id": "g_pmax_us__as1",
+   "name": "RSA_Core_Agencies",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "All-in-one SEO platform | Start a 7-day trial",
+   "cta": "Start trial",
+   "launched": "2026-08-12"
+  },
+  {
+   "id": "g_pmax_us__as1_ad2",
+   "adset_id": "g_pmax_us__as1",
+   "name": "RSA_Agency_Agencies",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "SEO software built for agencies | White-label reports",
+   "cta": "Start trial",
+   "launched": "2026-08-10"
+  },
+  {
+   "id": "g_pmax_us__as2_ad1",
+   "adset_id": "g_pmax_us__as2",
+   "name": "RSA_Agency_InHouse",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "SEO software built for agencies | White-label reports",
+   "cta": "Start trial",
+   "launched": "2026-08-29"
+  },
+  {
+   "id": "g_pmax_us__as2_ad2",
+   "adset_id": "g_pmax_us__as2",
+   "name": "RSA_Price_InHouse",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "Replace 4 SEO tools with one | See pricing",
+   "cta": "See pricing",
+   "launched": "2026-08-26"
+  },
+  {
+   "id": "g_search_nonbrand_uk__as1_ad1",
+   "adset_id": "g_search_nonbrand_uk__as1",
+   "name": "RSA_Core_Software",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "All-in-one SEO platform | Start a 7-day trial",
+   "cta": "Start trial",
+   "launched": "2026-08-21"
+  },
+  {
+   "id": "g_search_nonbrand_uk__as1_ad2",
+   "adset_id": "g_search_nonbrand_uk__as1",
+   "name": "RSA_Agency_Software",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "SEO software built for agencies | White-label reports",
+   "cta": "Start trial",
+   "launched": "2026-08-29"
+  },
+  {
+   "id": "g_search_nonbrand_uk__as2_ad1",
+   "adset_id": "g_search_nonbrand_uk__as2",
+   "name": "RSA_Agency_SEO",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "SEO software built for agencies | White-label reports",
+   "cta": "Start trial",
+   "launched": "2026-08-29"
+  },
+  {
+   "id": "g_search_nonbrand_uk__as2_ad2",
+   "adset_id": "g_search_nonbrand_uk__as2",
+   "name": "RSA_Price_SEO",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "Replace 4 SEO tools with one | See pricing",
+   "cta": "See pricing",
+   "launched": "2026-08-22"
+  },
+  {
+   "id": "g_search_brand_uk__as1_ad1",
+   "adset_id": "g_search_brand_uk__as1",
+   "name": "RSA_Core_Core",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "All-in-one SEO platform | Start a 7-day trial",
+   "cta": "Start trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "g_search_brand_uk__as1_ad2",
+   "adset_id": "g_search_brand_uk__as1",
+   "name": "RSA_Agency_Core",
+   "status": "ACTIVE",
+   "format": "rsa",
+   "hook": "SEO software built for agencies | White-label reports",
+   "cta": "Start trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_core__as1_ad1",
+   "adset_id": "m_prospecting_core__as1",
+   "name": "UGC_Agency_Owner_Agency",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "How a 9-person agency runs 140 client audits a month",
+   "cta": "Start free trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_core__as1_ad2",
+   "adset_id": "m_prospecting_core__as1",
+   "name": "UGC_Founder_v2_Agency",
+   "status": "PAUSED",
+   "format": "video",
+   "hook": "I stopped paying for four SEO tools",
+   "cta": "Start free trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_core__as1_ad3",
+   "adset_id": "m_prospecting_core__as1",
+   "name": "Static_Benefits_Grid_Agency",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "Rank tracking, audits, content and backlinks in one login",
+   "cta": "Sign up",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_core__as2_ad1",
+   "adset_id": "m_prospecting_core__as2",
+   "name": "Demo_Screen_Walkthrough_Mgr",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "90 seconds inside the dashboard",
+   "cta": "Start free trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_core__as2_ad2",
+   "adset_id": "m_prospecting_core__as2",
+   "name": "Static_WhiteLabel_Report_Mgr",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "Send clients reports with your logo, not ours",
+   "cta": "Start free trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_core__as2_ad3",
+   "adset_id": "m_prospecting_core__as2",
+   "name": "UGC_Founder_v3_Mgr",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "The fifth tool I cancelled this year",
+   "cta": "Start free trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_test__as1_ad1",
+   "adset_id": "m_prospecting_test__as1",
+   "name": "UGC_Agency_Owner_WhiteLabel",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "How a 9-person agency runs 140 client audits a month",
+   "cta": "Start free trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_test__as1_ad2",
+   "adset_id": "m_prospecting_test__as1",
+   "name": "UGC_Founder_v2_WhiteLabel",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "I stopped paying for four SEO tools",
+   "cta": "Start free trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_test__as1_ad3",
+   "adset_id": "m_prospecting_test__as1",
+   "name": "Static_Benefits_Grid_WhiteLabel",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "Rank tracking, audits, content and backlinks in one login",
+   "cta": "Sign up",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_test__as2_ad1",
+   "adset_id": "m_prospecting_test__as2",
+   "name": "Demo_Screen_Walkthrough_DIY",
+   "status": "PAUSED",
+   "format": "video",
+   "hook": "90 seconds inside the dashboard",
+   "cta": "Start free trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_test__as2_ad2",
+   "adset_id": "m_prospecting_test__as2",
+   "name": "Static_WhiteLabel_Report_DIY",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "Send clients reports with your logo, not ours",
+   "cta": "Start free trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_test__as2_ad3",
+   "adset_id": "m_prospecting_test__as2",
+   "name": "UGC_Founder_v3_DIY",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "The fifth tool I cancelled this year",
+   "cta": "Start free trial",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_retargeting_agency_14d__as1_ad1",
+   "adset_id": "m_retargeting_agency_14d__as1",
+   "name": "RT_Testimonial_Agency_14d",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "We replaced three tools in our first week",
+   "cta": "Finish signup",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_retargeting_agency_14d__as1_ad2",
+   "adset_id": "m_retargeting_agency_14d__as1",
+   "name": "RT_Pricing_Clarity_14d",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "What it costs after the trial, all of it",
+   "cta": "Finish signup",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_retargeting_agency_14d__as1_ad3",
+   "adset_id": "m_retargeting_agency_14d__as1",
+   "name": "RT_Objection_Migration_14d",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "Moving your projects over takes an afternoon",
+   "cta": "Finish signup",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_retargeting_individual_14d__as1_ad1",
+   "adset_id": "m_retargeting_individual_14d__as1",
+   "name": "RT_Testimonial_Agency_14d",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "We replaced three tools in our first week",
+   "cta": "Finish signup",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_retargeting_individual_14d__as1_ad2",
+   "adset_id": "m_retargeting_individual_14d__as1",
+   "name": "RT_Pricing_Clarity_14d",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "What it costs after the trial, all of it",
+   "cta": "Finish signup",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_retargeting_individual_14d__as1_ad3",
+   "adset_id": "m_retargeting_individual_14d__as1",
+   "name": "RT_Objection_Migration_14d",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "Moving your projects over takes an afternoon",
+   "cta": "Finish signup",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_retargeting_lapsed_15to30d__as1_ad1",
+   "adset_id": "m_retargeting_lapsed_15to30d__as1",
+   "name": "RT_Testimonial_Agency_15to30d",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "We replaced three tools in our first week",
+   "cta": "Finish signup",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_retargeting_lapsed_15to30d__as1_ad2",
+   "adset_id": "m_retargeting_lapsed_15to30d__as1",
+   "name": "RT_Pricing_Clarity_15to30d",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "What it costs after the trial, all of it",
+   "cta": "Finish signup",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_retargeting_lapsed_15to30d__as1_ad3",
+   "adset_id": "m_retargeting_lapsed_15to30d__as1",
+   "name": "RT_Objection_Migration_15to30d",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "Moving your projects over takes an afternoon",
+   "cta": "Finish signup",
+   "launched": "2026-11-01"
+  },
+  {
+   "id": "m_prospecting_advantageplus__as1_ad1",
+   "adset_id": "m_prospecting_advantageplus__as1",
+   "name": "UGC_Agency_Owner_US",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "How a 9-person agency runs 140 client audits a month",
+   "cta": "Start free trial",
+   "launched": "2026-08-16"
+  },
+  {
+   "id": "m_prospecting_advantageplus__as1_ad2",
+   "adset_id": "m_prospecting_advantageplus__as1",
+   "name": "UGC_Founder_v2_US",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "I stopped paying for four SEO tools",
+   "cta": "Start free trial",
+   "launched": "2026-08-22"
+  },
+  {
+   "id": "m_prospecting_advantageplus__as1_ad3",
+   "adset_id": "m_prospecting_advantageplus__as1",
+   "name": "Static_Benefits_Grid_US",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "Rank tracking, audits, content and backlinks in one login",
+   "cta": "Sign up",
+   "launched": "2026-08-13"
+  },
+  {
+   "id": "m_prospecting_broad__as1_ad1",
+   "adset_id": "m_prospecting_broad__as1",
+   "name": "Demo_Screen_Walkthrough_US",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "90 seconds inside the dashboard",
+   "cta": "Start free trial",
+   "launched": "2026-08-16"
+  },
+  {
+   "id": "m_prospecting_broad__as1_ad2",
+   "adset_id": "m_prospecting_broad__as1",
+   "name": "Static_WhiteLabel_Report_US",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "Send clients reports with your logo, not ours",
+   "cta": "Start free trial",
+   "launched": "2026-08-20"
+  },
+  {
+   "id": "m_prospecting_broad__as1_ad3",
+   "adset_id": "m_prospecting_broad__as1",
+   "name": "UGC_Founder_v3_US",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "The fifth tool I cancelled this year",
+   "cta": "Start free trial",
+   "launched": "2026-08-18"
+  },
+  {
+   "id": "m_retargeting_30d__as1_ad1",
+   "adset_id": "m_retargeting_30d__as1",
+   "name": "RT_Testimonial_Agency_30d",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "We replaced three tools in our first week",
+   "cta": "Finish signup",
+   "launched": "2026-08-15"
+  },
+  {
+   "id": "m_retargeting_30d__as1_ad2",
+   "adset_id": "m_retargeting_30d__as1",
+   "name": "RT_Pricing_Clarity_30d",
+   "status": "ACTIVE",
+   "format": "image",
+   "hook": "What it costs after the trial, all of it",
+   "cta": "Finish signup",
+   "launched": "2026-08-22"
+  },
+  {
+   "id": "m_retargeting_30d__as1_ad3",
+   "adset_id": "m_retargeting_30d__as1",
+   "name": "RT_Objection_Migration_30d",
+   "status": "ACTIVE",
+   "format": "video",
+   "hook": "Moving your projects over takes an afternoon",
+   "cta": "Finish signup",
+   "launched": "2026-08-29"
+  }
+ ],
+ "daily": [
+  {
+   "date": "2026-08-10",
+   "campaign_id": "g_pmax_us",
+   "spend": 502.93,
+   "impressions": 10034,
+   "clicks": 164,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-10",
+   "campaign_id": "g_search_brand_us",
+   "spend": 200.93,
+   "impressions": 237,
+   "clicks": 42,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-10",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 200.34,
+   "impressions": 651,
+   "clicks": 30,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-10",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 953.48,
+   "impressions": 2225,
+   "clicks": 115,
+   "platform_conversions": 3.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-10",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 945.71,
+   "impressions": 38505,
+   "clicks": 402,
+   "platform_conversions": 7.4,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-10",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 689.2,
+   "impressions": 36603,
+   "clicks": 346,
+   "platform_conversions": 2.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-10",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 423.74,
+   "impressions": 10965,
+   "clicks": 135,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-11",
+   "campaign_id": "g_pmax_us",
+   "spend": 484.81,
+   "impressions": 10093,
+   "clicks": 165,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-11",
+   "campaign_id": "g_search_brand_us",
+   "spend": 199.35,
+   "impressions": 249,
+   "clicks": 43,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-11",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 205.43,
+   "impressions": 682,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-11",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 971.69,
+   "impressions": 2227,
+   "clicks": 109,
+   "platform_conversions": 3.3,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-11",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1031.04,
+   "impressions": 48253,
+   "clicks": 498,
+   "platform_conversions": 12.4,
+   "trials": 9,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-11",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 725.2,
+   "impressions": 37532,
+   "clicks": 350,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-11",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 435.93,
+   "impressions": 11830,
+   "clicks": 133,
+   "platform_conversions": 2.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-12",
+   "campaign_id": "g_pmax_us",
+   "spend": 460.74,
+   "impressions": 10988,
+   "clicks": 162,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-12",
+   "campaign_id": "g_search_brand_us",
+   "spend": 202.42,
+   "impressions": 250,
+   "clicks": 42,
+   "platform_conversions": 3.7,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-12",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 216.83,
+   "impressions": 612,
+   "clicks": 30,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-12",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1035.23,
+   "impressions": 2502,
+   "clicks": 125,
+   "platform_conversions": 3.7,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-12",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 995.21,
+   "impressions": 40053,
+   "clicks": 475,
+   "platform_conversions": 4.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-12",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 731.52,
+   "impressions": 33945,
+   "clicks": 321,
+   "platform_conversions": 2.9,
+   "trials": 2,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-12",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 452.87,
+   "impressions": 12306,
+   "clicks": 142,
+   "platform_conversions": 4.1,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-13",
+   "campaign_id": "g_pmax_us",
+   "spend": 458.44,
+   "impressions": 8924,
+   "clicks": 149,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-13",
+   "campaign_id": "g_search_brand_us",
+   "spend": 198.72,
+   "impressions": 230,
+   "clicks": 45,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-13",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 213.1,
+   "impressions": 700,
+   "clicks": 31,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-13",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1035.94,
+   "impressions": 2448,
+   "clicks": 129,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-13",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 958.2,
+   "impressions": 38030,
+   "clicks": 427,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-13",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 732.55,
+   "impressions": 32419,
+   "clicks": 323,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-13",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 447.53,
+   "impressions": 12099,
+   "clicks": 141,
+   "platform_conversions": 4.9,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-14",
+   "campaign_id": "g_pmax_us",
+   "spend": 448.28,
+   "impressions": 8871,
+   "clicks": 148,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-14",
+   "campaign_id": "g_search_brand_us",
+   "spend": 193.0,
+   "impressions": 247,
+   "clicks": 43,
+   "platform_conversions": 3.5,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-14",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 197.49,
+   "impressions": 723,
+   "clicks": 31,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-14",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 987.22,
+   "impressions": 2172,
+   "clicks": 110,
+   "platform_conversions": 5.9,
+   "trials": 5,
+   "paid": 3
+  },
+  {
+   "date": "2026-08-14",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1011.73,
+   "impressions": 46080,
+   "clicks": 493,
+   "platform_conversions": 2.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-14",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 764.98,
+   "impressions": 38765,
+   "clicks": 401,
+   "platform_conversions": 3.6,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-14",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 431.77,
+   "impressions": 13038,
+   "clicks": 141,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-15",
+   "campaign_id": "g_pmax_us",
+   "spend": 342.61,
+   "impressions": 8135,
+   "clicks": 122,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-15",
+   "campaign_id": "g_search_brand_us",
+   "spend": 143.83,
+   "impressions": 184,
+   "clicks": 35,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-15",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 150.69,
+   "impressions": 428,
+   "clicks": 20,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-15",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 693.22,
+   "impressions": 1594,
+   "clicks": 80,
+   "platform_conversions": 2.1,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-15",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 943.25,
+   "impressions": 40066,
+   "clicks": 458,
+   "platform_conversions": 4.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-15",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 706.67,
+   "impressions": 38084,
+   "clicks": 362,
+   "platform_conversions": 5.0,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-15",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 388.69,
+   "impressions": 11768,
+   "clicks": 129,
+   "platform_conversions": 2.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-16",
+   "campaign_id": "g_pmax_us",
+   "spend": 349.63,
+   "impressions": 8305,
+   "clicks": 132,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-16",
+   "campaign_id": "g_search_brand_us",
+   "spend": 146.08,
+   "impressions": 166,
+   "clicks": 31,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-16",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 148.76,
+   "impressions": 559,
+   "clicks": 24,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-16",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 735.18,
+   "impressions": 1747,
+   "clicks": 81,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-16",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 928.42,
+   "impressions": 36937,
+   "clicks": 416,
+   "platform_conversions": 6.4,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-16",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 684.62,
+   "impressions": 35078,
+   "clicks": 329,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-16",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 414.56,
+   "impressions": 13812,
+   "clicks": 151,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-17",
+   "campaign_id": "g_pmax_us",
+   "spend": 438.23,
+   "impressions": 9823,
+   "clicks": 157,
+   "platform_conversions": 3.3,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-17",
+   "campaign_id": "g_search_brand_us",
+   "spend": 215.25,
+   "impressions": 262,
+   "clicks": 44,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-17",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 208.48,
+   "impressions": 677,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-17",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 979.98,
+   "impressions": 2182,
+   "clicks": 106,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-17",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 966.49,
+   "impressions": 38406,
+   "clicks": 419,
+   "platform_conversions": 6.5,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-17",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 691.84,
+   "impressions": 28688,
+   "clicks": 300,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-17",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 430.05,
+   "impressions": 13995,
+   "clicks": 151,
+   "platform_conversions": 2.7,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-18",
+   "campaign_id": "g_pmax_us",
+   "spend": 450.45,
+   "impressions": 9337,
+   "clicks": 156,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-18",
+   "campaign_id": "g_search_brand_us",
+   "spend": 199.84,
+   "impressions": 273,
+   "clicks": 49,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-18",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 190.45,
+   "impressions": 661,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-18",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 994.6,
+   "impressions": 2442,
+   "clicks": 122,
+   "platform_conversions": 7.2,
+   "trials": 6,
+   "paid": 4
+  },
+  {
+   "date": "2026-08-18",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1041.44,
+   "impressions": 45714,
+   "clicks": 516,
+   "platform_conversions": 8.5,
+   "trials": 6,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-18",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 751.82,
+   "impressions": 40681,
+   "clicks": 380,
+   "platform_conversions": 2.9,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-18",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 454.54,
+   "impressions": 12789,
+   "clicks": 145,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-19",
+   "campaign_id": "g_pmax_us",
+   "spend": 491.82,
+   "impressions": 9809,
+   "clicks": 158,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-19",
+   "campaign_id": "g_search_brand_us",
+   "spend": 187.48,
+   "impressions": 274,
+   "clicks": 47,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-19",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 193.24,
+   "impressions": 667,
+   "clicks": 31,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-19",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 915.84,
+   "impressions": 2096,
+   "clicks": 98,
+   "platform_conversions": 4.9,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-19",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1056.4,
+   "impressions": 44669,
+   "clicks": 504,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-19",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 768.07,
+   "impressions": 36751,
+   "clicks": 357,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-19",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 457.43,
+   "impressions": 14074,
+   "clicks": 150,
+   "platform_conversions": 2.6,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-20",
+   "campaign_id": "g_pmax_us",
+   "spend": 486.35,
+   "impressions": 10560,
+   "clicks": 174,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-20",
+   "campaign_id": "g_search_brand_us",
+   "spend": 209.3,
+   "impressions": 279,
+   "clicks": 51,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-20",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 187.9,
+   "impressions": 613,
+   "clicks": 27,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-20",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 974.4,
+   "impressions": 2158,
+   "clicks": 111,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-20",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1040.64,
+   "impressions": 43397,
+   "clicks": 472,
+   "platform_conversions": 7.5,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-20",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 730.53,
+   "impressions": 33701,
+   "clicks": 336,
+   "platform_conversions": 2.8,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-20",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 446.3,
+   "impressions": 11685,
+   "clicks": 141,
+   "platform_conversions": 4.9,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-21",
+   "campaign_id": "g_pmax_us",
+   "spend": 484.33,
+   "impressions": 11394,
+   "clicks": 171,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-21",
+   "campaign_id": "g_search_brand_us",
+   "spend": 205.94,
+   "impressions": 235,
+   "clicks": 44,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-21",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 200.73,
+   "impressions": 737,
+   "clicks": 32,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-21",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1015.33,
+   "impressions": 2368,
+   "clicks": 121,
+   "platform_conversions": 7.3,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-21",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 945.57,
+   "impressions": 37669,
+   "clicks": 438,
+   "platform_conversions": 4.3,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-21",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 704.81,
+   "impressions": 32788,
+   "clicks": 339,
+   "platform_conversions": 5.7,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-21",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 410.23,
+   "impressions": 11528,
+   "clicks": 141,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-22",
+   "campaign_id": "g_pmax_us",
+   "spend": 391.52,
+   "impressions": 8711,
+   "clicks": 135,
+   "platform_conversions": 3.7,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-22",
+   "campaign_id": "g_search_brand_us",
+   "spend": 146.96,
+   "impressions": 186,
+   "clicks": 35,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-22",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 154.88,
+   "impressions": 518,
+   "clicks": 25,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-22",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 702.91,
+   "impressions": 1496,
+   "clicks": 75,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-22",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 900.55,
+   "impressions": 40583,
+   "clicks": 451,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-22",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 734.87,
+   "impressions": 32160,
+   "clicks": 334,
+   "platform_conversions": 2.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-22",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 427.18,
+   "impressions": 14021,
+   "clicks": 152,
+   "platform_conversions": 4.3,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-23",
+   "campaign_id": "g_pmax_us",
+   "spend": 386.03,
+   "impressions": 8115,
+   "clicks": 128,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-23",
+   "campaign_id": "g_search_brand_us",
+   "spend": 151.28,
+   "impressions": 182,
+   "clicks": 32,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-23",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 166.56,
+   "impressions": 504,
+   "clicks": 23,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-23",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 731.61,
+   "impressions": 1582,
+   "clicks": 78,
+   "platform_conversions": 3.2,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-23",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 994.29,
+   "impressions": 46701,
+   "clicks": 485,
+   "platform_conversions": 4.3,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-23",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 657.53,
+   "impressions": 28926,
+   "clicks": 308,
+   "platform_conversions": 5.6,
+   "trials": 4,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-23",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 420.79,
+   "impressions": 12883,
+   "clicks": 154,
+   "platform_conversions": 2.7,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-24",
+   "campaign_id": "g_pmax_us",
+   "spend": 483.46,
+   "impressions": 11676,
+   "clicks": 178,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-24",
+   "campaign_id": "g_search_brand_us",
+   "spend": 183.86,
+   "impressions": 240,
+   "clicks": 46,
+   "platform_conversions": 3.4,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-24",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 191.28,
+   "impressions": 585,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-24",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1047.67,
+   "impressions": 2297,
+   "clicks": 109,
+   "platform_conversions": 3.2,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-24",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1047.52,
+   "impressions": 39990,
+   "clicks": 472,
+   "platform_conversions": 4.0,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-24",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 742.15,
+   "impressions": 36275,
+   "clicks": 345,
+   "platform_conversions": 2.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-24",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 418.4,
+   "impressions": 10480,
+   "clicks": 130,
+   "platform_conversions": 2.6,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-25",
+   "campaign_id": "g_pmax_us",
+   "spend": 449.6,
+   "impressions": 10406,
+   "clicks": 159,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-25",
+   "campaign_id": "g_search_brand_us",
+   "spend": 201.4,
+   "impressions": 250,
+   "clicks": 48,
+   "platform_conversions": 4.9,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-25",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 184.82,
+   "impressions": 540,
+   "clicks": 25,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-25",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 939.78,
+   "impressions": 2128,
+   "clicks": 112,
+   "platform_conversions": 5.9,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-25",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 976.31,
+   "impressions": 40604,
+   "clicks": 416,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-25",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 747.1,
+   "impressions": 37783,
+   "clicks": 385,
+   "platform_conversions": 2.7,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-25",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 435.81,
+   "impressions": 12278,
+   "clicks": 138,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-26",
+   "campaign_id": "g_pmax_us",
+   "spend": 461.22,
+   "impressions": 9846,
+   "clicks": 161,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-26",
+   "campaign_id": "g_search_brand_us",
+   "spend": 196.88,
+   "impressions": 232,
+   "clicks": 44,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-26",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 191.33,
+   "impressions": 653,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-26",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1003.74,
+   "impressions": 2052,
+   "clicks": 109,
+   "platform_conversions": 3.3,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-26",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1019.93,
+   "impressions": 42697,
+   "clicks": 433,
+   "platform_conversions": 5.2,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-26",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 767.96,
+   "impressions": 35930,
+   "clicks": 339,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-26",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 430.13,
+   "impressions": 12128,
+   "clicks": 131,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-27",
+   "campaign_id": "g_pmax_us",
+   "spend": 435.44,
+   "impressions": 8995,
+   "clicks": 148,
+   "platform_conversions": 7.4,
+   "trials": 6,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-27",
+   "campaign_id": "g_search_brand_us",
+   "spend": 189.26,
+   "impressions": 255,
+   "clicks": 47,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-27",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 194.42,
+   "impressions": 627,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-27",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1011.64,
+   "impressions": 2362,
+   "clicks": 121,
+   "platform_conversions": 4.4,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-27",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1001.67,
+   "impressions": 40313,
+   "clicks": 478,
+   "platform_conversions": 8.3,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-27",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 732.76,
+   "impressions": 32624,
+   "clicks": 323,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-27",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 452.81,
+   "impressions": 13539,
+   "clicks": 149,
+   "platform_conversions": 4.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-28",
+   "campaign_id": "g_pmax_us",
+   "spend": 432.78,
+   "impressions": 9109,
+   "clicks": 146,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-28",
+   "campaign_id": "g_search_brand_us",
+   "spend": 202.52,
+   "impressions": 262,
+   "clicks": 51,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-28",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 217.36,
+   "impressions": 654,
+   "clicks": 31,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-28",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 994.16,
+   "impressions": 2492,
+   "clicks": 122,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-28",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 942.55,
+   "impressions": 37295,
+   "clicks": 394,
+   "platform_conversions": 3.9,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-28",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 765.6,
+   "impressions": 38486,
+   "clicks": 402,
+   "platform_conversions": 7.2,
+   "trials": 5,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-28",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 415.29,
+   "impressions": 12012,
+   "clicks": 148,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-29",
+   "campaign_id": "g_pmax_us",
+   "spend": 337.09,
+   "impressions": 7550,
+   "clicks": 116,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-29",
+   "campaign_id": "g_search_brand_us",
+   "spend": 142.19,
+   "impressions": 166,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-29",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 165.82,
+   "impressions": 498,
+   "clicks": 24,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-29",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 714.81,
+   "impressions": 1653,
+   "clicks": 80,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-29",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 929.86,
+   "impressions": 36457,
+   "clicks": 402,
+   "platform_conversions": 4.1,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-08-29",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 673.12,
+   "impressions": 30888,
+   "clicks": 297,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-29",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 421.5,
+   "impressions": 13181,
+   "clicks": 142,
+   "platform_conversions": 2.9,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-30",
+   "campaign_id": "g_pmax_us",
+   "spend": 368.78,
+   "impressions": 8471,
+   "clicks": 134,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-30",
+   "campaign_id": "g_search_brand_us",
+   "spend": 166.5,
+   "impressions": 225,
+   "clicks": 38,
+   "platform_conversions": 3.4,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-30",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 164.1,
+   "impressions": 512,
+   "clicks": 22,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-30",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 699.12,
+   "impressions": 1735,
+   "clicks": 81,
+   "platform_conversions": 5.0,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-30",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 987.96,
+   "impressions": 40954,
+   "clicks": 423,
+   "platform_conversions": 9.9,
+   "trials": 7,
+   "paid": 3
+  },
+  {
+   "date": "2026-08-30",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 667.85,
+   "impressions": 29467,
+   "clicks": 314,
+   "platform_conversions": 8.5,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-30",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 393.75,
+   "impressions": 13241,
+   "clicks": 146,
+   "platform_conversions": 5.0,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-08-31",
+   "campaign_id": "g_pmax_us",
+   "spend": 473.65,
+   "impressions": 9848,
+   "clicks": 163,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-31",
+   "campaign_id": "g_search_brand_us",
+   "spend": 190.58,
+   "impressions": 235,
+   "clicks": 40,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-31",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 190.27,
+   "impressions": 620,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-31",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1004.78,
+   "impressions": 2314,
+   "clicks": 119,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-31",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1010.84,
+   "impressions": 41022,
+   "clicks": 421,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-31",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 769.28,
+   "impressions": 34262,
+   "clicks": 337,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-08-31",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 455.58,
+   "impressions": 14080,
+   "clicks": 152,
+   "platform_conversions": 5.2,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-01",
+   "campaign_id": "g_pmax_us",
+   "spend": 474.69,
+   "impressions": 10539,
+   "clicks": 159,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-01",
+   "campaign_id": "g_search_brand_us",
+   "spend": 184.89,
+   "impressions": 235,
+   "clicks": 43,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-01",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 207.86,
+   "impressions": 648,
+   "clicks": 32,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-01",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 969.79,
+   "impressions": 1972,
+   "clicks": 105,
+   "platform_conversions": 3.4,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-01",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 976.06,
+   "impressions": 41386,
+   "clicks": 465,
+   "platform_conversions": 3.8,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-01",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 740.92,
+   "impressions": 35730,
+   "clicks": 339,
+   "platform_conversions": 2.9,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-01",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 412.44,
+   "impressions": 11875,
+   "clicks": 141,
+   "platform_conversions": 2.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-02",
+   "campaign_id": "g_pmax_us",
+   "spend": 505.01,
+   "impressions": 12146,
+   "clicks": 190,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-02",
+   "campaign_id": "g_search_brand_us",
+   "spend": 212.05,
+   "impressions": 271,
+   "clicks": 52,
+   "platform_conversions": 3.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-02",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 193.55,
+   "impressions": 676,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-02",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 973.5,
+   "impressions": 2377,
+   "clicks": 119,
+   "platform_conversions": 5.3,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-02",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1053.8,
+   "impressions": 40568,
+   "clicks": 460,
+   "platform_conversions": 4.0,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-02",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 726.57,
+   "impressions": 33521,
+   "clicks": 322,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-02",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 415.87,
+   "impressions": 12609,
+   "clicks": 148,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-03",
+   "campaign_id": "g_pmax_us",
+   "spend": 466.54,
+   "impressions": 10385,
+   "clicks": 165,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-03",
+   "campaign_id": "g_search_brand_us",
+   "spend": 198.08,
+   "impressions": 287,
+   "clicks": 49,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-03",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 210.95,
+   "impressions": 651,
+   "clicks": 32,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-03",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1030.78,
+   "impressions": 2556,
+   "clicks": 122,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-03",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1036.25,
+   "impressions": 41799,
+   "clicks": 476,
+   "platform_conversions": 9.9,
+   "trials": 8,
+   "paid": 3
+  },
+  {
+   "date": "2026-09-03",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 706.17,
+   "impressions": 34876,
+   "clicks": 345,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-03",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 418.13,
+   "impressions": 12417,
+   "clicks": 150,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-04",
+   "campaign_id": "g_pmax_us",
+   "spend": 435.03,
+   "impressions": 9690,
+   "clicks": 163,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-04",
+   "campaign_id": "g_search_brand_us",
+   "spend": 192.95,
+   "impressions": 230,
+   "clicks": 41,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-04",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 206.53,
+   "impressions": 729,
+   "clicks": 31,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-04",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 889.68,
+   "impressions": 2142,
+   "clicks": 99,
+   "platform_conversions": 4.5,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-04",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 937.2,
+   "impressions": 42648,
+   "clicks": 444,
+   "platform_conversions": 10.1,
+   "trials": 7,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-04",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 747.49,
+   "impressions": 35984,
+   "clicks": 375,
+   "platform_conversions": 6.3,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-04",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 418.09,
+   "impressions": 11924,
+   "clicks": 133,
+   "platform_conversions": 5.6,
+   "trials": 4,
+   "paid": 3
+  },
+  {
+   "date": "2026-09-05",
+   "campaign_id": "g_pmax_us",
+   "spend": 366.61,
+   "impressions": 7585,
+   "clicks": 119,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-05",
+   "campaign_id": "g_search_brand_us",
+   "spend": 143.63,
+   "impressions": 165,
+   "clicks": 31,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-05",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 164.7,
+   "impressions": 470,
+   "clicks": 23,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-05",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 749.24,
+   "impressions": 1578,
+   "clicks": 77,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-05",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 988.65,
+   "impressions": 39809,
+   "clicks": 411,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-05",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 731.13,
+   "impressions": 33909,
+   "clicks": 324,
+   "platform_conversions": 4.0,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-05",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 423.81,
+   "impressions": 12611,
+   "clicks": 146,
+   "platform_conversions": 7.0,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-06",
+   "campaign_id": "g_pmax_us",
+   "spend": 365.44,
+   "impressions": 8676,
+   "clicks": 128,
+   "platform_conversions": 5.0,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-06",
+   "campaign_id": "g_search_brand_us",
+   "spend": 166.25,
+   "impressions": 218,
+   "clicks": 42,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-06",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 145.53,
+   "impressions": 458,
+   "clicks": 22,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-06",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 714.54,
+   "impressions": 1670,
+   "clicks": 86,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-06",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 951.76,
+   "impressions": 45036,
+   "clicks": 473,
+   "platform_conversions": 7.5,
+   "trials": 6,
+   "paid": 3
+  },
+  {
+   "date": "2026-09-06",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 721.66,
+   "impressions": 37675,
+   "clicks": 355,
+   "platform_conversions": 4.2,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-06",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 404.81,
+   "impressions": 11491,
+   "clicks": 140,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-07",
+   "campaign_id": "g_pmax_us",
+   "spend": 431.76,
+   "impressions": 8802,
+   "clicks": 146,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-07",
+   "campaign_id": "g_search_brand_us",
+   "spend": 199.67,
+   "impressions": 263,
+   "clicks": 49,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-07",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 213.47,
+   "impressions": 643,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-07",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 967.61,
+   "impressions": 2073,
+   "clicks": 110,
+   "platform_conversions": 3.5,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-07",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 965.8,
+   "impressions": 36161,
+   "clicks": 416,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-07",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 690.44,
+   "impressions": 28604,
+   "clicks": 307,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-07",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 415.29,
+   "impressions": 11595,
+   "clicks": 136,
+   "platform_conversions": 7.1,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-08",
+   "campaign_id": "g_pmax_us",
+   "spend": 444.16,
+   "impressions": 10796,
+   "clicks": 168,
+   "platform_conversions": 6.9,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-08",
+   "campaign_id": "g_search_brand_us",
+   "spend": 194.09,
+   "impressions": 227,
+   "clicks": 43,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-08",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 211.16,
+   "impressions": 709,
+   "clicks": 33,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-08",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 949.21,
+   "impressions": 1929,
+   "clicks": 104,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-08",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 986.18,
+   "impressions": 42081,
+   "clicks": 428,
+   "platform_conversions": 4.0,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-08",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 718.69,
+   "impressions": 32425,
+   "clicks": 332,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-08",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 420.07,
+   "impressions": 13149,
+   "clicks": 153,
+   "platform_conversions": 3.7,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-09",
+   "campaign_id": "g_pmax_us",
+   "spend": 502.38,
+   "impressions": 9470,
+   "clicks": 160,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-09",
+   "campaign_id": "g_search_brand_us",
+   "spend": 200.42,
+   "impressions": 222,
+   "clicks": 41,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-09",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 188.51,
+   "impressions": 574,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-09",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1041.18,
+   "impressions": 2690,
+   "clicks": 124,
+   "platform_conversions": 10.1,
+   "trials": 9,
+   "paid": 3
+  },
+  {
+   "date": "2026-09-09",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1016.83,
+   "impressions": 41196,
+   "clicks": 440,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-09",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 736.96,
+   "impressions": 32650,
+   "clicks": 338,
+   "platform_conversions": 2.7,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-09",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 451.64,
+   "impressions": 14204,
+   "clicks": 156,
+   "platform_conversions": 5.6,
+   "trials": 4,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-10",
+   "campaign_id": "g_pmax_us",
+   "spend": 505.84,
+   "impressions": 11233,
+   "clicks": 189,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-10",
+   "campaign_id": "g_search_brand_us",
+   "spend": 209.38,
+   "impressions": 242,
+   "clicks": 45,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-10",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 210.62,
+   "impressions": 619,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-10",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 995.34,
+   "impressions": 2407,
+   "clicks": 122,
+   "platform_conversions": 5.9,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-10",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 954.54,
+   "impressions": 43189,
+   "clicks": 441,
+   "platform_conversions": 8.2,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-10",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 693.36,
+   "impressions": 31866,
+   "clicks": 316,
+   "platform_conversions": 3.9,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-10",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 455.51,
+   "impressions": 14516,
+   "clicks": 154,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-11",
+   "campaign_id": "g_pmax_us",
+   "spend": 476.57,
+   "impressions": 10059,
+   "clicks": 165,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-11",
+   "campaign_id": "g_search_brand_us",
+   "spend": 205.75,
+   "impressions": 231,
+   "clicks": 44,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-11",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 207.78,
+   "impressions": 621,
+   "clicks": 30,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-11",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 935.19,
+   "impressions": 2063,
+   "clicks": 106,
+   "platform_conversions": 3.7,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-11",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 989.88,
+   "impressions": 36329,
+   "clicks": 420,
+   "platform_conversions": 11.0,
+   "trials": 9,
+   "paid": 3
+  },
+  {
+   "date": "2026-09-11",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 699.69,
+   "impressions": 37255,
+   "clicks": 344,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-11",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 456.34,
+   "impressions": 14257,
+   "clicks": 158,
+   "platform_conversions": 2.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-12",
+   "campaign_id": "g_pmax_us",
+   "spend": 388.74,
+   "impressions": 7689,
+   "clicks": 128,
+   "platform_conversions": 4.8,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-12",
+   "campaign_id": "g_search_brand_us",
+   "spend": 167.14,
+   "impressions": 220,
+   "clicks": 37,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-12",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 166.13,
+   "impressions": 483,
+   "clicks": 24,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-12",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 775.78,
+   "impressions": 1717,
+   "clicks": 92,
+   "platform_conversions": 6.7,
+   "trials": 6,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-12",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 900.03,
+   "impressions": 36487,
+   "clicks": 400,
+   "platform_conversions": 4.1,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-12",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 676.33,
+   "impressions": 33302,
+   "clicks": 352,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-12",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 395.73,
+   "impressions": 11872,
+   "clicks": 135,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-13",
+   "campaign_id": "g_pmax_us",
+   "spend": 364.6,
+   "impressions": 7467,
+   "clicks": 126,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-13",
+   "campaign_id": "g_search_brand_us",
+   "spend": 155.44,
+   "impressions": 180,
+   "clicks": 33,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-13",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 165.55,
+   "impressions": 608,
+   "clicks": 26,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-13",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 734.77,
+   "impressions": 1614,
+   "clicks": 84,
+   "platform_conversions": 6.7,
+   "trials": 6,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-13",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 898.49,
+   "impressions": 35645,
+   "clicks": 381,
+   "platform_conversions": 2.6,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-13",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 664.45,
+   "impressions": 31879,
+   "clicks": 301,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-13",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 417.74,
+   "impressions": 11913,
+   "clicks": 142,
+   "platform_conversions": 3.9,
+   "trials": 3,
+   "paid": 3
+  },
+  {
+   "date": "2026-09-14",
+   "campaign_id": "g_pmax_us",
+   "spend": 477.15,
+   "impressions": 11373,
+   "clicks": 171,
+   "platform_conversions": 3.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-14",
+   "campaign_id": "g_search_brand_us",
+   "spend": 209.95,
+   "impressions": 286,
+   "clicks": 48,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-14",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 193.22,
+   "impressions": 595,
+   "clicks": 27,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-14",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 957.04,
+   "impressions": 2257,
+   "clicks": 118,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-14",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 974.09,
+   "impressions": 40242,
+   "clicks": 477,
+   "platform_conversions": 2.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-14",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 765.72,
+   "impressions": 37277,
+   "clicks": 349,
+   "platform_conversions": 2.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-14",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 415.71,
+   "impressions": 12923,
+   "clicks": 143,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-15",
+   "campaign_id": "g_pmax_us",
+   "spend": 492.3,
+   "impressions": 10382,
+   "clicks": 171,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-15",
+   "campaign_id": "g_search_brand_us",
+   "spend": 57.98,
+   "impressions": 65,
+   "clicks": 12,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-15",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 185.57,
+   "impressions": 547,
+   "clicks": 26,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-15",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1119.59,
+   "impressions": 2547,
+   "clicks": 124,
+   "platform_conversions": 3.2,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-15",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1040.92,
+   "impressions": 43808,
+   "clicks": 467,
+   "platform_conversions": 5.7,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-15",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 689.39,
+   "impressions": 28106,
+   "clicks": 302,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-15",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 451.29,
+   "impressions": 13326,
+   "clicks": 154,
+   "platform_conversions": 6.1,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-16",
+   "campaign_id": "g_pmax_us",
+   "spend": 449.71,
+   "impressions": 8575,
+   "clicks": 147,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-16",
+   "campaign_id": "g_search_brand_us",
+   "spend": 60.18,
+   "impressions": 72,
+   "clicks": 14,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-16",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 192.52,
+   "impressions": 559,
+   "clicks": 27,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-16",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1067.69,
+   "impressions": 2383,
+   "clicks": 120,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-16",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1016.98,
+   "impressions": 37199,
+   "clicks": 425,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-16",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 731.01,
+   "impressions": 34792,
+   "clicks": 373,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-16",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 408.04,
+   "impressions": 11802,
+   "clicks": 146,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-17",
+   "campaign_id": "g_pmax_us",
+   "spend": 448.81,
+   "impressions": 9361,
+   "clicks": 161,
+   "platform_conversions": 2.1,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-17",
+   "campaign_id": "g_search_brand_us",
+   "spend": 63.6,
+   "impressions": 73,
+   "clicks": 14,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-17",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 200.95,
+   "impressions": 633,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-17",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 961.96,
+   "impressions": 2207,
+   "clicks": 111,
+   "platform_conversions": 4.8,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-17",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1036.13,
+   "impressions": 38988,
+   "clicks": 458,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-17",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 698.58,
+   "impressions": 34511,
+   "clicks": 354,
+   "platform_conversions": 3.8,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-17",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 424.49,
+   "impressions": 10408,
+   "clicks": 129,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-18",
+   "campaign_id": "g_pmax_us",
+   "spend": 434.15,
+   "impressions": 8533,
+   "clicks": 142,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-18",
+   "campaign_id": "g_search_brand_us",
+   "spend": 65.01,
+   "impressions": 85,
+   "clicks": 16,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-18",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 201.73,
+   "impressions": 683,
+   "clicks": 30,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-18",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 952.86,
+   "impressions": 2402,
+   "clicks": 118,
+   "platform_conversions": 6.8,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-18",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1039.05,
+   "impressions": 44546,
+   "clicks": 499,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-18",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 770.45,
+   "impressions": 36744,
+   "clicks": 360,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-18",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 422.63,
+   "impressions": 10726,
+   "clicks": 133,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-19",
+   "campaign_id": "g_pmax_us",
+   "spend": 370.25,
+   "impressions": 7107,
+   "clicks": 120,
+   "platform_conversions": 5.0,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-19",
+   "campaign_id": "g_search_brand_us",
+   "spend": 50.06,
+   "impressions": 65,
+   "clicks": 11,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-19",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 151.61,
+   "impressions": 452,
+   "clicks": 22,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-19",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 744.88,
+   "impressions": 1839,
+   "clicks": 90,
+   "platform_conversions": 5.8,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-19",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 942.37,
+   "impressions": 41467,
+   "clicks": 456,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-19",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 685.84,
+   "impressions": 34684,
+   "clicks": 355,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-19",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 424.85,
+   "impressions": 11165,
+   "clicks": 133,
+   "platform_conversions": 1.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-20",
+   "campaign_id": "g_pmax_us",
+   "spend": 376.75,
+   "impressions": 7501,
+   "clicks": 124,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-20",
+   "campaign_id": "g_search_brand_us",
+   "spend": 160.08,
+   "impressions": 234,
+   "clicks": 40,
+   "platform_conversions": 3.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-20",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 157.72,
+   "impressions": 516,
+   "clicks": 23,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-20",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 794.17,
+   "impressions": 1986,
+   "clicks": 95,
+   "platform_conversions": 2.1,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-20",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 968.35,
+   "impressions": 38667,
+   "clicks": 440,
+   "platform_conversions": 7.5,
+   "trials": 6,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-20",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 679.99,
+   "impressions": 33040,
+   "clicks": 327,
+   "platform_conversions": 1.3,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-20",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 394.78,
+   "impressions": 10841,
+   "clicks": 126,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-21",
+   "campaign_id": "g_pmax_us",
+   "spend": 461.68,
+   "impressions": 10307,
+   "clicks": 167,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-21",
+   "campaign_id": "g_search_brand_us",
+   "spend": 200.0,
+   "impressions": 256,
+   "clicks": 43,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-21",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 193.42,
+   "impressions": 670,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-21",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 945.32,
+   "impressions": 2067,
+   "clicks": 110,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-21",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1043.04,
+   "impressions": 39854,
+   "clicks": 470,
+   "platform_conversions": 7.7,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-21",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 690.65,
+   "impressions": 31482,
+   "clicks": 312,
+   "platform_conversions": 2.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-21",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 438.18,
+   "impressions": 11982,
+   "clicks": 137,
+   "platform_conversions": 7.7,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-22",
+   "campaign_id": "g_pmax_us",
+   "spend": 498.1,
+   "impressions": 11335,
+   "clicks": 183,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-22",
+   "campaign_id": "g_search_brand_us",
+   "spend": 210.57,
+   "impressions": 265,
+   "clicks": 51,
+   "platform_conversions": 3.7,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-22",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 213.23,
+   "impressions": 622,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-22",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1035.59,
+   "impressions": 2750,
+   "clicks": 128,
+   "platform_conversions": 4.5,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-22",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 948.14,
+   "impressions": 40740,
+   "clicks": 444,
+   "platform_conversions": 1.6,
+   "trials": 4,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-22",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 691.22,
+   "impressions": 35412,
+   "clicks": 357,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-22",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 422.47,
+   "impressions": 12301,
+   "clicks": 143,
+   "platform_conversions": 1.1,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-23",
+   "campaign_id": "g_pmax_us",
+   "spend": 465.29,
+   "impressions": 9580,
+   "clicks": 148,
+   "platform_conversions": 3.6,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-23",
+   "campaign_id": "g_search_brand_us",
+   "spend": 216.99,
+   "impressions": 273,
+   "clicks": 53,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-23",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 207.18,
+   "impressions": 684,
+   "clicks": 32,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-23",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1031.63,
+   "impressions": 2511,
+   "clicks": 123,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-23",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1023.98,
+   "impressions": 43674,
+   "clicks": 494,
+   "platform_conversions": 0.9,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-23",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 755.33,
+   "impressions": 35977,
+   "clicks": 372,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-23",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 411.25,
+   "impressions": 12130,
+   "clicks": 139,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-24",
+   "campaign_id": "g_pmax_us",
+   "spend": 493.28,
+   "impressions": 10388,
+   "clicks": 176,
+   "platform_conversions": 5.3,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-24",
+   "campaign_id": "g_search_brand_us",
+   "spend": 204.64,
+   "impressions": 264,
+   "clicks": 46,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-24",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 209.16,
+   "impressions": 625,
+   "clicks": 30,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-24",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1022.27,
+   "impressions": 2123,
+   "clicks": 109,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-24",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 959.52,
+   "impressions": 41047,
+   "clicks": 484,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-24",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 709.33,
+   "impressions": 35947,
+   "clicks": 334,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-24",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 407.41,
+   "impressions": 13621,
+   "clicks": 150,
+   "platform_conversions": 3.1,
+   "trials": 10,
+   "paid": 3
+  },
+  {
+   "date": "2026-09-25",
+   "campaign_id": "g_pmax_us",
+   "spend": 452.43,
+   "impressions": 9774,
+   "clicks": 164,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-25",
+   "campaign_id": "g_search_brand_us",
+   "spend": 198.6,
+   "impressions": 241,
+   "clicks": 47,
+   "platform_conversions": 2.1,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-25",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 198.2,
+   "impressions": 622,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-25",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 950.01,
+   "impressions": 2364,
+   "clicks": 112,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-25",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1023.62,
+   "impressions": 44635,
+   "clicks": 475,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-25",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 694.72,
+   "impressions": 36151,
+   "clicks": 341,
+   "platform_conversions": 1.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-25",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 452.09,
+   "impressions": 11471,
+   "clicks": 138,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-26",
+   "campaign_id": "g_pmax_us",
+   "spend": 347.31,
+   "impressions": 7609,
+   "clicks": 128,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-26",
+   "campaign_id": "g_search_brand_us",
+   "spend": 150.79,
+   "impressions": 180,
+   "clicks": 31,
+   "platform_conversions": 3.4,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-26",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 158.37,
+   "impressions": 536,
+   "clicks": 25,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-26",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 770.22,
+   "impressions": 1649,
+   "clicks": 89,
+   "platform_conversions": 4.3,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-26",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 970.88,
+   "impressions": 43538,
+   "clicks": 458,
+   "platform_conversions": 1.3,
+   "trials": 4,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-26",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 656.99,
+   "impressions": 30250,
+   "clicks": 285,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-26",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 408.83,
+   "impressions": 12901,
+   "clicks": 141,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-27",
+   "campaign_id": "g_pmax_us",
+   "spend": 344.83,
+   "impressions": 7919,
+   "clicks": 122,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-27",
+   "campaign_id": "g_search_brand_us",
+   "spend": 145.69,
+   "impressions": 163,
+   "clicks": 30,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-27",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 163.12,
+   "impressions": 450,
+   "clicks": 22,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-27",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 776.26,
+   "impressions": 1697,
+   "clicks": 80,
+   "platform_conversions": 3.6,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-27",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 976.88,
+   "impressions": 38460,
+   "clicks": 428,
+   "platform_conversions": 1.6,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-27",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 706.73,
+   "impressions": 34767,
+   "clicks": 356,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-27",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 392.12,
+   "impressions": 10803,
+   "clicks": 132,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-28",
+   "campaign_id": "g_pmax_us",
+   "spend": 477.01,
+   "impressions": 10150,
+   "clicks": 155,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-28",
+   "campaign_id": "g_search_brand_us",
+   "spend": 198.65,
+   "impressions": 260,
+   "clicks": 49,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-28",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 209.78,
+   "impressions": 727,
+   "clicks": 33,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-28",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 910.06,
+   "impressions": 1924,
+   "clicks": 98,
+   "platform_conversions": 4.9,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-28",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 998.52,
+   "impressions": 42503,
+   "clicks": 493,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-28",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 741.49,
+   "impressions": 35475,
+   "clicks": 368,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-28",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 444.82,
+   "impressions": 13525,
+   "clicks": 148,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-29",
+   "campaign_id": "g_pmax_us",
+   "spend": 442.68,
+   "impressions": 8991,
+   "clicks": 150,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-29",
+   "campaign_id": "g_search_brand_us",
+   "spend": 212.18,
+   "impressions": 270,
+   "clicks": 52,
+   "platform_conversions": 3.7,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-29",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 205.18,
+   "impressions": 708,
+   "clicks": 32,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-29",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1020.7,
+   "impressions": 2117,
+   "clicks": 107,
+   "platform_conversions": 4.3,
+   "trials": 4,
+   "paid": 2
+  },
+  {
+   "date": "2026-09-29",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 960.52,
+   "impressions": 39220,
+   "clicks": 424,
+   "platform_conversions": 1.2,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-29",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 715.44,
+   "impressions": 35948,
+   "clicks": 345,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-29",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 409.66,
+   "impressions": 11298,
+   "clicks": 128,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-30",
+   "campaign_id": "g_pmax_us",
+   "spend": 480.09,
+   "impressions": 10467,
+   "clicks": 155,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-30",
+   "campaign_id": "g_search_brand_us",
+   "spend": 202.41,
+   "impressions": 245,
+   "clicks": 47,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-30",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 202.42,
+   "impressions": 726,
+   "clicks": 31,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-30",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 939.65,
+   "impressions": 2000,
+   "clicks": 99,
+   "platform_conversions": 9.3,
+   "trials": 8,
+   "paid": 5
+  },
+  {
+   "date": "2026-09-30",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1027.59,
+   "impressions": 40774,
+   "clicks": 466,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-09-30",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 724.34,
+   "impressions": 30186,
+   "clicks": 324,
+   "platform_conversions": 1.4,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-09-30",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 422.43,
+   "impressions": 13088,
+   "clicks": 140,
+   "platform_conversions": 1.0,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-01",
+   "campaign_id": "g_pmax_us",
+   "spend": 427.63,
+   "impressions": 8077,
+   "clicks": 134,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-01",
+   "campaign_id": "g_search_brand_us",
+   "spend": 189.93,
+   "impressions": 262,
+   "clicks": 45,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-01",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 188.97,
+   "impressions": 589,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-01",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1037.16,
+   "impressions": 2474,
+   "clicks": 116,
+   "platform_conversions": 4.3,
+   "trials": 4,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-01",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1013.88,
+   "impressions": 42547,
+   "clicks": 484,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-01",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 704.03,
+   "impressions": 40108,
+   "clicks": 369,
+   "platform_conversions": 1.5,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-01",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 455.99,
+   "impressions": 14106,
+   "clicks": 157,
+   "platform_conversions": 1.1,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-02",
+   "campaign_id": "g_pmax_us",
+   "spend": 504.26,
+   "impressions": 9822,
+   "clicks": 160,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-02",
+   "campaign_id": "g_search_brand_us",
+   "spend": 195.48,
+   "impressions": 213,
+   "clicks": 41,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-02",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 216.03,
+   "impressions": 711,
+   "clicks": 34,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-02",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 990.02,
+   "impressions": 2298,
+   "clicks": 106,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-02",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 975.41,
+   "impressions": 40349,
+   "clicks": 442,
+   "platform_conversions": 1.5,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-02",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 732.1,
+   "impressions": 36079,
+   "clicks": 356,
+   "platform_conversions": 0.9,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-02",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 442.88,
+   "impressions": 11824,
+   "clicks": 145,
+   "platform_conversions": 1.1,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-03",
+   "campaign_id": "g_pmax_us",
+   "spend": 365.53,
+   "impressions": 7699,
+   "clicks": 125,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-03",
+   "campaign_id": "g_search_brand_us",
+   "spend": 145.84,
+   "impressions": 179,
+   "clicks": 33,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-03",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 142.35,
+   "impressions": 518,
+   "clicks": 22,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-03",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 814.96,
+   "impressions": 1707,
+   "clicks": 86,
+   "platform_conversions": 3.4,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-03",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 977.92,
+   "impressions": 39369,
+   "clicks": 462,
+   "platform_conversions": 2.0,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-03",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 658.63,
+   "impressions": 29822,
+   "clicks": 295,
+   "platform_conversions": 2.3,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-03",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 428.52,
+   "impressions": 12029,
+   "clicks": 146,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-04",
+   "campaign_id": "g_pmax_us",
+   "spend": 362.12,
+   "impressions": 8127,
+   "clicks": 122,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-04",
+   "campaign_id": "g_search_brand_us",
+   "spend": 164.16,
+   "impressions": 212,
+   "clicks": 39,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-04",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 155.04,
+   "impressions": 442,
+   "clicks": 21,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-04",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 801.82,
+   "impressions": 1678,
+   "clicks": 84,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-04",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 976.91,
+   "impressions": 45366,
+   "clicks": 478,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-04",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 725.06,
+   "impressions": 32680,
+   "clicks": 315,
+   "platform_conversions": 0.9,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-04",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 409.47,
+   "impressions": 13218,
+   "clicks": 141,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-05",
+   "campaign_id": "g_pmax_us",
+   "spend": 440.93,
+   "impressions": 9279,
+   "clicks": 159,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-05",
+   "campaign_id": "g_search_brand_us",
+   "spend": 202.06,
+   "impressions": 248,
+   "clicks": 43,
+   "platform_conversions": 3.6,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-05",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 189.25,
+   "impressions": 573,
+   "clicks": 26,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-05",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1000.09,
+   "impressions": 2116,
+   "clicks": 110,
+   "platform_conversions": 7.0,
+   "trials": 6,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-05",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 962.73,
+   "impressions": 37437,
+   "clicks": 431,
+   "platform_conversions": 0.9,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-05",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 734.11,
+   "impressions": 34945,
+   "clicks": 355,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-05",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 427.19,
+   "impressions": 12151,
+   "clicks": 130,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-06",
+   "campaign_id": "g_pmax_us",
+   "spend": 440.67,
+   "impressions": 9659,
+   "clicks": 148,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-06",
+   "campaign_id": "g_search_brand_us",
+   "spend": 189.11,
+   "impressions": 242,
+   "clicks": 41,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-06",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 212.71,
+   "impressions": 654,
+   "clicks": 30,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-06",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1047.34,
+   "impressions": 2307,
+   "clicks": 120,
+   "platform_conversions": 4.6,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-06",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1011.18,
+   "impressions": 42273,
+   "clicks": 467,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-06",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 694.53,
+   "impressions": 33172,
+   "clicks": 346,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-06",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 441.74,
+   "impressions": 12762,
+   "clicks": 144,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-07",
+   "campaign_id": "g_pmax_us",
+   "spend": 448.29,
+   "impressions": 8298,
+   "clicks": 141,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-07",
+   "campaign_id": "g_search_brand_us",
+   "spend": 193.33,
+   "impressions": 220,
+   "clicks": 43,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-07",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 183.25,
+   "impressions": 553,
+   "clicks": 25,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-07",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 893.26,
+   "impressions": 1791,
+   "clicks": 91,
+   "platform_conversions": 3.4,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-07",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1015.46,
+   "impressions": 43833,
+   "clicks": 499,
+   "platform_conversions": 2.2,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-07",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 772.89,
+   "impressions": 39834,
+   "clicks": 392,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-07",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 414.46,
+   "impressions": 12061,
+   "clicks": 145,
+   "platform_conversions": 1.8,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-08",
+   "campaign_id": "g_pmax_us",
+   "spend": 466.71,
+   "impressions": 9681,
+   "clicks": 149,
+   "platform_conversions": 5.6,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-08",
+   "campaign_id": "g_search_brand_us",
+   "spend": 188.38,
+   "impressions": 228,
+   "clicks": 41,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-08",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 214.35,
+   "impressions": 587,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-08",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 887.15,
+   "impressions": 2309,
+   "clicks": 109,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-08",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1040.48,
+   "impressions": 43216,
+   "clicks": 480,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-08",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 694.85,
+   "impressions": 33473,
+   "clicks": 348,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-08",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 453.24,
+   "impressions": 12236,
+   "clicks": 144,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-09",
+   "campaign_id": "g_pmax_us",
+   "spend": 470.94,
+   "impressions": 9831,
+   "clicks": 150,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-09",
+   "campaign_id": "g_search_brand_us",
+   "spend": 190.96,
+   "impressions": 270,
+   "clicks": 48,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-09",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 197.88,
+   "impressions": 619,
+   "clicks": 27,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-09",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 905.61,
+   "impressions": 2136,
+   "clicks": 111,
+   "platform_conversions": 3.3,
+   "trials": 3,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-09",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 972.5,
+   "impressions": 42179,
+   "clicks": 441,
+   "platform_conversions": 1.5,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-09",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 690.91,
+   "impressions": 35664,
+   "clicks": 331,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-09",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 426.89,
+   "impressions": 10706,
+   "clicks": 130,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-10",
+   "campaign_id": "g_pmax_us",
+   "spend": 351.43,
+   "impressions": 7053,
+   "clicks": 120,
+   "platform_conversions": 2.1,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-10",
+   "campaign_id": "g_search_brand_us",
+   "spend": 168.24,
+   "impressions": 228,
+   "clicks": 39,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-10",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 165.28,
+   "impressions": 575,
+   "clicks": 26,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-10",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 770.93,
+   "impressions": 1630,
+   "clicks": 86,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-10",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 893.34,
+   "impressions": 34324,
+   "clicks": 396,
+   "platform_conversions": 1.1,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-10",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 696.9,
+   "impressions": 29903,
+   "clicks": 312,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-10",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 391.59,
+   "impressions": 11005,
+   "clicks": 125,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-11",
+   "campaign_id": "g_pmax_us",
+   "spend": 331.77,
+   "impressions": 8027,
+   "clicks": 126,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-11",
+   "campaign_id": "g_search_brand_us",
+   "spend": 158.97,
+   "impressions": 208,
+   "clicks": 38,
+   "platform_conversions": 3.4,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-11",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 164.52,
+   "impressions": 516,
+   "clicks": 24,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-11",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 797.89,
+   "impressions": 1860,
+   "clicks": 98,
+   "platform_conversions": 7.9,
+   "trials": 7,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-11",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 898.74,
+   "impressions": 34924,
+   "clicks": 404,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-11",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 666.42,
+   "impressions": 30558,
+   "clicks": 304,
+   "platform_conversions": 1.1,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-11",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 423.8,
+   "impressions": 12935,
+   "clicks": 137,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-12",
+   "campaign_id": "g_pmax_us",
+   "spend": 459.78,
+   "impressions": 9491,
+   "clicks": 144,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-12",
+   "campaign_id": "g_search_brand_us",
+   "spend": 214.39,
+   "impressions": 277,
+   "clicks": 49,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-12",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 211.96,
+   "impressions": 681,
+   "clicks": 31,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-12",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1032.48,
+   "impressions": 2296,
+   "clicks": 115,
+   "platform_conversions": 4.9,
+   "trials": 4,
+   "paid": 3
+  },
+  {
+   "date": "2026-10-12",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 999.38,
+   "impressions": 40268,
+   "clicks": 461,
+   "platform_conversions": 1.4,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-12",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 739.03,
+   "impressions": 40539,
+   "clicks": 376,
+   "platform_conversions": 0.9,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-12",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 439.51,
+   "impressions": 12668,
+   "clicks": 136,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-13",
+   "campaign_id": "g_pmax_us",
+   "spend": 459.44,
+   "impressions": 8498,
+   "clicks": 144,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-13",
+   "campaign_id": "g_search_brand_us",
+   "spend": 191.04,
+   "impressions": 236,
+   "clicks": 42,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-13",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 186.26,
+   "impressions": 602,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-13",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 963.29,
+   "impressions": 2433,
+   "clicks": 117,
+   "platform_conversions": 4.8,
+   "trials": 4,
+   "paid": 3
+  },
+  {
+   "date": "2026-10-13",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 968.3,
+   "impressions": 35241,
+   "clicks": 414,
+   "platform_conversions": 1.6,
+   "trials": 5,
+   "paid": 3
+  },
+  {
+   "date": "2026-10-13",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 691.05,
+   "impressions": 34746,
+   "clicks": 337,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-13",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 443.56,
+   "impressions": 11603,
+   "clicks": 139,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-14",
+   "campaign_id": "g_pmax_us",
+   "spend": 447.74,
+   "impressions": 8833,
+   "clicks": 141,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-14",
+   "campaign_id": "g_search_brand_us",
+   "spend": 208.26,
+   "impressions": 299,
+   "clicks": 52,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-14",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 185.34,
+   "impressions": 617,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-14",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 951.59,
+   "impressions": 2186,
+   "clicks": 114,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-14",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1018.48,
+   "impressions": 41893,
+   "clicks": 485,
+   "platform_conversions": 1.6,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-14",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 728.89,
+   "impressions": 32987,
+   "clicks": 354,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-14",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 420.03,
+   "impressions": 13372,
+   "clicks": 149,
+   "platform_conversions": 2.0,
+   "trials": 5,
+   "paid": 3
+  },
+  {
+   "date": "2026-10-15",
+   "campaign_id": "g_pmax_us",
+   "spend": 450.57,
+   "impressions": 10513,
+   "clicks": 160,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-15",
+   "campaign_id": "g_search_brand_us",
+   "spend": 215.22,
+   "impressions": 243,
+   "clicks": 47,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-15",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 189.02,
+   "impressions": 591,
+   "clicks": 27,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-15",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1016.68,
+   "impressions": 2408,
+   "clicks": 122,
+   "platform_conversions": 3.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-15",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1013.76,
+   "impressions": 38812,
+   "clicks": 439,
+   "platform_conversions": 1.3,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-15",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 723.46,
+   "impressions": 30592,
+   "clicks": 313,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-15",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 415.78,
+   "impressions": 10974,
+   "clicks": 132,
+   "platform_conversions": 2.0,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-16",
+   "campaign_id": "g_pmax_us",
+   "spend": 475.55,
+   "impressions": 11405,
+   "clicks": 174,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-16",
+   "campaign_id": "g_search_brand_us",
+   "spend": 186.41,
+   "impressions": 219,
+   "clicks": 40,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-16",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 205.84,
+   "impressions": 566,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-16",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1050.81,
+   "impressions": 2278,
+   "clicks": 114,
+   "platform_conversions": 2.1,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-16",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1007.53,
+   "impressions": 44343,
+   "clicks": 481,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-16",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 752.66,
+   "impressions": 33711,
+   "clicks": 352,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-16",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 413.86,
+   "impressions": 11595,
+   "clicks": 139,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-17",
+   "campaign_id": "g_pmax_us",
+   "spend": 349.04,
+   "impressions": 8393,
+   "clicks": 124,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-17",
+   "campaign_id": "g_search_brand_us",
+   "spend": 146.45,
+   "impressions": 200,
+   "clicks": 36,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-17",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 152.76,
+   "impressions": 507,
+   "clicks": 24,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-17",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 778.82,
+   "impressions": 1706,
+   "clicks": 86,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-17",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 991.8,
+   "impressions": 42200,
+   "clicks": 441,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-17",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 672.29,
+   "impressions": 33421,
+   "clicks": 340,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-17",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 425.45,
+   "impressions": 12697,
+   "clicks": 137,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-18",
+   "campaign_id": "g_pmax_us",
+   "spend": 343.7,
+   "impressions": 6842,
+   "clicks": 112,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-18",
+   "campaign_id": "g_search_brand_us",
+   "spend": 162.82,
+   "impressions": 208,
+   "clicks": 37,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-18",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 153.06,
+   "impressions": 468,
+   "clicks": 21,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-18",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 760.62,
+   "impressions": 1711,
+   "clicks": 81,
+   "platform_conversions": 4.3,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-18",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1000.47,
+   "impressions": 38031,
+   "clicks": 414,
+   "platform_conversions": 1.0,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-18",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 682.18,
+   "impressions": 30688,
+   "clicks": 323,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-18",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 403.46,
+   "impressions": 10243,
+   "clicks": 123,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-19",
+   "campaign_id": "g_pmax_us",
+   "spend": 437.04,
+   "impressions": 8769,
+   "clicks": 143,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-19",
+   "campaign_id": "g_search_brand_us",
+   "spend": 193.08,
+   "impressions": 234,
+   "clicks": 40,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-19",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 209.67,
+   "impressions": 739,
+   "clicks": 32,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-19",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 896.21,
+   "impressions": 1895,
+   "clicks": 92,
+   "platform_conversions": 4.6,
+   "trials": 4,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-19",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1047.46,
+   "impressions": 47643,
+   "clicks": 512,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-19",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 687.29,
+   "impressions": 36904,
+   "clicks": 344,
+   "platform_conversions": 1.1,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-19",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 448.35,
+   "impressions": 13182,
+   "clicks": 156,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-20",
+   "campaign_id": "g_pmax_us",
+   "spend": 435.43,
+   "impressions": 9214,
+   "clicks": 151,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-20",
+   "campaign_id": "g_search_brand_us",
+   "spend": 183.64,
+   "impressions": 206,
+   "clicks": 40,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-20",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 188.07,
+   "impressions": 635,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-20",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 964.52,
+   "impressions": 2215,
+   "clicks": 114,
+   "platform_conversions": 4.6,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-20",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1035.3,
+   "impressions": 37944,
+   "clicks": 430,
+   "platform_conversions": 1.6,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-20",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 733.87,
+   "impressions": 34978,
+   "clicks": 340,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-20",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 433.44,
+   "impressions": 12014,
+   "clicks": 135,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-21",
+   "campaign_id": "g_pmax_us",
+   "spend": 427.65,
+   "impressions": 8643,
+   "clicks": 146,
+   "platform_conversions": 3.4,
+   "trials": 3,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-21",
+   "campaign_id": "g_search_brand_us",
+   "spend": 205.26,
+   "impressions": 300,
+   "clicks": 51,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-21",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 188.71,
+   "impressions": 594,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-21",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 924.88,
+   "impressions": 2189,
+   "clicks": 102,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-21",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1039.12,
+   "impressions": 46734,
+   "clicks": 496,
+   "platform_conversions": 2.1,
+   "trials": 6,
+   "paid": 4
+  },
+  {
+   "date": "2026-10-21",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 750.94,
+   "impressions": 33747,
+   "clicks": 363,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-21",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 414.92,
+   "impressions": 13452,
+   "clicks": 148,
+   "platform_conversions": 1.8,
+   "trials": 5,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-22",
+   "campaign_id": "g_pmax_us",
+   "spend": 478.39,
+   "impressions": 9496,
+   "clicks": 161,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-22",
+   "campaign_id": "g_search_brand_us",
+   "spend": 182.99,
+   "impressions": 238,
+   "clicks": 44,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-22",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 214.02,
+   "impressions": 718,
+   "clicks": 31,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-22",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1021.11,
+   "impressions": 2268,
+   "clicks": 110,
+   "platform_conversions": 4.9,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-22",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 995.51,
+   "impressions": 42480,
+   "clicks": 470,
+   "platform_conversions": 2.2,
+   "trials": 7,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-22",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 704.69,
+   "impressions": 36035,
+   "clicks": 364,
+   "platform_conversions": 1.5,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-22",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 444.3,
+   "impressions": 11029,
+   "clicks": 135,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-23",
+   "campaign_id": "g_pmax_us",
+   "spend": 476.76,
+   "impressions": 10070,
+   "clicks": 155,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-23",
+   "campaign_id": "g_search_brand_us",
+   "spend": 204.4,
+   "impressions": 246,
+   "clicks": 48,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-23",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 214.58,
+   "impressions": 681,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-23",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1042.24,
+   "impressions": 2746,
+   "clicks": 127,
+   "platform_conversions": 4.6,
+   "trials": 4,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-23",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1053.5,
+   "impressions": 48008,
+   "clicks": 500,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-23",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 732.45,
+   "impressions": 35321,
+   "clicks": 377,
+   "platform_conversions": 1.9,
+   "trials": 5,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-23",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 452.92,
+   "impressions": 13265,
+   "clicks": 155,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-24",
+   "campaign_id": "g_pmax_us",
+   "spend": 378.6,
+   "impressions": 8632,
+   "clicks": 131,
+   "platform_conversions": 3.7,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-24",
+   "campaign_id": "g_search_brand_us",
+   "spend": 157.68,
+   "impressions": 185,
+   "clicks": 33,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-24",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 151.41,
+   "impressions": 488,
+   "clicks": 23,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-24",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 773.19,
+   "impressions": 1699,
+   "clicks": 82,
+   "platform_conversions": 4.6,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-24",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 903.77,
+   "impressions": 40413,
+   "clicks": 429,
+   "platform_conversions": 1.9,
+   "trials": 5,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-24",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 717.01,
+   "impressions": 36863,
+   "clicks": 348,
+   "platform_conversions": 1.0,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-24",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 396.12,
+   "impressions": 10989,
+   "clicks": 125,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-25",
+   "campaign_id": "g_pmax_us",
+   "spend": 380.93,
+   "impressions": 7257,
+   "clicks": 124,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-25",
+   "campaign_id": "g_search_brand_us",
+   "spend": 148.42,
+   "impressions": 208,
+   "clicks": 35,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-25",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 151.47,
+   "impressions": 523,
+   "clicks": 23,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-25",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 693.58,
+   "impressions": 1687,
+   "clicks": 83,
+   "platform_conversions": 13.7,
+   "trials": 11,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-25",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 974.35,
+   "impressions": 40745,
+   "clicks": 476,
+   "platform_conversions": 1.6,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-25",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 707.01,
+   "impressions": 31737,
+   "clicks": 328,
+   "platform_conversions": 1.7,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-25",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 400.75,
+   "impressions": 11732,
+   "clicks": 138,
+   "platform_conversions": 1.8,
+   "trials": 5,
+   "paid": 2
+  },
+  {
+   "date": "2026-10-26",
+   "campaign_id": "g_pmax_us",
+   "spend": 487.87,
+   "impressions": 11049,
+   "clicks": 181,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-26",
+   "campaign_id": "g_search_brand_us",
+   "spend": 187.71,
+   "impressions": 270,
+   "clicks": 46,
+   "platform_conversions": 3.5,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-26",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 200.86,
+   "impressions": 629,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-26",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 960.97,
+   "impressions": 2220,
+   "clicks": 105,
+   "platform_conversions": 3.6,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-26",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1028.34,
+   "impressions": 44099,
+   "clicks": 518,
+   "platform_conversions": 1.5,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-26",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 710.26,
+   "impressions": 39508,
+   "clicks": 371,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-26",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 455.33,
+   "impressions": 12964,
+   "clicks": 144,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-27",
+   "campaign_id": "g_pmax_us",
+   "spend": 458.75,
+   "impressions": 10641,
+   "clicks": 168,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-27",
+   "campaign_id": "g_search_brand_us",
+   "spend": 197.36,
+   "impressions": 248,
+   "clicks": 48,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-27",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 199.4,
+   "impressions": 622,
+   "clicks": 30,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-27",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1049.55,
+   "impressions": 2567,
+   "clicks": 128,
+   "platform_conversions": 5.7,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-27",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1004.97,
+   "impressions": 36049,
+   "clicks": 419,
+   "platform_conversions": 1.7,
+   "trials": 4,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-27",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 759.17,
+   "impressions": 37695,
+   "clicks": 377,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-27",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 440.93,
+   "impressions": 11313,
+   "clicks": 136,
+   "platform_conversions": 0.9,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-28",
+   "campaign_id": "g_pmax_us",
+   "spend": 486.01,
+   "impressions": 11018,
+   "clicks": 171,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-28",
+   "campaign_id": "g_search_brand_us",
+   "spend": 210.97,
+   "impressions": 295,
+   "clicks": 53,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-28",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 214.54,
+   "impressions": 749,
+   "clicks": 33,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-28",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 934.2,
+   "impressions": 2261,
+   "clicks": 105,
+   "platform_conversions": 6.7,
+   "trials": 6,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-28",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 979.7,
+   "impressions": 36717,
+   "clicks": 436,
+   "platform_conversions": 1.5,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-28",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 752.5,
+   "impressions": 41304,
+   "clicks": 384,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-28",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 456.68,
+   "impressions": 12594,
+   "clicks": 149,
+   "platform_conversions": 1.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-29",
+   "campaign_id": "g_pmax_us",
+   "spend": 500.27,
+   "impressions": 10494,
+   "clicks": 163,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-29",
+   "campaign_id": "g_search_brand_us",
+   "spend": 194.05,
+   "impressions": 238,
+   "clicks": 41,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-29",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 195.76,
+   "impressions": 631,
+   "clicks": 27,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-29",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1019.35,
+   "impressions": 2265,
+   "clicks": 114,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-29",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 996.36,
+   "impressions": 36458,
+   "clicks": 433,
+   "platform_conversions": 1.8,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-29",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 740.87,
+   "impressions": 36449,
+   "clicks": 378,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-29",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 454.92,
+   "impressions": 13505,
+   "clicks": 150,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-30",
+   "campaign_id": "g_pmax_us",
+   "spend": 429.99,
+   "impressions": 9840,
+   "clicks": 160,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-30",
+   "campaign_id": "g_search_brand_us",
+   "spend": 198.33,
+   "impressions": 255,
+   "clicks": 46,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-30",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 195.45,
+   "impressions": 658,
+   "clicks": 28,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-30",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1006.67,
+   "impressions": 2473,
+   "clicks": 119,
+   "platform_conversions": 6.2,
+   "trials": 5,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-30",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 1001.33,
+   "impressions": 43359,
+   "clicks": 456,
+   "platform_conversions": 1.0,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-30",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 720.13,
+   "impressions": 33328,
+   "clicks": 329,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-30",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 446.0,
+   "impressions": 12627,
+   "clicks": 138,
+   "platform_conversions": 1.4,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-31",
+   "campaign_id": "g_pmax_us",
+   "spend": 377.41,
+   "impressions": 8431,
+   "clicks": 144,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-31",
+   "campaign_id": "g_search_brand_us",
+   "spend": 168.66,
+   "impressions": 221,
+   "clicks": 39,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-31",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 147.81,
+   "impressions": 448,
+   "clicks": 20,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-31",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 723.9,
+   "impressions": 1585,
+   "clicks": 80,
+   "platform_conversions": 2.4,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-31",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 986.8,
+   "impressions": 35835,
+   "clicks": 418,
+   "platform_conversions": 1.6,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-10-31",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 659.0,
+   "impressions": 27466,
+   "clicks": 292,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 1
+  },
+  {
+   "date": "2026-10-31",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 393.08,
+   "impressions": 12319,
+   "clicks": 142,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "g_pmax_us",
+   "spend": 317.8,
+   "impressions": 6464,
+   "clicks": 111,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "g_search_brand_uk",
+   "spend": 55.44,
+   "impressions": 124,
+   "clicks": 22,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "g_search_brand_us",
+   "spend": 165.7,
+   "impressions": 216,
+   "clicks": 41,
+   "platform_conversions": 4.7,
+   "trials": 4,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 150.8,
+   "impressions": 505,
+   "clicks": 24,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 809.12,
+   "impressions": 1551,
+   "clicks": 83,
+   "platform_conversions": 3.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 299.0,
+   "impressions": 11288,
+   "clicks": 130,
+   "platform_conversions": 1.0,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 214.71,
+   "impressions": 9072,
+   "clicks": 93,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "m_prospecting_core",
+   "spend": 735.97,
+   "impressions": 25004,
+   "clicks": 285,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "m_prospecting_test",
+   "spend": 268.9,
+   "impressions": 11847,
+   "clicks": 120,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 151.89,
+   "impressions": 4362,
+   "clicks": 47,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "m_retargeting_agency_14d",
+   "spend": 192.39,
+   "impressions": 4836,
+   "clicks": 60,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "m_retargeting_individual_14d",
+   "spend": 165.51,
+   "impressions": 4888,
+   "clicks": 59,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-01",
+   "campaign_id": "m_retargeting_lapsed_15to30d",
+   "spend": 93.97,
+   "impressions": 3346,
+   "clicks": 35,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "g_pmax_us",
+   "spend": 428.01,
+   "impressions": 9248,
+   "clicks": 159,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "g_search_brand_uk",
+   "spend": 63.13,
+   "impressions": 144,
+   "clicks": 23,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "g_search_brand_us",
+   "spend": 191.23,
+   "impressions": 229,
+   "clicks": 43,
+   "platform_conversions": 3.3,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 206.37,
+   "impressions": 707,
+   "clicks": 31,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 896.93,
+   "impressions": 1999,
+   "clicks": 99,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 294.07,
+   "impressions": 11414,
+   "clicks": 122,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 236.78,
+   "impressions": 11456,
+   "clicks": 119,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "m_prospecting_core",
+   "spend": 747.03,
+   "impressions": 25231,
+   "clicks": 303,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "m_prospecting_test",
+   "spend": 262.52,
+   "impressions": 10196,
+   "clicks": 104,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 159.27,
+   "impressions": 4576,
+   "clicks": 55,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "m_retargeting_agency_14d",
+   "spend": 216.51,
+   "impressions": 4960,
+   "clicks": 62,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "m_retargeting_individual_14d",
+   "spend": 178.49,
+   "impressions": 5284,
+   "clicks": 59,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-02",
+   "campaign_id": "m_retargeting_lapsed_15to30d",
+   "spend": 107.41,
+   "impressions": 3640,
+   "clicks": 36,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "g_pmax_us",
+   "spend": 391.09,
+   "impressions": 9699,
+   "clicks": 147,
+   "platform_conversions": 2.1,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "g_search_brand_uk",
+   "spend": 62.9,
+   "impressions": 155,
+   "clicks": 25,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "g_search_brand_us",
+   "spend": 204.38,
+   "impressions": 242,
+   "clicks": 42,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 195.35,
+   "impressions": 747,
+   "clicks": 32,
+   "platform_conversions": 2.2,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1019.77,
+   "impressions": 2452,
+   "clicks": 114,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 297.78,
+   "impressions": 11503,
+   "clicks": 131,
+   "platform_conversions": 0.8,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 236.47,
+   "impressions": 11870,
+   "clicks": 113,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "m_prospecting_core",
+   "spend": 791.16,
+   "impressions": 27280,
+   "clicks": 325,
+   "platform_conversions": 1.0,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "m_prospecting_test",
+   "spend": 270.45,
+   "impressions": 9897,
+   "clicks": 106,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 166.74,
+   "impressions": 4745,
+   "clicks": 54,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "m_retargeting_agency_14d",
+   "spend": 219.18,
+   "impressions": 5436,
+   "clicks": 64,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "m_retargeting_individual_14d",
+   "spend": 177.38,
+   "impressions": 4330,
+   "clicks": 53,
+   "platform_conversions": 0.4,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-03",
+   "campaign_id": "m_retargeting_lapsed_15to30d",
+   "spend": 109.45,
+   "impressions": 3709,
+   "clicks": 40,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "g_pmax_us",
+   "spend": 377.49,
+   "impressions": 7240,
+   "clicks": 125,
+   "platform_conversions": 2.3,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "g_search_brand_uk",
+   "spend": 64.98,
+   "impressions": 142,
+   "clicks": 25,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "g_search_brand_us",
+   "spend": 212.43,
+   "impressions": 284,
+   "clicks": 53,
+   "platform_conversions": 2.5,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 200.05,
+   "impressions": 668,
+   "clicks": 31,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 1017.93,
+   "impressions": 2048,
+   "clicks": 110,
+   "platform_conversions": 1.1,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 308.98,
+   "impressions": 13412,
+   "clicks": 151,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 231.9,
+   "impressions": 10561,
+   "clicks": 111,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "m_prospecting_core",
+   "spend": 795.53,
+   "impressions": 29563,
+   "clicks": 340,
+   "platform_conversions": 0.7,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "m_prospecting_test",
+   "spend": 292.1,
+   "impressions": 9882,
+   "clicks": 109,
+   "platform_conversions": 1.1,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 173.38,
+   "impressions": 4886,
+   "clicks": 55,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "m_retargeting_agency_14d",
+   "spend": 211.34,
+   "impressions": 5686,
+   "clicks": 71,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "m_retargeting_individual_14d",
+   "spend": 177.01,
+   "impressions": 4713,
+   "clicks": 57,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-04",
+   "campaign_id": "m_retargeting_lapsed_15to30d",
+   "spend": 104.25,
+   "impressions": 3278,
+   "clicks": 35,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "g_pmax_us",
+   "spend": 419.43,
+   "impressions": 10727,
+   "clicks": 159,
+   "platform_conversions": 1.2,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "g_search_brand_uk",
+   "spend": 65.11,
+   "impressions": 164,
+   "clicks": 26,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "g_search_brand_us",
+   "spend": 200.16,
+   "impressions": 245,
+   "clicks": 44,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "g_search_nonbrand_uk",
+   "spend": 190.98,
+   "impressions": 648,
+   "clicks": 29,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "g_search_nonbrand_us",
+   "spend": 904.8,
+   "impressions": 1767,
+   "clicks": 94,
+   "platform_conversions": 5.7,
+   "trials": 5,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "m_prospecting_advantageplus",
+   "spend": 294.98,
+   "impressions": 12356,
+   "clicks": 144,
+   "platform_conversions": 0.6,
+   "trials": 2,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "m_prospecting_broad",
+   "spend": 234.52,
+   "impressions": 11806,
+   "clicks": 119,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "m_prospecting_core",
+   "spend": 733.24,
+   "impressions": 29311,
+   "clicks": 324,
+   "platform_conversions": 1.0,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "m_prospecting_test",
+   "spend": 273.83,
+   "impressions": 10117,
+   "clicks": 107,
+   "platform_conversions": 0.3,
+   "trials": 1,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "m_retargeting_30d",
+   "spend": 168.22,
+   "impressions": 4580,
+   "clicks": 56,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "m_retargeting_agency_14d",
+   "spend": 200.97,
+   "impressions": 4941,
+   "clicks": 58,
+   "platform_conversions": 1.2,
+   "trials": 3,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "m_retargeting_individual_14d",
+   "spend": 170.81,
+   "impressions": 4763,
+   "clicks": 59,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  },
+  {
+   "date": "2026-11-05",
+   "campaign_id": "m_retargeting_lapsed_15to30d",
+   "spend": 108.98,
+   "impressions": 3623,
+   "clicks": 39,
+   "platform_conversions": 0.0,
+   "trials": 0,
+   "paid": 0
+  }
+ ],
+ "search_terms": [
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "seo software",
+   "clicks": 412,
+   "cost": 3918.35,
+   "trials": 15,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "best seo software for agencies",
+   "clicks": 188,
+   "cost": 1815.81,
+   "trials": 9,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "rank tracker",
+   "clicks": 240,
+   "cost": 1656.92,
+   "trials": 6,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "semrush alternative",
+   "clicks": 205,
+   "cost": 2362.07,
+   "trials": 8,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "white label seo reports",
+   "clicks": 96,
+   "cost": 962.94,
+   "trials": 5,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "all in one seo tool",
+   "clicks": 131,
+   "cost": 1122.24,
+   "trials": 4,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "free seo tools",
+   "clicks": 174,
+   "cost": 844.43,
+   "trials": 0,
+   "recommend_negative": true,
+   "reason": "Free-intent: 174 clicks, $887, 0 trials",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "seo jobs remote",
+   "clicks": 63,
+   "cost": 263.82,
+   "trials": 0,
+   "recommend_negative": true,
+   "reason": "Job seekers, not buyers",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "what is seo",
+   "clicks": 118,
+   "cost": 452.13,
+   "trials": 0,
+   "recommend_negative": true,
+   "reason": "Informational; 0 trials in 12 weeks",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "semrush login",
+   "clicks": 57,
+   "cost": 352.28,
+   "trials": 0,
+   "recommend_negative": true,
+   "reason": "Navigational to a competitor's login page",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "seo course certification",
+   "clicks": 49,
+   "cost": 279.89,
+   "trials": 0,
+   "recommend_negative": true,
+   "reason": "Education intent",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "keyword rank checker",
+   "clicks": 87,
+   "cost": 616.17,
+   "trials": 2,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "term": "ahrefs pricing",
+   "clicks": 74,
+   "cost": 782.06,
+   "trials": 2,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_pmax_us",
+   "term": "atlas map",
+   "clicks": 92,
+   "cost": 161.62,
+   "trials": 0,
+   "recommend_negative": true,
+   "reason": "Wrong 'atlas': maps and geography",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_pmax_us",
+   "term": "search atlas",
+   "clicks": 160,
+   "cost": 366.23,
+   "trials": 7,
+   "recommend_negative": false,
+   "reason": "Brand traffic leaking into PMax; consider brand exclusion",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_pmax_us",
+   "term": "seo audit tool",
+   "clicks": 66,
+   "cost": 221.8,
+   "trials": 1,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_brand_us",
+   "term": "search atlas",
+   "clicks": 980,
+   "cost": 3923.37,
+   "trials": 31,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_brand_us",
+   "term": "search atlas pricing",
+   "clicks": 214,
+   "cost": 972.51,
+   "trials": 9,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_brand_us",
+   "term": "search atlas review",
+   "clicks": 133,
+   "cost": 629.32,
+   "trials": 3,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_brand_us",
+   "term": "search atlas careers",
+   "clicks": 41,
+   "cost": 164.82,
+   "trials": 0,
+   "recommend_negative": true,
+   "reason": "Job seekers on the brand campaign",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_uk",
+   "term": "seo software uk",
+   "clicks": 140,
+   "cost": 1000.57,
+   "trials": 2,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_uk",
+   "term": "seo tools uk",
+   "clicks": 118,
+   "cost": 772.32,
+   "trials": 1,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_uk",
+   "term": "seo agency london",
+   "clicks": 77,
+   "cost": 610.42,
+   "trials": 0,
+   "recommend_negative": true,
+   "reason": "Looking to hire an agency, not buy software",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_nonbrand_uk",
+   "term": "white label seo uk",
+   "clicks": 39,
+   "cost": 271.59,
+   "trials": 0,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_brand_uk",
+   "term": "search atlas",
+   "clicks": 64,
+   "cost": 154.66,
+   "trials": 0,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  },
+  {
+   "campaign_id": "g_search_brand_uk",
+   "term": "search atlas uk",
+   "clicks": 22,
+   "cost": 59.71,
+   "trials": 0,
+   "recommend_negative": false,
+   "reason": "",
+   "negated": false
+  }
+ ],
+ "negatives": [
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "text": "jobs",
+   "match": "broad",
+   "added": "2026-08-12",
+   "source": "manual"
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "text": "salary",
+   "match": "broad",
+   "added": "2026-08-12",
+   "source": "manual"
+  },
+  {
+   "campaign_id": "g_search_nonbrand_us",
+   "text": "wordpress plugin free",
+   "match": "phrase",
+   "added": "2026-09-03",
+   "source": "manual"
+  },
+  {
+   "campaign_id": "g_search_brand_us",
+   "text": "atlas copco",
+   "match": "phrase",
+   "added": "2026-08-20",
+   "source": "manual"
+  },
+  {
+   "campaign_id": "g_pmax_us",
+   "text": "world atlas",
+   "match": "phrase",
+   "added": "2026-09-10",
+   "source": "manual"
+  },
+  {
+   "campaign_id": "g_search_nonbrand_uk",
+   "text": "jobs",
+   "match": "broad",
+   "added": "2026-08-12",
+   "source": "manual"
+  }
+ ],
+ "content": [
+  {
+   "id": "c01",
+   "name": "UGC_Agency_Owner (cut 2)",
+   "platform": "meta",
+   "format": "video",
+   "segment": "agency",
+   "status": "running",
+   "owner": "Vin",
+   "due": "2026-11-01",
+   "campaign_id": "m_prospecting_core",
+   "test_id": null,
+   "notes": "Proven; Core rotation."
+  },
+  {
+   "id": "c02",
+   "name": "Demo_Screen_Walkthrough",
+   "platform": "meta",
+   "format": "video",
+   "segment": "mixed",
+   "status": "running",
+   "owner": "Vin",
+   "due": "2026-11-01",
+   "campaign_id": "m_prospecting_core",
+   "test_id": null,
+   "notes": "Proven; Core rotation."
+  },
+  {
+   "id": "c03",
+   "name": "Hook A: white-label agency",
+   "platform": "meta",
+   "format": "video",
+   "segment": "agency",
+   "status": "running",
+   "owner": "Creative",
+   "due": "2026-11-01",
+   "campaign_id": "m_prospecting_test",
+   "test_id": "t01",
+   "notes": "Test arm A."
+  },
+  {
+   "id": "c04",
+   "name": "Hook B: individual DIY",
+   "platform": "meta",
+   "format": "video",
+   "segment": "individual",
+   "status": "running",
+   "owner": "Creative",
+   "due": "2026-11-01",
+   "campaign_id": "m_prospecting_test",
+   "test_id": "t01",
+   "notes": "Test arm B."
+  },
+  {
+   "id": "c05",
+   "name": "RSA headline set v3",
+   "platform": "google",
+   "format": "rsa",
+   "segment": "mixed",
+   "status": "running",
+   "owner": "Vin",
+   "due": "2026-11-03",
+   "campaign_id": "g_search_nonbrand_us",
+   "test_id": "t02",
+   "notes": "Pinned H1 variant."
+  },
+  {
+   "id": "c06",
+   "name": "RT_Pricing_Clarity static",
+   "platform": "meta",
+   "format": "image",
+   "segment": "individual",
+   "status": "scheduled",
+   "owner": "Creative",
+   "due": "2026-11-07",
+   "campaign_id": "m_retargeting_individual_14d",
+   "test_id": null,
+   "notes": "Goes live Friday."
+  },
+  {
+   "id": "c07",
+   "name": "UK GBP pricing landing page",
+   "platform": "google",
+   "format": "landing page",
+   "segment": "mixed",
+   "status": "scheduled",
+   "owner": "Web",
+   "due": "2026-11-10",
+   "campaign_id": "g_search_nonbrand_uk",
+   "test_id": "t06",
+   "notes": "Needed before t06 starts."
+  },
+  {
+   "id": "c08",
+   "name": "UGC_Founder_v3",
+   "platform": "meta",
+   "format": "video",
+   "segment": "mixed",
+   "status": "pending_feedback",
+   "owner": "Client",
+   "due": "2026-11-06",
+   "campaign_id": null,
+   "test_id": null,
+   "notes": "Sent 11-03; waiting on founder notes."
+  },
+  {
+   "id": "c09",
+   "name": "Agency case study carousel",
+   "platform": "meta",
+   "format": "image",
+   "segment": "agency",
+   "status": "pending_feedback",
+   "owner": "Client",
+   "due": "2026-11-08",
+   "campaign_id": "m_retargeting_agency_14d",
+   "test_id": null,
+   "notes": "Needs the customer's sign-off on the numbers."
+  },
+  {
+   "id": "c10",
+   "name": "RT_Objection_Migration v2",
+   "platform": "meta",
+   "format": "video",
+   "segment": "mixed",
+   "status": "pending_feedback",
+   "owner": "Creative",
+   "due": "2026-11-09",
+   "campaign_id": "m_retargeting_lapsed_15to30d",
+   "test_id": null,
+   "notes": "Voiceover re-record requested."
+  },
+  {
+   "id": "c11",
+   "name": "PMax asset refresh (Q4)",
+   "platform": "google",
+   "format": "image",
+   "segment": "mixed",
+   "status": "final_pending_approval",
+   "owner": "Client",
+   "due": "2026-11-06",
+   "campaign_id": "g_pmax_us",
+   "test_id": null,
+   "notes": "Final files uploaded; awaiting approval."
+  },
+  {
+   "id": "c12",
+   "name": "Static_WhiteLabel_Report v2",
+   "platform": "meta",
+   "format": "image",
+   "segment": "agency",
+   "status": "final_pending_approval",
+   "owner": "Client",
+   "due": "2026-11-07",
+   "campaign_id": "m_prospecting_core",
+   "test_id": null,
+   "notes": "Logo lockup fixed."
+  },
+  {
+   "id": "c13",
+   "name": "Brand UK RSA set",
+   "platform": "google",
+   "format": "rsa",
+   "segment": "brand",
+   "status": "approved",
+   "owner": "Vin",
+   "due": "2026-10-30",
+   "campaign_id": "g_search_brand_uk",
+   "test_id": null,
+   "notes": "Approved 10-30; live 11-01."
+  },
+  {
+   "id": "c14",
+   "name": "Retargeting 14d split: agency video",
+   "platform": "meta",
+   "format": "video",
+   "segment": "agency",
+   "status": "approved",
+   "owner": "Vin",
+   "due": "2026-10-28",
+   "campaign_id": "m_retargeting_agency_14d",
+   "test_id": "t03",
+   "notes": "Winner from t03, rebuilt for the 14d split."
+  }
+ ],
+ "tests": [
+  {
+   "id": "t01",
+   "name": "Hook A (agency white-label) vs Hook B (individual DIY)",
+   "hypothesis": "An agency-outcome hook lowers prospecting cost per trial below $260 because agency trials convert to paid at ~1.8x.",
+   "platform": "meta",
+   "campaign_id": "m_prospecting_test",
+   "started": "2026-11-01",
+   "ends": "2026-11-21",
+   "status": "running",
+   "metric": "cost_per_trial",
+   "benchmark": {
+    "win_below": 260,
+    "min_spend": 4000,
+    "min_trials": 15
+   },
+   "current": {
+    "spend": 1367.8,
+    "trials": 7,
+    "value": 195.4
+   },
+   "notes": "Read after both arms clear $2,000 each."
+  },
+  {
+   "id": "t02",
+   "name": "RSA headline v3 (pinned price claim)",
+   "hypothesis": "Pinning 'Replace 4 SEO tools with one' as H1 lifts non-brand CTR above 5.5%.",
+   "platform": "google",
+   "campaign_id": "g_search_nonbrand_us",
+   "started": "2026-11-03",
+   "ends": "2026-11-17",
+   "status": "running",
+   "metric": "ctr",
+   "benchmark": {
+    "win_above": 5.5,
+    "min_spend": 3000,
+    "min_trials": 10
+   },
+   "current": {
+    "spend": 2942.5,
+    "trials": 8,
+    "value": 5.07
+   },
+   "notes": "Baseline CTR 5.0% (Aug-Oct)."
+  },
+  {
+   "id": "t03",
+   "name": "Retargeting split by segment, 14-day window",
+   "hypothesis": "Splitting 30-day retargeting into agency and individual 14-day audiences lowers cost per trial below $220.",
+   "platform": "meta",
+   "campaign_id": "m_retargeting_30d",
+   "started": "2026-10-06",
+   "ends": "2026-10-26",
+   "status": "won",
+   "metric": "cost_per_trial",
+   "benchmark": {
+    "win_below": 220,
+    "min_spend": 4000,
+    "min_trials": 18
+   },
+   "current": {
+    "spend": 4620.0,
+    "trials": 24,
+    "value": 192.5
+   },
+   "notes": "Won: $192.50 vs $220. Shipped as Retargeting_Agency_14d + Retargeting_Individual_14d on 11-01."
+  },
+  {
+   "id": "t04",
+   "name": "Interest stack vs Advantage+ broad",
+   "hypothesis": "A hand-built interest stack beats Advantage+ broad on cost per trial (below $260).",
+   "platform": "meta",
+   "campaign_id": "m_prospecting_broad",
+   "started": "2026-09-01",
+   "ends": "2026-09-21",
+   "status": "lost",
+   "metric": "cost_per_trial",
+   "benchmark": {
+    "win_below": 260,
+    "min_spend": 5000,
+    "min_trials": 15
+   },
+   "current": {
+    "spend": 6105.0,
+    "trials": 17,
+    "value": 359.12
+   },
+   "notes": "Lost: $359 per trial. Interest stack retired; budget moved to Advantage+."
+  },
+  {
+   "id": "t05",
+   "name": "PMax with brand exclusion",
+   "hypothesis": "Excluding brand terms from PMax keeps click-to-trial above 1.2% without brand cannibalisation.",
+   "platform": "google",
+   "campaign_id": "g_pmax_us",
+   "started": "2026-10-01",
+   "ends": "2026-10-21",
+   "status": "inconclusive",
+   "metric": "click_to_trial",
+   "benchmark": {
+    "win_above": 1.2,
+    "min_spend": 4000,
+    "min_trials": 20
+   },
+   "current": {
+    "spend": 4380.0,
+    "trials": 13,
+    "value": 0.86
+   },
+   "notes": "Under min_trials (13 of 20). Rerun with a longer window."
+  },
+  {
+   "id": "t06",
+   "name": "UK non-brand: GBP pricing landing page",
+   "hypothesis": "Showing GBP prices lifts UK click-to-trial above 2.0% now that the tag fires.",
+   "platform": "google",
+   "campaign_id": "g_search_nonbrand_uk",
+   "started": "2026-11-10",
+   "ends": "2026-11-30",
+   "status": "queued",
+   "metric": "click_to_trial",
+   "benchmark": {
+    "win_above": 2.0,
+    "min_spend": 2500,
+    "min_trials": 10
+   },
+   "current": {
+    "spend": 0.0,
+    "trials": 0,
+    "value": null
+   },
+   "notes": "Blocked on content c07 (landing page)."
+  }
+ ],
+ "lessons": [
+  {
+   "id": "l01",
+   "date": "2026-08-18",
+   "text": "Brand search CPT ($150) is the cheapest line in the account but the least incremental; cap it, don't grow it.",
+   "tags": [
+    "google",
+    "brand",
+    "budget"
+   ],
+   "source": "analysis"
+  },
+  {
+   "id": "l02",
+   "date": "2026-08-29",
+   "text": "Meta CTR sits at 1.0-1.2% across prospecting; creative, not audience, moves it.",
+   "tags": [
+    "meta",
+    "creative"
+   ],
+   "source": "analysis"
+  },
+  {
+   "id": "l03",
+   "date": "2026-09-15",
+   "text": "Shared budget starvation: Search_NonBrand_US drained the shared Google budget and Search_Brand_US delivered ~30% of plan 09-15 to 09-19. Every campaign now carries its own budget; no shared budgets.",
+   "tags": [
+    "google",
+    "budget",
+    "incident"
+   ],
+   "source": "incident"
+  },
+  {
+   "id": "l04",
+   "date": "2026-09-21",
+   "text": "Interest stacks lost to Advantage+ broad ($359 vs $270 per trial). Stop hand-building interest audiences for prospecting.",
+   "tags": [
+    "meta",
+    "test",
+    "audience"
+   ],
+   "source": "test t04"
+  },
+  {
+   "id": "l05",
+   "date": "2026-09-22",
+   "text": "Meta event break: from 09-22 Meta reports ~1/3 of the trials PostHog records. Judge Meta on PostHog trials only; never optimise to platform-reported conversions until the event is repaired.",
+   "tags": [
+    "meta",
+    "tracking",
+    "incident"
+   ],
+   "source": "incident"
+  },
+  {
+   "id": "l06",
+   "date": "2026-10-02",
+   "text": "Free-intent and informational queries ('free seo tools', 'what is seo') burned ~$1,300 with zero trials. Review search terms weekly.",
+   "tags": [
+    "google",
+    "search terms",
+    "negatives"
+   ],
+   "source": "search terms"
+  },
+  {
+   "id": "l07",
+   "date": "2026-10-21",
+   "text": "PMax brand-exclusion test never reached minimum trials. Set min_trials so a 3-week test can actually clear it.",
+   "tags": [
+    "google",
+    "pmax",
+    "test"
+   ],
+   "source": "test t05"
+  },
+  {
+   "id": "l08",
+   "date": "2026-10-26",
+   "text": "Segmented 14-day retargeting beat the 30-day pool ($192 vs $220 target). Agency visitors convert to paid at ~1.8x individuals.",
+   "tags": [
+    "meta",
+    "retargeting",
+    "test"
+   ],
+   "source": "test t03"
+  },
+  {
+   "id": "l09",
+   "date": "2026-11-02",
+   "text": "UK tag fix: the UK signup tag had never fired, so Search_NonBrand_UK showed zero trials for 12 weeks. Fixed 11-02; UK trials start appearing the same day. Treat any campaign with spend and zero trials for 7 days as a tracking problem first.",
+   "tags": [
+    "google",
+    "uk",
+    "tracking",
+    "incident"
+   ],
+   "source": "incident"
+  },
+  {
+   "id": "l10",
+   "date": "2026-11-04",
+   "text": "New build plus legacy Meta campaigns overlap audiences; legacy click-to-trial dropped ~7% since 11-01. Watch frequency and wind legacy down once Core clears learning.",
+   "tags": [
+    "meta",
+    "budget",
+    "audience"
+   ],
+   "source": "pacing review"
+  }
+ ],
+ "checklist": [
+  {
+   "day": 1,
+   "date": "2026-11-01",
+   "items": [
+    {
+     "id": "d01-1",
+     "text": "Pacing check vs daily target",
+     "done": true
+    },
+    {
+     "id": "d01-2",
+     "text": "Launch new Meta build (5 campaigns) and Search_Brand_UK",
+     "done": true
+    },
+    {
+     "id": "d01-3",
+     "text": "Cut legacy Meta budgets to reduced levels",
+     "done": true
+    },
+    {
+     "id": "d01-4",
+     "text": "Confirm PostHog trial events for every new campaign",
+     "done": true
+    },
+    {
+     "id": "d01-5",
+     "text": "Review search terms: Search_NonBrand_US",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 2,
+   "date": "2026-11-02",
+   "items": [
+    {
+     "id": "d02-1",
+     "text": "Pacing check vs daily target",
+     "done": true
+    },
+    {
+     "id": "d02-2",
+     "text": "Verify UK signup tag fires (PostHog + Google)",
+     "done": true
+    },
+    {
+     "id": "d02-3",
+     "text": "Add recommended negatives on Search_NonBrand_US",
+     "done": true
+    },
+    {
+     "id": "d02-4",
+     "text": "Check Meta frequency on retargeting",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 3,
+   "date": "2026-11-03",
+   "items": [
+    {
+     "id": "d03-1",
+     "text": "Pacing check vs daily target",
+     "done": true
+    },
+    {
+     "id": "d03-2",
+     "text": "Start t02 RSA headline test",
+     "done": false
+    },
+    {
+     "id": "d03-3",
+     "text": "Send UGC_Founder_v3 for client feedback",
+     "done": false
+    },
+    {
+     "id": "d03-4",
+     "text": "Compare platform vs PostHog trials (Meta)",
+     "done": true
+    }
+   ]
+  },
+  {
+   "day": 4,
+   "date": "2026-11-04",
+   "items": [
+    {
+     "id": "d04-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d04-2",
+     "text": "First read of new build vs legacy cost per trial",
+     "done": true
+    },
+    {
+     "id": "d04-3",
+     "text": "Review cost per trial by campaign (3d / 7d)",
+     "done": true
+    }
+   ]
+  },
+  {
+   "day": 5,
+   "date": "2026-11-05",
+   "items": [
+    {
+     "id": "d05-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d05-2",
+     "text": "Approve PMax asset refresh",
+     "done": false
+    },
+    {
+     "id": "d05-3",
+     "text": "Chase founder notes on UGC_Founder_v3",
+     "done": false
+    },
+    {
+     "id": "d05-4",
+     "text": "Check content pipeline: anything overdue",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 6,
+   "date": "2026-11-06",
+   "items": [
+    {
+     "id": "d06-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d06-2",
+     "text": "Review search terms: PMax_US and UK",
+     "done": false
+    },
+    {
+     "id": "d06-3",
+     "text": "Review search terms: Search_NonBrand_US",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 7,
+   "date": "2026-11-07",
+   "items": [
+    {
+     "id": "d07-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d07-2",
+     "text": "Weekly report to client",
+     "done": false
+    },
+    {
+     "id": "d07-3",
+     "text": "Launch RT_Pricing_Clarity static",
+     "done": false
+    },
+    {
+     "id": "d07-4",
+     "text": "Review search terms: Search_NonBrand_US",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 8,
+   "date": "2026-11-08",
+   "items": [
+    {
+     "id": "d08-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d08-2",
+     "text": "Decide legacy Meta wind-down step 1",
+     "done": false
+    },
+    {
+     "id": "d08-3",
+     "text": "Check Meta frequency on retargeting",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 9,
+   "date": "2026-11-09",
+   "items": [
+    {
+     "id": "d09-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d09-2",
+     "text": "Compare platform vs PostHog trials (Meta)",
+     "done": false
+    },
+    {
+     "id": "d09-3",
+     "text": "Review cost per trial by campaign (3d / 7d)",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 10,
+   "date": "2026-11-10",
+   "items": [
+    {
+     "id": "d10-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d10-2",
+     "text": "Start t06 UK GBP pricing test",
+     "done": false
+    },
+    {
+     "id": "d10-3",
+     "text": "Review cost per trial by campaign (3d / 7d)",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 11,
+   "date": "2026-11-11",
+   "items": [
+    {
+     "id": "d11-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d11-2",
+     "text": "Check content pipeline: anything overdue",
+     "done": false
+    },
+    {
+     "id": "d11-3",
+     "text": "Review search terms: PMax_US and UK",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 12,
+   "date": "2026-11-12",
+   "items": [
+    {
+     "id": "d12-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d12-2",
+     "text": "Review search terms: PMax_US and UK",
+     "done": false
+    },
+    {
+     "id": "d12-3",
+     "text": "Review search terms: Search_NonBrand_US",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 13,
+   "date": "2026-11-13",
+   "items": [
+    {
+     "id": "d13-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d13-2",
+     "text": "Review search terms: Search_NonBrand_US",
+     "done": false
+    },
+    {
+     "id": "d13-3",
+     "text": "Check Meta frequency on retargeting",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 14,
+   "date": "2026-11-14",
+   "items": [
+    {
+     "id": "d14-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d14-2",
+     "text": "Weekly report to client",
+     "done": false
+    },
+    {
+     "id": "d14-3",
+     "text": "Mid-month budget reallocation",
+     "done": false
+    },
+    {
+     "id": "d14-4",
+     "text": "Check Meta frequency on retargeting",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 15,
+   "date": "2026-11-15",
+   "items": [
+    {
+     "id": "d15-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d15-2",
+     "text": "Release reserve if Core cost per trial is under $280",
+     "done": false
+    },
+    {
+     "id": "d15-3",
+     "text": "Compare platform vs PostHog trials (Meta)",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 16,
+   "date": "2026-11-16",
+   "items": [
+    {
+     "id": "d16-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d16-2",
+     "text": "Review cost per trial by campaign (3d / 7d)",
+     "done": false
+    },
+    {
+     "id": "d16-3",
+     "text": "Check content pipeline: anything overdue",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 17,
+   "date": "2026-11-17",
+   "items": [
+    {
+     "id": "d17-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d17-2",
+     "text": "Read t02 result",
+     "done": false
+    },
+    {
+     "id": "d17-3",
+     "text": "Check content pipeline: anything overdue",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 18,
+   "date": "2026-11-18",
+   "items": [
+    {
+     "id": "d18-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d18-2",
+     "text": "Review search terms: PMax_US and UK",
+     "done": false
+    },
+    {
+     "id": "d18-3",
+     "text": "Review search terms: Search_NonBrand_US",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 19,
+   "date": "2026-11-19",
+   "items": [
+    {
+     "id": "d19-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d19-2",
+     "text": "Review search terms: Search_NonBrand_US",
+     "done": false
+    },
+    {
+     "id": "d19-3",
+     "text": "Check Meta frequency on retargeting",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 20,
+   "date": "2026-11-20",
+   "items": [
+    {
+     "id": "d20-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d20-2",
+     "text": "Check Meta frequency on retargeting",
+     "done": false
+    },
+    {
+     "id": "d20-3",
+     "text": "Compare platform vs PostHog trials (Meta)",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 21,
+   "date": "2026-11-21",
+   "items": [
+    {
+     "id": "d21-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d21-2",
+     "text": "Weekly report to client",
+     "done": false
+    },
+    {
+     "id": "d21-3",
+     "text": "Read t01 result and ship the winner to Core",
+     "done": false
+    },
+    {
+     "id": "d21-4",
+     "text": "Compare platform vs PostHog trials (Meta)",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 22,
+   "date": "2026-11-22",
+   "items": [
+    {
+     "id": "d22-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d22-2",
+     "text": "Review cost per trial by campaign (3d / 7d)",
+     "done": false
+    },
+    {
+     "id": "d22-3",
+     "text": "Check content pipeline: anything overdue",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 23,
+   "date": "2026-11-23",
+   "items": [
+    {
+     "id": "d23-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d23-2",
+     "text": "Check content pipeline: anything overdue",
+     "done": false
+    },
+    {
+     "id": "d23-3",
+     "text": "Review search terms: PMax_US and UK",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 24,
+   "date": "2026-11-24",
+   "items": [
+    {
+     "id": "d24-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d24-2",
+     "text": "Thanksgiving week: lower bids on individual segment",
+     "done": false
+    },
+    {
+     "id": "d24-3",
+     "text": "Review search terms: PMax_US and UK",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 25,
+   "date": "2026-11-25",
+   "items": [
+    {
+     "id": "d25-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d25-2",
+     "text": "Review search terms: Search_NonBrand_US",
+     "done": false
+    },
+    {
+     "id": "d25-3",
+     "text": "Check Meta frequency on retargeting",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 26,
+   "date": "2026-11-26",
+   "items": [
+    {
+     "id": "d26-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d26-2",
+     "text": "Black Friday creative live",
+     "done": false
+    },
+    {
+     "id": "d26-3",
+     "text": "Check Meta frequency on retargeting",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 27,
+   "date": "2026-11-27",
+   "items": [
+    {
+     "id": "d27-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d27-2",
+     "text": "Compare platform vs PostHog trials (Meta)",
+     "done": false
+    },
+    {
+     "id": "d27-3",
+     "text": "Review cost per trial by campaign (3d / 7d)",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 28,
+   "date": "2026-11-28",
+   "items": [
+    {
+     "id": "d28-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d28-2",
+     "text": "Weekly report to client",
+     "done": false
+    },
+    {
+     "id": "d28-3",
+     "text": "Draft December plan",
+     "done": false
+    },
+    {
+     "id": "d28-4",
+     "text": "Review cost per trial by campaign (3d / 7d)",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 29,
+   "date": "2026-11-29",
+   "items": [
+    {
+     "id": "d29-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d29-2",
+     "text": "Check content pipeline: anything overdue",
+     "done": false
+    },
+    {
+     "id": "d29-3",
+     "text": "Review search terms: PMax_US and UK",
+     "done": false
+    }
+   ]
+  },
+  {
+   "day": 30,
+   "date": "2026-11-30",
+   "items": [
+    {
+     "id": "d30-1",
+     "text": "Pacing check vs daily target",
+     "done": false
+    },
+    {
+     "id": "d30-2",
+     "text": "Month close: final pacing, lessons, December budgets",
+     "done": false
+    },
+    {
+     "id": "d30-3",
+     "text": "Review search terms: PMax_US and UK",
+     "done": false
+    }
+   ]
+  }
+ ],
+ "activity": []
+}

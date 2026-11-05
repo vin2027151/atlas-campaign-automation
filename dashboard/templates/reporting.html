@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+  /* ---- reporting page (tokens from app.css only) ---- */
+  .rp-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .rp-kpis .kpi { display: flex; flex-direction: column; }
+  .rp-kpis .kpi-sub { margin-top: auto; padding-top: 2px; }
+  .rp-kpis .kpi-delta.flat { color: var(--muted); }
+  .rp-kpis .kpi-delta.na { color: var(--muted); font-weight: 500; }
+  .rp-kpis .kpi-label { white-space: normal; }
+
+  .rp-pace { display: flex; flex-direction: column; gap: var(--s4); }
+  .rp-pace-row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: var(--s4); align-items: start; }
+  .rp-pace-name { display: flex; flex-direction: column; gap: 2px; }
+  .rp-pace-name .strong { display: flex; align-items: center; gap: 6px; }
+  .rp-pace-pct { font-size: var(--fs-xl); font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .rp-bar { position: relative; height: 22px; background: var(--surface-3); border-radius: var(--r-sm); margin-top: 18px; }
+  .rp-bar .proj { position: absolute; inset: 0 auto 0 0; background: var(--accent-soft); border: 1px dashed var(--accent-line); border-radius: var(--r-sm); }
+  .rp-bar .fill { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: var(--r-sm) 0 0 var(--r-sm); }
+  .rp-bar.over .proj { background: var(--bad-soft); border-color: var(--bad-line); }
+  .rp-bar.under .proj { background: var(--watch-soft); border-color: var(--watch-line); }
+  .rp-bar .budget { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink-2); }
+  .rp-bar .today { position: absolute; top: -18px; bottom: -4px; width: 2px; background: var(--ink); }
+  .rp-bar .today span { position: absolute; top: 0; left: 4px; font-size: var(--fs-xs); color: var(--ink); white-space: nowrap; line-height: 12px; }
+  .rp-bar .today.flip span { left: auto; right: 4px; }
+  .rp-pace-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--s2) var(--s3); margin-top: var(--s3); }
+  .rp-stat .label { font-size: var(--fs-xs); color: var(--muted); font-weight: 500; }
+  .rp-stat .v { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .rp-legend { display: flex; gap: var(--s4); flex-wrap: wrap; font-size: var(--fs-sm); color: var(--muted); }
+  .rp-legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+  .rp-legend i.fill { background: var(--accent); }
+  .rp-legend i.proj { background: var(--accent-soft); border: 1px dashed var(--accent-line); }
+  .rp-legend i.mark { width: 2px; background: var(--ink); }
+  .rp-legend i.bud { width: 2px; background: var(--ink-2); }
+
+  .rp-trust { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4); }
+  .rp-trust-item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s2) var(--s4); align-items: center; }
+  .rp-ratio { font-size: var(--fs-kpi); font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .rp-trust-item .dl { grid-column: 1 / -1; grid-template-columns: max-content max-content max-content max-content; font-size: var(--fs-sm); }
+  .rp-trust-item .dl dd { font-variant-numeric: tabular-nums; }
+  .rp-trust-card.bad { border-color: var(--bad-line); }
+  .rp-trust-card.bad .card-head { background: var(--bad-soft); border-radius: var(--r-lg) var(--r-lg) 0 0; }
+
+  .rp-changes > li { display: flex; gap: var(--s2); align-items: flex-start; }
+  .rp-changes .badge { flex: none; margin-top: 1px; }
+  .rp-changes .chip { margin-top: 1px; }
+
+  .rp-acct td:first-child { font-weight: 600; }
+  .rp-acct tr.total td { background: var(--surface-2); font-weight: 600; border-top: 1px solid var(--line-strong); }
+
+  @media (max-width: 1100px) {
+    .rp-pace-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 820px) {
+    .rp-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rp-trust { grid-template-columns: minmax(0, 1fr); }
+    .rp-pace-row { grid-template-columns: minmax(0, 1fr); gap: var(--s1); }
+    .rp-pace-name { flex-direction: row; align-items: baseline; justify-content: space-between; }
+  }
+  @media (max-width: 420px) {
+    .rp-pace-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .rp-trust-item .dl { grid-template-columns: max-content 1fr; }
+  }
+
+  /* ---- print: drop chrome, fit to the page ---- */
+  @media print {
+    @page { size: A4 portrait; margin: 10mm; }
+    :root { --bg: #fff; }
+    body { background: #fff; font-size: 11px; display: block; min-height: 0; }
+    .topbar, .footer, .page-actions, .toast-stack { display: none !important; }
+    .main { max-width: none; padding: 0; }
+    .main > * + * { margin-top: 10px; }
+    .card, .kpi { box-shadow: none; break-inside: avoid; page-break-inside: avoid; }
+    .rp-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 6px; }
+    .kpi { padding: 6px 8px; }
+    .kpi-value { font-size: 18px; }
+    .rp-charts { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    .rp-charts .chart-box { height: 200px; }
+    .rp-trust { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    .table-wrap { overflow: visible; }
+    .table th, .table td { padding: 3px 6px; }
+    .rp-print-only { display: block !important; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  .rp-print-only { display: none; }
+</style>
+{% endblock %}
+
+{% block subtitle %}
+<p class="page-sub">Search Atlas paid media, {{ meta.today }}. Trials are PostHog-attributed signups (the truth); platform-reported conversions appear only in the data-trust check. Target cost per trial {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }}.</p>
+<p class="rp-print-only muted">Printed from Atlas Ops reporting. SAMPLE DATA: generated, not a live ad account.</p>
+{% endblock %}
+
+{% block actions %}
+<a class="btn" href="/api/reporting/export.csv" download id="rp-export">Export CSV</a>
+<button class="btn btn-primary" type="button" id="rp-print">Print / export PDF</button>
+{% endblock %}
+
+{% block content %}
+<section class="grid kpi-grid rp-kpis" id="rp-kpis" aria-label="Headline numbers">
+  {% for i in range(8) %}<div class="kpi"><div class="skeleton" style="height:58px"></div></div>{% endfor %}
+</section>
+
+<section class="card" aria-labelledby="rp-pace-title">
+  <div class="card-head">
+    <h2 class="card-title" id="rp-pace-title">Budget pacing <span class="card-sub" id="rp-pace-sub"></span></h2>
+    <div class="rp-legend" aria-hidden="true">
+      <span><i class="fill"></i>Spent MTD</span>
+      <span><i class="proj"></i>Projected month end (7-day rate)</span>
+      <span><i class="mark"></i>Where we should be today</span>
+      <span><i class="bud"></i>Monthly budget</span>
+    </div>
+  </div>
+  <div class="card-body rp-pace" id="rp-pacing"><div class="skeleton" style="height:120px"></div></div>
+</section>
+
+<section class="grid grid-2 rp-charts" aria-label="Trends">
+  <div class="card">
+    <div class="card-head"><h2 class="card-title">Daily spend and trials <span class="card-sub">last 30 days</span></h2></div>
+    <div class="card-body"><div class="chart-box"><canvas id="rp-chart-volume" aria-label="Daily spend and trials, last 30 days" role="img"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2 class="card-title">Cost per trial, rolling 7 days <span class="card-sub">shaded: target band</span></h2></div>
+    <div class="card-body"><div class="chart-box"><canvas id="rp-chart-cpt" aria-label="Rolling 7-day cost per trial for the account, Google and Meta" role="img"></canvas></div></div>
+  </div>
+</section>
+
+<section class="card" aria-labelledby="rp-acct-title">
+  <div class="card-head">
+    <h2 class="card-title" id="rp-acct-title">By account <span class="card-sub" id="rp-acct-sub">month to date</span></h2>
+  </div>
+  <div class="table-wrap">
+    <table class="table rp-acct">
+      <thead><tr>
+        <th>Account</th><th class="num">Spend MTD</th><th class="num">Trials</th><th class="num">Cost / trial</th>
+        <th class="num" title="Paid memberships from matured trial cohorts (trials at least 14 days old)">Paid*</th>
+        <th class="num" title="Spend / paid memberships on the matured cohort">Cost / paid*</th>
+        <th class="num">Trial &rarr; paid*</th>
+        <th class="num">Share of spend</th><th class="num">Share of trials</th>
+      </tr></thead>
+      <tbody id="rp-acct"><tr><td colspan="9"><div class="skeleton"></div></td></tr></tbody>
+    </table>
+  </div>
+  <div class="card-foot" id="rp-acct-foot">* Paid columns use the matured trial cohort; trials need 7&ndash;14 days to convert to paid.</div>
+</section>
+
+<section aria-labelledby="rp-trust-title">
+  <div class="row-between" style="margin-bottom: var(--s2)">
+    <h2 class="card-title" id="rp-trust-title">Data trust: platform-reported vs PostHog trials, last 7 days</h2>
+  </div>
+  <div class="rp-trust" id="rp-trust"><div class="skeleton" style="height:120px"></div></div>
+</section>
+
+<section class="card" aria-labelledby="rp-chg-title">
+  <div class="card-head"><h2 class="card-title" id="rp-chg-title">What changed this week <span class="card-sub" id="rp-chg-sub"></span></h2></div>
+  <div class="card-body"><ul class="list rp-changes" id="rp-changes"><li><div class="skeleton" style="width:100%"></div></li></ul></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/reporting.js"></script>
+{% endblock %}

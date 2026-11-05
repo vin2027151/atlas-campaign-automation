@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+  /* window selector */
+  .win-label { color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+
+  /* platform split */
+  .split-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--surface-3); }
+  .split-bar > span { display: block; height: 100%; }
+  .split-bar .seg-google { background: var(--google); }
+  .split-bar .seg-meta { background: var(--meta); }
+  .split-legend { display: flex; justify-content: space-between; gap: var(--s3); margin-top: var(--s2); font-size: var(--fs-sm); color: var(--ink-2); flex-wrap: wrap; }
+  .plat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .plat-card .card-head { min-height: 40px; }
+  .plat-stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s3); }
+  .plat-stat .kpi-label { font-size: var(--fs-xs); }
+  .plat-stat .stat-value { font-size: var(--fs-lg); font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .plat-card .card-foot { display: flex; justify-content: space-between; gap: var(--s2); flex-wrap: wrap; }
+
+  /* funnel */
+  .funnel { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: stretch; gap: var(--s2); }
+  .funnel-stage { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: var(--s3); min-width: 0; }
+  .funnel-stage .stat-value { font-size: var(--fs-xl); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .funnel-step { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); font-size: var(--fs-sm); min-width: 76px; text-align: center; }
+  .funnel-step .arrow { font-size: var(--fs-lg); line-height: 1; color: var(--line-strong); }
+  .funnel-step .rate { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* campaign table */
+  #camp-table tbody tr.camp-row { cursor: pointer; }
+  #camp-table tbody tr.camp-row td:first-child { width: 1%; }
+  #camp-table .caret { display: inline-block; width: 10px; color: var(--muted); transition: transform .12s; }
+  #camp-table tr.is-open .caret { transform: rotate(90deg); }
+  #camp-table tr.group-row td { background: var(--surface-2); font-weight: 600; color: var(--ink-2); font-size: var(--fs-sm); border-top: 1px solid var(--line-strong); cursor: default; }
+  #camp-table tr.group-row.legacy td { background: var(--watch-soft); color: var(--watch); border-top: 2px dashed var(--watch-line); }
+  #camp-table tr.camp-row.legacy td { background: color-mix(in srgb, var(--watch-soft) 35%, var(--surface)); }
+  #camp-table tr.adset-row td { background: var(--surface); color: var(--ink-2); font-size: var(--fs-sm); }
+  #camp-table tr.adset-row td.adset-name { padding-left: calc(var(--s3) + 22px); }
+  #camp-table .monitor { font-weight: 700; }
+  #camp-table th.monitor-head { color: var(--accent); }
+  .ratio-flag { display: inline-block; margin-left: 4px; font-size: var(--fs-xs); font-weight: 700; padding: 0 4px; border-radius: var(--r-sm); background: var(--bad-soft); color: var(--bad); border: 1px solid var(--bad-line); }
+  .ratio-flag.under { background: var(--watch-soft); color: var(--watch); border-color: var(--watch-line); }
+  .legacy-tag { background: var(--watch-soft); color: var(--watch); border-color: var(--watch-line); margin-left: 6px; }
+  .legend-note { display: flex; gap: var(--s4); flex-wrap: wrap; font-size: var(--fs-sm); color: var(--muted); }
+  .band-swatch { display: inline-block; width: 14px; height: 10px; border-radius: 2px; background: color-mix(in srgb, var(--good) 16%, transparent); border: 1px dashed var(--good); vertical-align: -1px; margin-right: 4px; }
+
+  @media (max-width: 1100px) {
+    .plat-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 820px) {
+    .funnel { grid-template-columns: minmax(0, 1fr); }
+    .funnel-step { flex-direction: row; gap: var(--s2); min-width: 0; }
+    .funnel-step .arrow { transform: rotate(90deg); }
+  }
+  @media (max-width: 640px) {
+    .plat-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>
+{% endblock %}
+
+{% block subtitle %}<p class="page-sub">Where the money goes, by platform and campaign. Trials are PostHog-attributed signups; 3-day cost per trial is the active monitor against the {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }} target.</p>{% endblock %}
+
+{% block actions %}
+<span class="win-label" id="win-label" aria-live="polite"></span>
+<div class="btn-group" id="win-select" role="group" aria-label="Date window">
+  <button class="btn btn-sm" data-window="3d">3d</button>
+  <button class="btn btn-sm active" data-window="7d" aria-pressed="true">7d</button>
+  <button class="btn btn-sm" data-window="14d">14d</button>
+  <button class="btn btn-sm" data-window="30d">30d</button>
+  <button class="btn btn-sm" data-window="mtd">MTD</button>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="grid plat-grid" id="platform-split" aria-label="Platform split">
+  <div class="card"><div class="card-body"><div class="skeleton"></div></div></div>
+  <div class="card"><div class="card-body"><div class="skeleton"></div></div></div>
+  <div class="card"><div class="card-body"><div class="skeleton"></div></div></div>
+</section>
+
+<section class="card" aria-labelledby="funnel-title">
+  <div class="card-head">
+    <h2 class="card-title" id="funnel-title">Account funnel <span class="card-sub" id="funnel-sub"></span></h2>
+  </div>
+  <div class="card-body"><div class="funnel" id="funnel"></div></div>
+  <div class="card-foot" id="funnel-note"></div>
+</section>
+
+<section class="card" aria-labelledby="daily-title">
+  <div class="card-head">
+    <h2 class="card-title" id="daily-title">Daily spend by campaign</h2>
+    <span class="card-sub">Click a legend item to hide or show a campaign</span>
+  </div>
+  <div class="card-body"><div class="chart-box lg"><canvas id="daily-chart" aria-label="Stacked daily spend by campaign"></canvas></div></div>
+</section>
+
+<section class="card" aria-labelledby="cpt-title">
+  <div class="card-head">
+    <h2 class="card-title" id="cpt-title">Rolling 3-day cost per trial</h2>
+    <div class="legend-note"><span><span class="band-swatch"></span>Target band</span><span>Gaps are days with no trials in the trailing 3 days</span></div>
+  </div>
+  <div class="card-body"><div class="chart-box lg"><canvas id="cpt-chart" aria-label="Rolling 3-day cost per trial by campaign"></canvas></div></div>
+</section>
+
+<section class="card" aria-labelledby="table-title">
+  <div class="card-head">
+    <h2 class="card-title" id="table-title">Campaigns <span class="card-sub" id="table-sub"></span></h2>
+    <span class="card-sub">Click a header to sort, a row to see its ad sets</span>
+  </div>
+  <div class="table-wrap">
+    <table class="table" id="camp-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="sortable" data-key="name">Campaign</th>
+          <th class="sortable" data-key="country">Country</th>
+          <th class="sortable" data-key="status">Status</th>
+          <th class="sortable num" data-key="daily_budget">Budget / day</th>
+          <th class="sortable num" data-key="spend">Spend</th>
+          <th class="sortable num" data-key="spend_per_day">Spend / day</th>
+          <th class="sortable num" data-key="trials">Trials</th>
+          <th class="sortable num monitor-head" data-key="cpt_3d" title="Trailing 3 days ending today, whatever the window">CPT 3d</th>
+          <th class="sortable num" data-key="cpt_7d" title="Trailing 7 days ending today">CPT 7d</th>
+          <th class="sortable num" data-key="paid">Paid</th>
+          <th class="sortable num" data-key="trial_to_paid">Trial&rarr;paid</th>
+          <th class="sortable num" data-key="cost_per_paid">Cost / paid</th>
+          <th class="sortable num" data-key="platform_vs_posthog_pct" title="Platform-reported conversions, and as % of PostHog trials. Flagged outside 80-120%.">Platform conv. vs PostHog</th>
+        </tr>
+      </thead>
+      <tbody id="camp-body"><tr><td colspan="14" class="table-empty">Loading&hellip;</td></tr></tbody>
+    </table>
+  </div>
+  <div class="card-foot" id="table-note"></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/spend.js"></script>
+{% endblock %}

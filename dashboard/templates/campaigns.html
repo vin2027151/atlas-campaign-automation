@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+  .cmp-summary { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .cmp-summary .kpi-value { font-size: var(--fs-xl); }
+  .cmp-summary .kpi-bar > span.over { background: var(--watch); }
+  .cmp-toolbar { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; padding: 0 var(--s4); border-bottom: 1px solid var(--line); }
+  .cmp-toolbar .tabs { border-bottom: 0; }
+  .cmp-filters { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; padding: var(--s2) 0; }
+  .cmp-filters .input { width: 200px; }
+  .fchip { height: 24px; padding: 0 10px; border-radius: 12px; font-size: var(--fs-sm); }
+  .fchip[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+  .cmp-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--s4); align-items: start; }
+  .cmp-table td.name { font-weight: 600; }
+  .cmp-table td.name .tag { margin-left: 6px; font-weight: 500; }
+  .cmp-table td.bid { color: var(--ink-2); max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+  .cmp-table tr.is-open > td { background: var(--accent-soft) !important; }
+  .cmp-table tr.panel-row > td { background: var(--surface-2) !important; padding: 0; white-space: normal; }
+  .cmp-table tr.panel-row:hover > td { background: var(--surface-2) !important; }
+  .row-actions { display: inline-flex; gap: var(--s1); }
+  .budget-btn { appearance: none; background: none; border: 1px dashed transparent; border-radius: var(--r-sm); padding: 1px 4px; margin: -2px -5px; font: inherit; color: inherit; cursor: text; font-variant-numeric: tabular-nums; }
+  .budget-btn:hover { border-color: var(--accent-line); background: var(--surface); color: var(--accent); }
+  .budget-input { width: 90px; height: 24px; text-align: right; font-variant-numeric: tabular-nums; }
+  .expand-btn[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+  .panel { padding: var(--s3) var(--s4) var(--s4); border-left: 3px solid var(--accent); }
+  .panel .tabs { margin-bottom: var(--s3); }
+  .panel .table-wrap { background: var(--surface); }
+  .panel-note { color: var(--muted); font-size: var(--fs-sm); margin: var(--s2) 0; }
+  .sub-table td.wrap { min-width: 200px; max-width: 320px; color: var(--ink-2); }
+  .sub-table tr.ad-row td { background: var(--surface) !important; font-size: var(--fs-sm); }
+  .sub-table tr.ad-row td.hook { white-space: normal; min-width: 220px; max-width: 340px; color: var(--ink-2); }
+  .apportioned { border-bottom: 1px dotted var(--muted); cursor: help; }
+  .st-table tr.recommend td { background: var(--watch-soft) !important; }
+  .st-table tr.negated td { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line-strong); }
+  .st-table tr.negated td.keep { text-decoration: none; }
+  .st-reason { color: var(--watch); font-size: var(--fs-sm); white-space: normal; min-width: 200px; }
+  .neg-form { display: flex; gap: var(--s2); flex-wrap: wrap; align-items: center; margin: var(--s3) 0 var(--s2); }
+  .neg-form .input { width: 240px; }
+  .select.sm { height: 24px; font-size: var(--fs-sm); padding: 0 4px; }
+  .act-card { position: sticky; top: calc(var(--topbar-h) + var(--s4)); }
+  .act-list { max-height: 70vh; overflow: auto; }
+  .act-list li { padding: var(--s2) var(--s4); font-size: var(--fs-sm); }
+  .act-list .act-top { display: flex; justify-content: space-between; gap: var(--s2); }
+  .act-list .act-action { font-family: var(--mono); font-size: var(--fs-xs); color: var(--accent); }
+  .act-list .act-ts { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .act-list .act-detail { color: var(--ink-2); word-break: break-word; }
+  .act-list li.fresh { background: var(--accent-soft); }
+  @media (max-width: 1100px) {
+    .cmp-layout { grid-template-columns: minmax(0, 1fr); }
+    .act-card { position: static; }
+    .act-list { max-height: 360px; }
+    .cmp-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .cmp-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cmp-toolbar { padding: 0 var(--s3); }
+    .cmp-filters .input { width: 100%; flex: 1 1 100%; }
+    .panel { padding: var(--s2) var(--s2) var(--s3); }
+    .neg-form .input { width: 100%; }
+  }
+</style>
+{% endblock %}
+{% block subtitle %}<p class="page-sub">Every campaign on Google Ads and Meta in one place. Pause or enable campaigns, ad sets and ads, edit daily budgets inline, and add negative keywords. Changes go through the platform adapter ({{ meta.adapter or "local" }} sample state) and are logged.</p>{% endblock %}
+{% block content %}
+<section class="grid kpi-grid cmp-summary" id="cmp-summary" aria-label="Campaign summary">
+  <div class="kpi"><div class="kpi-label">Loading</div><div class="kpi-value skeleton">&nbsp;</div></div>
+</section>
+
+<div class="cmp-layout">
+  <section class="card" aria-label="Campaigns">
+    <div class="cmp-toolbar">
+      <div class="tabs" id="cmp-platform-tabs" role="tablist">
+        <button class="tab active" data-platform="all">All <span class="count" data-count="all"></span></button>
+        <button class="tab" data-platform="google">Google <span class="count" data-count="google"></span></button>
+        <button class="tab" data-platform="meta">Meta <span class="count" data-count="meta"></span></button>
+      </div>
+      <div class="spacer"></div>
+      <div class="cmp-filters">
+        <button class="btn btn-sm fchip" data-filter="ACTIVE" aria-pressed="false">Active</button>
+        <button class="btn btn-sm fchip" data-filter="PAUSED" aria-pressed="false">Paused</button>
+        <button class="btn btn-sm fchip" data-filter="legacy" aria-pressed="false">Legacy</button>
+        <input class="input" id="cmp-search" type="search" placeholder="Search campaigns" aria-label="Search campaigns by name">
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="table cmp-table" id="cmp-table">
+        <thead>
+          <tr>
+            <th></th><th>Campaign</th><th>Ctry</th><th>Type</th><th>Status</th>
+            <th class="num" title="Click to edit">Daily budget</th>
+            <th class="num" title="Daily budget x days in month">Monthly</th>
+            <th class="num">7d spend</th><th class="num">7d trials</th><th class="num">7d CPT</th><th class="num">3d CPT</th>
+            <th>Bid strategy</th><th>Start</th><th class="actions"></th>
+          </tr>
+        </thead>
+        <tbody id="cmp-body"><tr><td colspan="14" class="table-empty">Loading campaigns&hellip;</td></tr></tbody>
+      </table>
+    </div>
+    <div class="card-foot" id="cmp-foot">CPT = PostHog-attributed cost per trial. Target {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }}.</div>
+  </section>
+
+  <aside class="card act-card" aria-label="Activity">
+    <div class="card-head"><h2 class="card-title">Activity</h2><span class="card-sub" id="act-sub">last 15</span></div>
+    <ul class="list act-list" id="act-list"><li class="muted">Loading&hellip;</li></ul>
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/campaigns.js"></script>
+{% endblock %}

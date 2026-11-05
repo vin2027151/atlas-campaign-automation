@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% block title %}Management{% endblock %}
+{% block head %}
+<style>
+  /* ---- management page: tokens only ---- */
+  .mg-section-title { display: flex; align-items: baseline; gap: var(--s2); flex-wrap: wrap; }
+  .mg-section-title .card-sub { font-weight: 400; }
+
+  /* 1. Today strip */
+  .mg-today { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; }
+  .mg-today > div { padding: var(--s3) var(--s4); border-right: 1px solid var(--line); min-width: 0; }
+  .mg-today > div:last-child { border-right: 0; }
+  .mg-today .lbl { color: var(--muted); font-size: var(--fs-sm); font-weight: 500; white-space: nowrap; }
+  .mg-today .big { font-size: var(--fs-kpi); font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .mg-today .big small { font-size: var(--fs-md); color: var(--muted); font-weight: 500; }
+  .mg-today .sub { color: var(--muted); font-size: var(--fs-sm); }
+  .mg-status-line { font-size: var(--fs-md); color: var(--ink); margin-top: 4px; }
+  .mg-status-line .num { text-align: left; }
+  .mg-today .kpi-bar { width: 140px; max-width: 100%; }
+
+  /* 2. Checklist */
+  .mg-rail { display: flex; gap: 6px; overflow-x: auto; padding: var(--s3) var(--s4); scroll-snap-type: x proximity; scrollbar-width: thin; border-bottom: 1px solid var(--line); }
+  .mg-day {
+    flex: none; scroll-snap-align: center; width: 58px;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 6px 0 7px; border-radius: var(--r); cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-2);
+    font: 500 var(--fs-xs)/1.2 var(--font); font-variant-numeric: tabular-nums;
+  }
+  .mg-day:hover { border-color: var(--line-strong); background: var(--surface-2); }
+  .mg-day .d-num { font-size: var(--fs-md); font-weight: 600; color: var(--ink); }
+  .mg-day .d-date { color: var(--muted); }
+  .mg-day .d-dots { height: 4px; width: 34px; border-radius: 2px; background: var(--surface-3); overflow: hidden; margin-top: 2px; }
+  .mg-day .d-dots > span { display: block; height: 100%; background: var(--good); }
+  .mg-day.past { background: var(--surface-2); }
+  .mg-day.past.has-open .d-dots > span { background: var(--watch); }
+  .mg-day.future { color: var(--muted); }
+  .mg-day.future .d-num { color: var(--muted); font-weight: 500; }
+  .mg-day.today { border-color: var(--accent-line); background: var(--accent-soft); }
+  .mg-day.today .d-num, .mg-day.today .d-date { color: var(--accent); }
+  .mg-day.selected { box-shadow: 0 0 0 2px var(--accent); border-color: var(--accent); }
+  .mg-check-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); }
+  .mg-check-grid > div { min-width: 0; }
+  .mg-check-grid > div + div { border-left: 1px solid var(--line); background: var(--surface-2); border-radius: 0 0 var(--r-lg) 0; }
+  .mg-pane-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s2); padding: var(--s3) var(--s4) var(--s2); }
+  .mg-pane-head h3 { font-size: var(--fs-md); }
+  .mg-items { list-style: none; margin: 0; padding: 0 var(--s4) var(--s3); }
+  .mg-items li { border-bottom: 1px solid var(--line); }
+  .mg-items li:last-child { border-bottom: 0; }
+  .mg-items label { display: flex; align-items: flex-start; gap: var(--s2); padding: 7px 0; cursor: pointer; }
+  .mg-items input { width: 15px; height: 15px; margin: 2px 0 0; accent-color: var(--good); flex: none; }
+  .mg-items .t { flex: 1; min-width: 0; }
+  .mg-items .is-done .t { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line-strong); }
+  .mg-items .meta { color: var(--muted); font-size: var(--fs-xs); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .mg-items .meta.old { color: var(--watch); font-weight: 600; }
+  .mg-empty { color: var(--muted); padding: var(--s2) 0 var(--s3); }
+
+  /* 3. In play */
+  .mg-reads { display: flex; gap: var(--s2); flex-wrap: wrap; }
+  .read { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px; border-radius: 10px;
+    font-size: var(--fs-xs); font-weight: 600; letter-spacing: .02em; text-transform: uppercase; border: 1px solid; white-space: nowrap; cursor: help; }
+  .read::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .read.scaling { color: var(--good); background: var(--good-soft); border-color: var(--good-line); }
+  .read.holding { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
+  .read.watching { color: var(--watch); background: var(--watch-soft); border-color: var(--watch-line); }
+  .read.failing { color: var(--bad); background: var(--bad-soft); border-color: var(--bad-line); }
+  .read .n { font-variant-numeric: tabular-nums; }
+  .mg-group-row td { background: var(--surface-2) !important; font-weight: 600; color: var(--ink-2); font-size: var(--fs-sm); }
+  .mg-group-row td.num { font-weight: 600; }
+  .mg-camp a { color: var(--ink); font-weight: 500; }
+  .mg-camp a:hover { color: var(--accent); }
+  .mg-camp .tag { margin-left: 4px; }
+  .mg-why { color: var(--muted); font-size: var(--fs-sm); white-space: normal; min-width: 200px; }
+  .mg-rule { margin: 0; padding: var(--s3) var(--s4); display: grid; grid-template-columns: max-content 1fr; gap: 6px var(--s3); font-size: var(--fs-sm); color: var(--ink-2); }
+  .mg-rule dd { margin: 0; }
+  details.mg-fold > summary { cursor: pointer; list-style: none; padding: var(--s2) var(--s4); color: var(--ink-2); font-size: var(--fs-sm); font-weight: 500; border-top: 1px solid var(--line); }
+  details.mg-fold > summary::-webkit-details-marker { display: none; }
+  details.mg-fold > summary::before { content: "\25B8"; display: inline-block; width: 14px; color: var(--muted); }
+  details.mg-fold[open] > summary::before { content: "\25BE"; }
+
+  /* 4. Tests */
+  .mg-tests { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--s3); padding: var(--s4); }
+  .mg-test { border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s3); background: var(--surface); display: flex; flex-direction: column; gap: var(--s2); min-width: 0; }
+  .mg-test h3 { font-size: var(--fs-md); line-height: 1.3; }
+  .mg-test .hyp { color: var(--muted); font-size: var(--fs-sm); }
+  .mg-test-nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s2); }
+  .mg-test-nums .lbl { color: var(--muted); font-size: var(--fs-xs); }
+  .mg-test-nums .v { font-size: var(--fs-lg); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .mg-gates { display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content; gap: 4px var(--s2); align-items: center; font-size: var(--fs-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .mg-ledger-tally { display: flex; gap: var(--s2); flex-wrap: wrap; }
+  .mg-sub-head { padding: var(--s3) var(--s4) 0; display: flex; align-items: baseline; justify-content: space-between; gap: var(--s2); flex-wrap: wrap; border-top: 1px solid var(--line); }
+  .mg-sub-head h3 { font-size: var(--fs-md); }
+
+  /* 5. Tracking */
+  .mg-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
+  .mg-dot.ok { background: var(--good); } .mg-dot.degraded { background: var(--watch); } .mg-dot.broken { background: var(--bad); }
+
+  /* 6. Lessons */
+  .mg-lesson-form { display: grid; grid-template-columns: minmax(0, 1fr) 220px auto; gap: var(--s2); align-items: start; padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); background: var(--surface-2); }
+  .mg-lesson-form .textarea { min-height: 30px; height: 30px; padding: 5px var(--s2); }
+  .mg-lesson-form .textarea:focus { height: 72px; }
+  .mg-filter { display: flex; gap: 6px; flex-wrap: wrap; padding: var(--s3) var(--s4) 0; }
+  .mg-chip { appearance: none; display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 11px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font: 500 var(--fs-xs)/1 var(--font); cursor: pointer; }
+  .mg-chip:hover { border-color: var(--line-strong); color: var(--ink); }
+  .mg-chip.active { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+  .mg-chip .c { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .mg-lessons { list-style: none; margin: 0; padding: var(--s2) var(--s4) var(--s3); }
+  .mg-lessons li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: var(--s3); padding: var(--s2) 0; border-bottom: 1px solid var(--line); }
+  .mg-lessons li:last-child { border-bottom: 0; }
+  .mg-lessons .when { color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; padding-top: 1px; }
+  .mg-lessons .tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; align-items: center; }
+  .mg-lessons .src { color: var(--muted); font-size: var(--fs-xs); margin-left: 2px; }
+  .mg-lessons li.is-new { animation: mg-flash 1.6s ease-out; }
+  @keyframes mg-flash { from { background: var(--accent-soft); } }
+
+  /* 7. Activity */
+  .mg-activity { list-style: none; margin: 0; padding: var(--s2) var(--s4) var(--s3); }
+  .mg-activity li { display: grid; grid-template-columns: 96px 140px minmax(0, 1fr); gap: var(--s3); padding: 6px 0; border-bottom: 1px solid var(--line); font-size: var(--fs-sm); }
+  .mg-activity li:last-child { border-bottom: 0; }
+  .mg-activity .ts { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .mg-activity .act { font-family: var(--mono); font-size: var(--fs-xs); color: var(--ink-2); padding-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .mg-two { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--s4); align-items: start; }
+  .mg-loading { padding: var(--s5); }
+
+  @media (max-width: 1100px) {
+    .mg-two { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 900px) {
+    .mg-today { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .mg-today > div:last-child { grid-column: 1 / -1; border-top: 1px solid var(--line); }
+    .mg-today > div:nth-child(3) { border-right: 0; }
+    .mg-check-grid { grid-template-columns: minmax(0, 1fr); }
+    .mg-check-grid > div + div { border-left: 0; border-top: 1px solid var(--line); border-radius: 0 0 var(--r-lg) var(--r-lg); }
+    .mg-lesson-form { grid-template-columns: minmax(0, 1fr) 160px auto; }
+  }
+  @media (max-width: 640px) {
+    .mg-today > div { padding: var(--s2) var(--s3); }
+    .mg-today .big { font-size: var(--fs-xl); }
+    .mg-rail, .mg-pane-head, .mg-items, .mg-filter, .mg-lessons, .mg-activity, .mg-sub-head { padding-left: var(--s3); padding-right: var(--s3); }
+    .mg-tests { grid-template-columns: minmax(0, 1fr); padding: var(--s3); }
+    .mg-lesson-form { grid-template-columns: minmax(0, 1fr); padding: var(--s3); }
+    .mg-lesson-form .textarea { height: 60px; }
+    .mg-activity li { grid-template-columns: 80px minmax(0, 1fr); }
+    .mg-activity .act { display: none; }
+    .mg-rule { grid-template-columns: minmax(0, 1fr); padding: var(--s3); }
+  }
+  @media (max-width: 420px) {
+    .mg-today { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .mg-today > div:nth-child(2) { border-right: 0; }
+    .mg-today > div:nth-child(3) { grid-column: 1 / -1; border-top: 1px solid var(--line); }
+    .mg-lessons li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  }
+</style>
+{% endblock %}
+
+{% block subtitle %}<p class="page-sub">What is in play, what is being tracked, what is winning and what is not, and what to check today. Day-by-day plan for the November build; cost per trial is PostHog-attributed against the {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }} band.</p>{% endblock %}
+{% block actions %}<button class="btn btn-sm" id="mg-refresh" type="button">Refresh</button>{% endblock %}
+
+{% block content %}
+<section class="card mg-today" id="mg-today" aria-label="Today">
+  <div class="mg-loading"><div class="skeleton" style="width:220px"></div></div>
+</section>
+
+<section class="card" id="mg-checklist" aria-labelledby="mg-checklist-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-checklist-title">Daily checklist</h2><span class="card-sub" id="mg-checklist-sub"></span></div>
+    <button class="btn btn-sm btn-ghost" type="button" id="mg-goto-today">Jump to today</button>
+  </div>
+  <div class="mg-rail" id="mg-rail" role="listbox" aria-label="30-day plan"></div>
+  <div class="mg-check-grid">
+    <div>
+      <div class="mg-pane-head"><h3 id="mg-day-title">&nbsp;</h3><span class="card-sub" id="mg-day-count"></span></div>
+      <ul class="mg-items" id="mg-day-items"></ul>
+    </div>
+    <div>
+      <div class="mg-pane-head"><h3>Carried over</h3><span class="card-sub" id="mg-carry-count"></span></div>
+      <ul class="mg-items" id="mg-carry"></ul>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="mg-inplay" aria-labelledby="mg-inplay-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-inplay-title">In play</h2><span class="card-sub">active campaigns, trailing 7 days</span></div>
+    <div class="mg-reads" id="mg-read-counts"></div>
+  </div>
+  <div class="table-wrap">
+    <table class="table compact">
+      <thead><tr><th>Campaign</th><th class="num">Daily budget</th><th class="num">7d spend</th><th class="num">7d CPT</th><th class="num">Trials 7d</th><th>Read</th><th>Why</th></tr></thead>
+      <tbody id="mg-inplay-body"><tr><td colspan="7" class="table-empty">Loading&hellip;</td></tr></tbody>
+    </table>
+  </div>
+  <details class="mg-fold" id="mg-paused"><summary>Paused campaigns</summary><div id="mg-paused-body"></div></details>
+  <details class="mg-fold"><summary>How the read is computed</summary><dl class="mg-rule" id="mg-rule"></dl></details>
+</section>
+
+<section class="card" id="mg-tests" aria-labelledby="mg-tests-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-tests-title">Tests scoreboard</h2><span class="card-sub" id="mg-tests-sub"></span></div>
+  </div>
+  <div class="mg-tests" id="mg-running"></div>
+  <div class="mg-sub-head"><h3>Win / loss ledger</h3><div class="mg-ledger-tally" id="mg-tally"></div></div>
+  <div class="table-wrap" style="border:0;margin-top:var(--s2)">
+    <table class="table compact">
+      <thead><tr><th>Result</th><th>Test</th><th>Campaign</th><th class="num">Benchmark</th><th class="num">Result</th><th class="num">Spend</th><th class="num">Trials</th><th>Ended</th><th>What it taught</th></tr></thead>
+      <tbody id="mg-ledger"></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card" id="mg-tracking" aria-labelledby="mg-tracking-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-tracking-title">Tracking status</h2><span class="card-sub">PostHog is the source of truth</span></div>
+  </div>
+  <div class="table-wrap">
+    <table class="table compact">
+      <thead><tr><th>Signal</th><th>Status</th><th>Checked</th><th>Note</th></tr></thead>
+      <tbody id="mg-tracking-body"></tbody>
+    </table>
+  </div>
+</section>
+
+
+<div class="mg-two">
+  <section class="card" id="mg-lessons-card" aria-labelledby="mg-lessons-title">
+    <div class="card-head">
+      <div class="mg-section-title"><h2 class="card-title" id="mg-lessons-title">Lessons log</h2><span class="card-sub" id="mg-lessons-sub"></span></div>
+    </div>
+    <form class="mg-lesson-form" id="mg-lesson-form" autocomplete="off">
+      <label class="sr-only" for="mg-lesson-text">Lesson</label>
+      <textarea class="textarea" id="mg-lesson-text" name="text" placeholder="What did we learn? One sentence, with the number." required maxlength="600"></textarea>
+      <label class="sr-only" for="mg-lesson-tags">Tags</label>
+      <input class="input" id="mg-lesson-tags" name="tags" placeholder="tags, comma separated" list="mg-tag-list">
+      <datalist id="mg-tag-list"></datalist>
+      <button class="btn btn-primary" type="submit" id="mg-lesson-submit">Add lesson</button>
+    </form>
+    <div class="mg-filter" id="mg-tag-filter" aria-label="Filter lessons by tag"></div>
+    <ul class="mg-lessons" id="mg-lessons"></ul>
+  </section>
+  <section class="card" id="mg-activity-card" aria-labelledby="mg-activity-title">
+    <div class="card-head">
+      <div class="mg-section-title"><h2 class="card-title" id="mg-activity-title">Recent activity</h2><span class="card-sub">last 20 changes</span></div>
+    </div>
+    <ul class="mg-activity" id="mg-activity"></ul>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/management.js"></script>
+{% endblock %}
