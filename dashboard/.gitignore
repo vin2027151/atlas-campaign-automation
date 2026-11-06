@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 data/.state-*.json
+
+data/planning/
+static/media/library/uploads/

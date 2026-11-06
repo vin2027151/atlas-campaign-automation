@@ -34,6 +34,10 @@ PAGES = [
      "Running tests against their benchmarks, results, and the lessons log."),
     ("campaigns", "/campaigns", "Campaigns", "Campaigns",
      "Campaigns, ad sets and ads: pause, resume, budgets, search terms and negatives."),
+    ("planning", "/planning", "Campaign Planning", "Campaign planning",
+     "Pull account state, compare it to the 30-day plan, draft API changes from a brief, review the diff, publish by hand."),
+    ("media", "/media", "Media", "Media library",
+     "Numbered image, video and HTML5 assets: requests, ready for review, approved."),
 ]
 API_PAGES = [p[0] for p in PAGES if p[0] != "home"]
 

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/media.css">
+{% endblock %}
+
+{% block subtitle %}<p class="page-sub">Every creative the ad accounts can use, numbered by kind (IMG, VID, H5). Requests wait for a file, uploads wait for review, and only approved media can be tagged in a Campaign Planning brief.</p>{% endblock %}
+{% block actions %}<button class="btn btn-primary" id="new-toggle" type="button" aria-expanded="false" aria-controls="new-card">+ New request</button>{% endblock %}
+
+{% block content %}
+<section class="card" id="new-card" hidden aria-labelledby="new-title">
+  <div class="card-head"><h2 class="card-title" id="new-title">New media request</h2><button class="btn btn-ghost btn-sm" type="button" data-close-new>Cancel</button></div>
+  <div class="card-body">
+    <form class="md-form" id="new-form" autocomplete="off" novalidate>
+      <div class="field"><label for="nr-kind">Kind</label>
+        <select class="select" id="nr-kind" name="kind">
+          <option value="image">Image</option><option value="video">Video</option><option value="html5">HTML5</option>
+        </select></div>
+      <div class="field wide"><label for="nr-title">Title</label>
+        <input class="input" id="nr-title" name="title" required maxlength="140" placeholder="e.g. 9:16 UGC video: agency owner explains white-label reports, 20 s"></div>
+      <div class="field"><label for="nr-due">Due</label><input class="input" id="nr-due" name="due" type="date" min="{{ today }}"></div>
+      <fieldset class="field md-fieldset"><legend class="label">Platforms</legend>
+        <div class="row">
+          <label class="check"><input type="checkbox" name="platforms" value="meta" checked> Meta</label>
+          <label class="check"><input type="checkbox" name="platforms" value="google"> Google Ads</label>
+        </div></fieldset>
+      <div class="field wide"><label for="nr-placements">Placements <span class="muted">(comma separated)</span></label>
+        <input class="input" id="nr-placements" name="placements" maxlength="300" placeholder="Reels, Stories, Facebook Feed"></div>
+      <div class="field full"><label for="nr-description">Description</label>
+        <input class="input" id="nr-description" name="description" maxlength="1000" placeholder="One line: what it is and where it runs"></div>
+      <div class="field full"><label for="nr-brief">Brief</label>
+        <textarea class="textarea" id="nr-brief" name="brief" maxlength="2000" placeholder="Hook, script or layout, specs (size, length, file type), what to avoid"></textarea></div>
+      <div class="form-actions"><button class="btn" type="button" data-close-new>Cancel</button><button class="btn btn-primary" type="submit" id="nr-submit">Create request</button></div>
+    </form>
+  </div>
+</section>
+
+<section aria-label="Media library">
+  <div class="md-toolbar">
+    <div class="tabs" role="tablist" aria-label="Filter by kind" id="kind-tabs">
+      <button class="tab active" type="button" role="tab" aria-selected="true" data-kind="">All<span class="count" data-count=""></span></button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-kind="image">Image<span class="count" data-count="image"></span></button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-kind="video">Video<span class="count" data-count="video"></span></button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-kind="html5">HTML5<span class="count" data-count="html5"></span></button>
+    </div>
+    <div class="md-tools">
+      <label class="sr-only" for="md-search">Search media</label>
+      <input class="input md-search" id="md-search" type="search" placeholder="Search ID, title, ad copy, campaign" autocomplete="off">
+      <div class="md-summary" id="md-summary" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="md-board mt-2" id="board" aria-live="polite"><div class="skeleton" style="height:180px"></div></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/media.js"></script>
+{% endblock %}

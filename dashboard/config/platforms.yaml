@@ -1,0 +1,23 @@
+# Ad platform connection settings for planning/executor.py.
+# EXAMPLE credentials only. This file is committed; real values never go here.
+# Going live needs all three: mode: live, env ATLAS_ALLOW_LIVE=1, and real values
+# supplied outside the repo (the live adapters refuse any value containing EXAMPLE).
+mode: sample          # sample | live. live also needs env ATLAS_ALLOW_LIVE=1 and real values.
+google_ads:
+  api_version: "v22"  # set to the current Google Ads API version before going live
+  developer_token: "EXAMPLE-DEV-TOKEN-NOT-REAL"
+  client_id: "000000000000-example.apps.googleusercontent.com"
+  client_secret: "EXAMPLE-CLIENT-SECRET"
+  refresh_token: "EXAMPLE-REFRESH-TOKEN"
+  login_customer_id: "1112223333"   # MCC
+  customer_id: "4445556666"         # Search Atlas ads account (sample)
+meta:
+  api_version: "v24.0"  # set to the current Graph API version before going live
+  app_id: "000000000000000"
+  app_secret: "EXAMPLE-APP-SECRET"
+  access_token: "EXAMPLE-SYSTEM-USER-TOKEN"
+  ad_account_id: "act_7778889999"
+  page_id: "123456789012345"
+  instagram_actor_id: "17840000000000000"
+  required_permissions: [ads_management, ads_read, business_management, pages_read_engagement, pages_manage_ads, pages_show_list]
+  media_access: "ad account /adimages and /advideos (upload), page for object_story_spec"

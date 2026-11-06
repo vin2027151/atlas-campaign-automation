@@ -1,0 +1,1148 @@
+{
+ "version": 1,
+ "updated_at": "2026-11-06T02:21:44Z",
+ "counters": {
+  "image": 14,
+  "video": 6,
+  "html5": 1
+ },
+ "assets": [
+  {
+   "id": "IMG-0001",
+   "kind": "image",
+   "status": "approved",
+   "title": "Agency Founders Don't Go Back.",
+   "description": "Live Meta ad (image), running since Oct 8, 2026. Primary text: \"Agency founders who switch to Search Atlas don't go back.\" CTA: See Details.",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0001.jpg",
+   "thumb_url": "/static/media/library/IMG-0001.jpg",
+   "package_url": null,
+   "width": 338,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 20658,
+   "aspect": "9:16",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=875410725566613",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0001.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "875410725566613",
+   "started_running": "Oct 8, 2026",
+   "primary_text": "Agency founders who switch to Search Atlas don't go back.\nOne founder cancelled Ahrefs, Majestic SEO, Semrush, and a few others, and saved 90% of the SEO and AI Search grunt work.\nAnother replaced 6 software programs and grew SEO traffic 137% year over year.\nAnother cancelled over $3,800/month in SEO tools, and their performance went up 15–20% per month.\nAfter 10+ years in SEO, another said \"I can't believe how good this is.\"\nThe agencies are different, but the reason is the same: more client work done with fewer tools and fewer manual steps.\nSee what it can do across your own client accounts.\nTry Search Atlas free for 7 days.",
+   "headline": "Agency Founders Don't Go Back.",
+   "cta": "See Details"
+  },
+  {
+   "id": "IMG-0002",
+   "kind": "image",
+   "status": "approved",
+   "title": "Cancel Ahrefs & Semrush. Save $1,000+",
+   "description": "Live Meta ad (image), running since Nov 2, 2026. Primary text: \"Ahrefs, Semrush, and the rest of the stack add up fast.\" CTA: Sign up.",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0002.jpg",
+   "thumb_url": "/static/media/library/IMG-0002.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 29459,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1769106130873097",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0002.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "1769106130873097",
+   "started_running": "Nov 2, 2026",
+   "primary_text": "Ahrefs, Semrush, and the rest of the stack add up fast.\nEach tool is another subscription, another login, and another bill every month.\nCancel Ahrefs and Semrush and you can save $1,000+ a month.\nSearch Atlas brings more of that work into one platform across search, AEO, AI visibility, content, and technical work.\nThat means fewer tools to manage and less money going to the stack.\nTry Search Atlas free for 7 days.",
+   "headline": "Cancel Ahrefs & Semrush. Save $1,000+",
+   "cta": "Sign up"
+  },
+  {
+   "id": "IMG-0003",
+   "kind": "image",
+   "status": "approved",
+   "title": "90% of the Grunt Work, Saved",
+   "description": "Live Meta ad (image), running since Nov 2, 2026. Primary text: \"90% of the SEO and AI Search grunt work, saved.\" CTA: Sign up.",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0003.jpg",
+   "thumb_url": "/static/media/library/IMG-0003.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 39238,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1372723021410103",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0003.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "1372723021410103",
+   "started_running": "Nov 2, 2026",
+   "primary_text": "90% of the SEO and AI Search grunt work, saved.\nThat's what Frankie Fihn, Founder at Beyond Agency Profits, says Search Atlas did for his team.\nThey're cancelling Ahrefs, Majestic SEO, Semrush, and a few others.\nSee what it can do across your own client accounts.\nTry Search Atlas free for 7 days.",
+   "headline": "90% of the Grunt Work, Saved",
+   "cta": "Sign up"
+  },
+  {
+   "id": "IMG-0004",
+   "kind": "image",
+   "status": "approved",
+   "title": "Claude, ChatGPT and Gemini gave you a first draft. Now what?",
+   "description": "Live Meta ad (carousel, 4 cards), running since Nov 2, 2026. Primary text: \"Claude, ChatGPT and Gemini gave you a first draft. Now what?\"",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0004-1.jpg",
+   "thumb_url": "/static/media/library/IMG-0004-1.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 159655,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1515525683963199",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0004-1.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": [
+    "/static/media/library/IMG-0004-1.jpg",
+    "/static/media/library/IMG-0004-2.jpg",
+    "/static/media/library/IMG-0004-3.jpg",
+    "/static/media/library/IMG-0004-4.jpg"
+   ],
+   "meta_library_id": "1515525683963199",
+   "started_running": "Nov 2, 2026",
+   "primary_text": "Claude, ChatGPT and Gemini gave you a first draft. Now what?\nA draft isn't a strategy.\nIt has no keyword data, no competitor gaps, no rank tracking.\nSearch Atlas bridges the gap: expert-built playbooks, automated technical fixes, AI-powered marketing workflows, and Google + AI search tracking in one platform.\nThe draft becomes finished work.\nTry Search Atlas free for 7 days.\nAI Gave You Copy. Now What?\nClaude, ChatGPT and Gemini gave you copy.\nSign Up\nClaude, ChatGPT and Gemini gave you copy.\nA Draft Isn't a Strategy\nNo data, no gaps, no tracking.\nSign Up\nNo data, no gaps, no tracking.\nSearch Atlas Bridges the Gap\nPlaybooks, fixes and tracking.\nSign Up\nPlaybooks, fixes and tracking.\nTurn the Draft Into Results\nTry Search Atlas free.",
+   "headline": "Claude, ChatGPT and Gemini gave you a first draft. Now what?",
+   "cta": null
+  },
+  {
+   "id": "IMG-0005",
+   "kind": "image",
+   "status": "approved",
+   "title": "OTTO SEO Is a Game-Changer",
+   "description": "Live Meta ad (image), running since Nov 2, 2026. Primary text: \"After 15 years in SEO, Perry Belcher, Co-Founder at DigitalMarketer, calls OTTO SEO a game-changer.\" CTA: Sign up.",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0005.jpg",
+   "thumb_url": "/static/media/library/IMG-0005.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 50658,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=2059025648868705",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0005.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "2059025648868705",
+   "started_running": "Nov 2, 2026",
+   "primary_text": "After 15 years in SEO, Perry Belcher, Co-Founder at DigitalMarketer, calls OTTO SEO a game-changer.\n\"Search Atlas is the number one search engine tool in the world… Other tools are overhyped and overpriced.\"\nSee what it can do across your own client accounts.\nTry Search Atlas free for 7 days.",
+   "headline": "OTTO SEO Is a Game-Changer",
+   "cta": "Sign up"
+  },
+  {
+   "id": "IMG-0006",
+   "kind": "image",
+   "status": "approved",
+   "title": "5,000+ Agencies Already Switched",
+   "description": "Live Meta ad (image), running since Nov 2, 2026. Primary text: \"5,000+ agencies already switched.\" CTA: Sign up.",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0006.jpg",
+   "thumb_url": "/static/media/library/IMG-0006.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 50126,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=955272784027777",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0006.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "955272784027777",
+   "started_running": "Nov 2, 2026",
+   "primary_text": "5,000+ agencies already switched.\nJosh Nelson, Founder & CEO at Seven Figure Agency: \"If you want to be on the cutting edge of SEO, Search Atlas is absolutely where it's at.\"\nKimball Conover, CNC Marketing: \"This software has more than doubled my agency's MRR, and I'm here to stay for life.\"\nFrankie Fihn, Beyond Agency Profits: \"We are canceling Ahrefs, Majestic SEO, SemRush and a few others.\"\nTry Search Atlas free for 7 days.",
+   "headline": "5,000+ Agencies Already Switched",
+   "cta": "Sign up"
+  },
+  {
+   "id": "IMG-0007",
+   "kind": "image",
+   "status": "approved",
+   "title": "Cancel Ahrefs & Semrush",
+   "description": "Live Meta ad (image), running since Nov 2, 2026. Primary text: \"Still paying for Ahrefs, Semrush, and Surfer every month?\" CTA: Sign up.",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0007.jpg",
+   "thumb_url": "/static/media/library/IMG-0007.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 43317,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1665516808316372",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0007.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "1665516808316372",
+   "started_running": "Nov 2, 2026",
+   "primary_text": "Still paying for Ahrefs, Semrush, and Surfer every month?\nThose subscriptions add up fast.\nSearch Atlas brings more of that work into one platform, so you can cancel more of the tools you've been stacking.\nTry Search Atlas free for 7 days.",
+   "headline": "Cancel Ahrefs & Semrush",
+   "cta": "Sign up"
+  },
+  {
+   "id": "IMG-0008",
+   "kind": "image",
+   "status": "approved",
+   "title": "See what agency founders say about Search Atlas.",
+   "description": "Live Meta ad (carousel, 5 cards), running since Nov 2, 2026. Primary text: \"See what agency founders say about Search Atlas.\"",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0008-1.jpg",
+   "thumb_url": "/static/media/library/IMG-0008-1.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 145966,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1413316390918136",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0008-1.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": [
+    "/static/media/library/IMG-0008-1.jpg",
+    "/static/media/library/IMG-0008-2.jpg",
+    "/static/media/library/IMG-0008-3.jpg",
+    "/static/media/library/IMG-0008-4.jpg",
+    "/static/media/library/IMG-0008-5.jpg"
+   ],
+   "meta_library_id": "1413316390918136",
+   "started_running": "Nov 2, 2026",
+   "primary_text": "See what agency founders say about Search Atlas.",
+   "headline": "See what agency founders say about Search Atlas.",
+   "cta": null
+  },
+  {
+   "id": "IMG-0009",
+   "kind": "image",
+   "status": "approved",
+   "title": "Real Results. Real Users.",
+   "description": "Live Meta ad (image), running since Nov 4, 2026. Primary text: \"Real results. Real users.\" CTA: Sign up.",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0009.jpg",
+   "thumb_url": "/static/media/library/IMG-0009.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 47065,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=2127568638131187",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0009.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "2127568638131187",
+   "started_running": "Nov 4, 2026",
+   "primary_text": "Real results. Real users.\nHalcyon Health: +186% organic revenue, featured across 40+ major publications in 90 days.\nVeranda Homes: 4X ROAS, +230% revenue in one quarter on the same ad spend.\nMeridian Digital: +472% organic traffic and 250+ page-one keywords in three months, without adding a single hire.\nTry Search Atlas free for 7 days.",
+   "headline": "Real Results. Real Users.",
+   "cta": "Sign up"
+  },
+  {
+   "id": "IMG-0010",
+   "kind": "image",
+   "status": "approved",
+   "title": "\"We're sorry to see you go.\" Why are you leaving Ahrefs?",
+   "description": "Live Meta ad (carousel, 5 cards), running since Nov 3, 2026. Primary text: \"\"We're sorry to see you go.\" Why are you leaving Ahrefs?\"",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0010-1.jpg",
+   "thumb_url": "/static/media/library/IMG-0010-1.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 264964,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1158481310466063",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0010-1.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": [
+    "/static/media/library/IMG-0010-1.jpg",
+    "/static/media/library/IMG-0010-2.jpg",
+    "/static/media/library/IMG-0010-3.jpg",
+    "/static/media/library/IMG-0010-4.jpg",
+    "/static/media/library/IMG-0010-5.jpg"
+   ],
+   "meta_library_id": "1158481310466063",
+   "started_running": "Nov 3, 2026",
+   "primary_text": "\"We're sorry to see you go.\" Why are you leaving Ahrefs?\nMy Health Score said 62. Then it just... sat there.\nI hit my limit halfway through a client report.\nAdding my team cost more than the tool.\nOther: found one that fixes, writes and publishes.\nConnect your site in minutes and see your first fixes go live in week 1.\nTry Search Atlas free for 7 days.\nWhy Are You Leaving Ahrefs?\nThe cancellation survey.\nSign Up\nThe cancellation survey.\nFound One That Fixes, Writes, Publishes\nHealth Score, limits, team costs.\nSign Up\nHealth Score, limits, team costs.\n143 Issues Found. 0 Fixed.\nAhrefs finds the problems. That's it.\nSign Up\nAhrefs finds the problems. That's it.\nThe Switch: Monthly Tool Cost\nReceipt comparison: Ahrefs vs. Search Atlas.\nSign Up\nReceipt comparison: Ahrefs vs. Search Atlas.\nMake It Official.\nConnect your site in minutes.",
+   "headline": "\"We're sorry to see you go.\" Why are you leaving Ahrefs?",
+   "cta": null
+  },
+  {
+   "id": "IMG-0011",
+   "kind": "image",
+   "status": "approved",
+   "title": "Not AI Slop. Real Strategy.",
+   "description": "Live Meta ad (image), running since Nov 2, 2026. Primary text: \"AI tools can write.\" CTA: Sign up.",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0011.jpg",
+   "thumb_url": "/static/media/library/IMG-0011.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 52901,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1698802774948119",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0011.jpg"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "1698802774948119",
+   "started_running": "Nov 2, 2026",
+   "primary_text": "AI tools can write.\nBut writing isn't a strategy.\nWithout one, you get generic drafts that sound like everyone else.\nSearch Atlas gives you real strategy and real workflows, built by experts.\nAnd the work gets done for you, not left on your to-do list.\nTry Search Atlas free for 7 days.",
+   "headline": "Not AI Slop. Real Strategy.",
+   "cta": "Sign up"
+  },
+  {
+   "id": "IMG-0012",
+   "kind": "image",
+   "status": "in_review",
+   "title": "Real Work. Real Wins.",
+   "description": "Live Meta ad (image), running since Nov 4, 2026. Primary text: \"Real work. Real wins.\" CTA: Sign up.",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0012.jpg",
+   "thumb_url": "/static/media/library/IMG-0012.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 40744,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1507850437836691",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0012.jpg"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "1507850437836691",
+   "started_running": "Nov 4, 2026",
+   "primary_text": "Real work. Real wins.\nHere's what agencies are getting done with Search Atlas:\n90% of the SEO grunt work, gone (Frankie Fihn).\n120x ROAS: $107 in ad spend turned into $12,901 in revenue (Stephan Noack).\n2x: \"More than doubled my agency's MRR\" (Kimball Conover).\n16+ days of work saved (Joshua Erdman).\nTry Search Atlas free for 7 days.",
+   "headline": "Real Work. Real Wins.",
+   "cta": "Sign up"
+  },
+  {
+   "id": "IMG-0013",
+   "kind": "image",
+   "status": "in_review",
+   "title": "Still using five tools to run one agency?",
+   "description": "Live Meta ad (carousel, 4 cards), running since Nov 5, 2026. Primary text: \"Still using five tools to run one agency?\"",
+   "brief": "",
+   "format": "image/jpeg",
+   "file_url": "/static/media/library/IMG-0013-1.jpg",
+   "thumb_url": "/static/media/library/IMG-0013-1.jpg",
+   "package_url": null,
+   "width": 480,
+   "height": 600,
+   "duration_s": null,
+   "size_bytes": 115244,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1667202928231938",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "IMG-0013-1.jpg"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": [
+    "/static/media/library/IMG-0013-1.jpg",
+    "/static/media/library/IMG-0013-2.jpg",
+    "/static/media/library/IMG-0013-3.jpg",
+    "/static/media/library/IMG-0013-4.jpg"
+   ],
+   "meta_library_id": "1667202928231938",
+   "started_running": "Nov 5, 2026",
+   "primary_text": "Still using five tools to run one agency?\nRank tracking, site audits, keyword research, content optimization and local SEO each live in a different tool.\nThe stack keeps growing, but your team still has to move between platforms and do the work connecting everything.\nSearch Atlas brings your agency's SEO, content, local search and reporting workflows into one platform.\nTry Search Atlas free for 7 days.\nLow impression count\nStill Using Five Tools?\nFive tools. Five monthly bills.\nSign Up\nFive tools. Five monthly bills.\nWhy Manage Them Separately?\nRank tracking, audits, keywords, content, local SEO.\nSign Up\nRank tracking, audits, keywords, content, local SEO.\nIntroducing Search Atlas\nOne platform for your agency's SEO workflows.\nSign Up\nOne platform for your agency's SEO workflows.\nStop Switching Tools\nStart getting things done in one platform.",
+   "headline": "Still using five tools to run one agency?",
+   "cta": null
+  },
+  {
+   "id": "IMG-0014",
+   "kind": "image",
+   "status": "requested",
+   "title": "1080x1080 static: 'Rank in AI search' comparison card",
+   "description": "Square comparison card for Meta feed and Google Demand Gen.",
+   "brief": "Two-column card. Left \"Classic SEO tools\": rankings only. Right \"Search Atlas\": rankings plus visibility in ChatGPT, Gemini and Google AI Overviews. Dark #121212 background, purple #936BDA headers, mint #00FFD4 check marks, Inter Tight. Headline \"Rank in AI search\". No competitor names or logos. PNG, 1080x1080.",
+   "format": null,
+   "file_url": null,
+   "thumb_url": null,
+   "package_url": null,
+   "width": null,
+   "height": null,
+   "duration_s": null,
+   "size_bytes": null,
+   "aspect": null,
+   "platforms": [
+    "meta",
+    "google"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Feed",
+    "Demand Gen"
+   ],
+   "source": "request",
+   "source_url": null,
+   "requested_by": "vin",
+   "due": "2026-11-10",
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Due 2026-11-10"
+    }
+   ],
+   "tags": [
+    "m_prospecting_core"
+   ],
+   "platform_refs": {}
+  },
+  {
+   "id": "VID-0001",
+   "kind": "video",
+   "status": "approved",
+   "title": "Automate Your SEO With AI",
+   "description": "Live Meta ad (video), running since Oct 29, 2026. Primary text: \"Automate Your SEO With AI With OTTO SEO by Search Atlas!\" CTA: See details.",
+   "brief": "",
+   "format": "video/mp4",
+   "file_url": "/static/media/library/VID-0001.mp4",
+   "thumb_url": "/static/media/library/VID-0001-poster.jpg",
+   "package_url": null,
+   "width": 360,
+   "height": 640,
+   "duration_s": 15.8,
+   "size_bytes": 862498,
+   "aspect": "9:16",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Reels",
+    "Stories"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=989143694240655",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "VID-0001.mp4"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "989143694240655",
+   "started_running": "Oct 29, 2026",
+   "primary_text": "Automate Your SEO With AI With OTTO SEO by Search Atlas!\nImagine automating hundreds of hours of SEO tasks in seconds using AI. Automations include:\n✅ Detecting broken links and technical issues, then deploying fixes\n✅ Creating optimized, high-quality, high-converting content\n✅ Updating page titles, meta descriptions, and alt tags instantly\n✅ Adding relevant schema markups sitewide\n✅ Optimizing Google Business Profile for better reputation and relevance\n✅ And much more!\nFor a limited time, get started at no cost and get instant access to 37 more SEO tools.",
+   "headline": "Automate Your SEO With AI",
+   "cta": "See details"
+  },
+  {
+   "id": "VID-0002",
+   "kind": "video",
+   "status": "approved",
+   "title": "Atlas Agent Is Live",
+   "description": "Live Meta ad (video), running since Oct 29, 2026. Primary text: \"Growing your client list shouldn't mean growing your payroll.\" CTA: Sign up.",
+   "brief": "",
+   "format": "video/mp4",
+   "file_url": "/static/media/library/VID-0002.mp4",
+   "thumb_url": "/static/media/library/VID-0002-poster.jpg",
+   "package_url": null,
+   "width": 360,
+   "height": 450,
+   "duration_s": 7.0,
+   "size_bytes": 299807,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Reels",
+    "Stories"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=2150154078963658",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "VID-0002.mp4"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "2150154078963658",
+   "started_running": "Oct 29, 2026",
+   "primary_text": "Growing your client list shouldn't mean growing your payroll.",
+   "headline": "Atlas Agent Is Live",
+   "cta": "Sign up"
+  },
+  {
+   "id": "VID-0003",
+   "kind": "video",
+   "status": "approved",
+   "title": "Search Atlas Brain: The AI Engine Behind Modern SEO",
+   "description": "Live Meta ad (video), running since Oct 30, 2026. Primary text: \"Most SEO tools give you dashboards.\" CTA: Sign up.",
+   "brief": "",
+   "format": "video/mp4",
+   "file_url": "/static/media/library/VID-0003.mp4",
+   "thumb_url": "/static/media/library/VID-0003-poster.jpg",
+   "package_url": null,
+   "width": 360,
+   "height": 450,
+   "duration_s": 5.0,
+   "size_bytes": 64917,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Reels",
+    "Stories"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1766713894539900",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "VID-0003.mp4"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "1766713894539900",
+   "started_running": "Oct 30, 2026",
+   "primary_text": "Most SEO tools give you dashboards.\nAtlas Brain executes the work.\nInstead of jumping between tools, spreadsheets, and reports, you simply tell Atlas Brain what you want done:\n• Fix technical SEO issues • Build authority and links • Expand AI search visibility • Generate and optimize content • Deploy updates across sites\nAtlas Brain turns intent into executed SEO and AI search workflows — with approvals, deployment, and performance tracking built in.\nNo dashboards. No chaos. Just execution.\nStart using Atlas Brain today.",
+   "headline": "Search Atlas Brain: The AI Engine Behind Modern SEO",
+   "cta": "Sign up"
+  },
+  {
+   "id": "VID-0004",
+   "kind": "video",
+   "status": "approved",
+   "title": "Agencies Are Doubling Their MRR",
+   "description": "Live Meta ad (video), running since Oct 31, 2026. Primary text: \"Agencies are doubling MRR while the same team handles delivery.\" CTA: Sign up.",
+   "brief": "",
+   "format": "video/mp4",
+   "file_url": "/static/media/library/VID-0004.mp4",
+   "thumb_url": "/static/media/library/VID-0004-poster.jpg",
+   "package_url": null,
+   "width": 360,
+   "height": 450,
+   "duration_s": 12.0,
+   "size_bytes": 463537,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Reels",
+    "Stories"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1098789782972873",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "VID-0004.mp4"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Live in the Meta Ad Library"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "1098789782972873",
+   "started_running": "Oct 31, 2026",
+   "primary_text": "Agencies are doubling MRR while the same team handles delivery.\nThey cut manual work out of the process and made room for more retainers.",
+   "headline": "Agencies Are Doubling Their MRR",
+   "cta": "Sign up"
+  },
+  {
+   "id": "VID-0005",
+   "kind": "video",
+   "status": "in_review",
+   "title": "Agencies Use It to Double Their MRR",
+   "description": "Live Meta ad (video), running since Nov 4, 2026. Primary text: \"Want to double your agency's MRR?\" CTA: Sign up.",
+   "brief": "",
+   "format": "video/mp4",
+   "file_url": "/static/media/library/VID-0005.mp4",
+   "thumb_url": "/static/media/library/VID-0005-poster.jpg",
+   "package_url": null,
+   "width": 360,
+   "height": 450,
+   "duration_s": 8.4,
+   "size_bytes": 303360,
+   "aspect": "4:5",
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Facebook Feed",
+    "Instagram Reels",
+    "Stories"
+   ],
+   "source": "Meta Ad Library, Search Atlas (page 155804360945012), active in US, archived 2026-11-05",
+   "source_url": "https://www.facebook.com/ads/library/?id=1663950672133010",
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Imported from the Search Atlas creative library"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "VID-0005.mp4"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {},
+   "cards": null,
+   "meta_library_id": "1663950672133010",
+   "started_running": "Nov 4, 2026",
+   "primary_text": "Want to double your agency's MRR?",
+   "headline": "Agencies Use It to Double Their MRR",
+   "cta": "Sign up"
+  },
+  {
+   "id": "VID-0006",
+   "kind": "video",
+   "status": "requested",
+   "title": "9:16 UGC video: agency owner explains white-label reports, 20 s",
+   "description": "Vertical selfie-style video for Meta Reels and Stories, agency segment.",
+   "brief": "Agency owner on camera, phone held vertical, natural light. 0-3 s hook: \"My clients think I built these reports myself.\" 3-15 s: screen recording of a white-label Search Atlas report with the agency's own logo, scroll through rankings and AI visibility. 15-20 s: \"Start a free trial at searchatlas.com\" end card. Burned-in captions, 1080x1920, MP4 under 50 MB.",
+   "format": null,
+   "file_url": null,
+   "thumb_url": null,
+   "package_url": null,
+   "width": null,
+   "height": null,
+   "duration_s": null,
+   "size_bytes": null,
+   "aspect": null,
+   "platforms": [
+    "meta"
+   ],
+   "placements": [
+    "Reels",
+    "Stories"
+   ],
+   "source": "request",
+   "source_url": null,
+   "requested_by": "vin",
+   "due": "2026-11-12",
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Due 2026-11-12"
+    }
+   ],
+   "tags": [
+    "m_prospecting_test",
+    "m_retargeting_agency_14d"
+   ],
+   "platform_refs": {}
+  },
+  {
+   "id": "H5-0001",
+   "kind": "html5",
+   "status": "approved",
+   "title": "Rank in Google and AI search, 300x250",
+   "description": "Animated display banner: headline, rising bar chart, mint \"Start free trial\" CTA. clickTag goes to searchatlas.com. Zip is ready for a Google Ads HTML5 upload.",
+   "brief": "",
+   "format": "application/zip",
+   "file_url": "/static/media/library/H5-0001/index.html",
+   "thumb_url": null,
+   "package_url": "/static/media/library/H5-0001.zip",
+   "width": 300,
+   "height": 250,
+   "duration_s": null,
+   "size_bytes": 1826,
+   "aspect": "300x250",
+   "platforms": [
+    "google"
+   ],
+   "placements": [
+    "Google Display Network",
+    "Display remarketing"
+   ],
+   "source": "built",
+   "source_url": null,
+   "requested_by": "vin",
+   "due": null,
+   "created_at": "2026-11-05T14:00:00Z",
+   "updated_at": "2026-11-05T14:00:00Z",
+   "history": [
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "requested",
+     "note": "Display banner for remarketing and GDN prospecting tests"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "uploaded",
+     "note": "index.html + zip, 300x250"
+    },
+    {
+     "ts": "2026-11-05T14:00:00Z",
+     "action": "approved",
+     "note": "Brand colors and clickTag checked"
+    }
+   ],
+   "tags": [],
+   "platform_refs": {}
+  }
+ ],
+ "source_manifest": "static/media/library/manifest.json"
+}

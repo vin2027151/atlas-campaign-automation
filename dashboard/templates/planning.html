@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/planning.css">
+{% endblock %}
+{% block subtitle %}<p class="page-sub">Pull the full Google Ads and Meta account state, compare it to the 30-day plan, turn a plain-English brief into API-shaped changes, read the diff, then publish by hand. The model only reads the state document and writes a proposal; publishing is deterministic code.</p>{% endblock %}
+{% block actions %}<span class="pill pill-sample" id="pl-mode-pill" title="Platform mode from config/platforms.yaml">Mode: sample</span>{% endblock %}
+{% block content %}
+<div class="callout watch" id="pl-mock-note" hidden>Mock mode (<code>?mock=1</code>): every response on this page comes from fixtures inside planning.js. Nothing reaches the server.</div>
+<div class="callout bad" id="pl-load-error" hidden role="alert"></div>
+
+<div class="pl-layout">
+  <div class="pl-main">
+
+    <!-- 1. Analyze -->
+    <section class="card pl-step" id="sec-analyze" aria-labelledby="sec-analyze-title">
+      <div class="card-head">
+        <h2 class="card-title pl-step-title" id="sec-analyze-title"><span class="pl-num" aria-hidden="true">1</span>Analyze</h2>
+        <span class="card-sub">Account state vs the 30-day plan</span>
+      </div>
+      <div class="card-body stack">
+        <div class="pl-action-row">
+          <button class="btn btn-primary" id="an-run" type="button">Analyze</button>
+          <span class="muted" id="an-eta">Estimated time loading&hellip;</span>
+        </div>
+        <div class="pl-job" data-job-slot="analyze" hidden></div>
+        <div class="callout bad" id="an-error" role="alert" hidden></div>
+        <div id="an-result"><p class="muted mt-0">No analysis yet. Analyze pulls every campaign, budget, bid strategy, ad group, ad set, keyword, negative and ad into a saved state document.</p></div>
+      </div>
+    </section>
+
+    <!-- 2. Command Brief -->
+    <section class="card pl-step" id="sec-brief" aria-labelledby="sec-brief-title">
+      <div class="card-head">
+        <h2 class="card-title pl-step-title" id="sec-brief-title"><span class="pl-num" aria-hidden="true">2</span>Command Brief</h2>
+        <span class="card-sub" id="brief-calls">Plain English in, API-shaped changes out</span>
+      </div>
+      <form class="card-body stack" id="brief-form" novalidate>
+        <div class="field">
+          <label for="brief-text">What should change?</label>
+          <textarea class="textarea pl-brief" id="brief-text" rows="5" aria-describedby="brief-count brief-hint"
+            placeholder="Example: Move $300/day from Search_Brand_US to Search_NonBrand_US, pause Prospecting_Broad, and add 'free seo tool' as a phrase negative on NonBrand US. Launch a new paused ad in Prospecting_Core using IMG-0002."></textarea>
+          <div class="row-between">
+            <span class="field-hint" id="brief-hint">Opus 5.5 writes a changeset; the server validates it and diffs it against the latest state document.</span>
+            <span class="field-hint num" id="brief-count" aria-live="polite">0 / 4,000</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label" id="media-label">Tag approved media</span>
+          <div class="pl-chips" id="media-selected" aria-live="polite"><span class="muted small">No media tagged.</span></div>
+          <div class="pl-media-tools">
+            <input class="input" id="media-filter" type="search" placeholder="Filter approved media" aria-label="Filter approved media">
+          </div>
+          <div class="pl-media" id="media-picker" role="group" aria-labelledby="media-label"><p class="muted small mt-0">Loading the media library&hellip;</p></div>
+        </div>
+
+        <div class="pl-action-row">
+          <button class="btn btn-primary" id="brief-submit" type="submit" disabled>Draft changes</button>
+          <span class="muted" id="brief-eta"></span>
+        </div>
+        <div class="pl-job" data-job-slot="draft" hidden></div>
+        <div class="callout bad" id="brief-error" role="alert" hidden></div>
+      </form>
+    </section>
+
+    <!-- 3. Review changes -->
+    <section class="card pl-step" id="sec-review" aria-labelledby="sec-review-title">
+      <div class="card-head">
+        <h2 class="card-title pl-step-title" id="sec-review-title"><span class="pl-num" aria-hidden="true">3</span>Review changes</h2>
+        <div class="row" id="rv-head"></div>
+      </div>
+      <div class="card-body stack">
+        <div id="rv-content"><p class="muted mt-0">Submit a brief, or pick a changeset from the history, to review its diff here.</p></div>
+        <form class="pl-revise stack-sm" id="rv-form" hidden novalidate>
+          <div class="field">
+            <label for="rv-text">Revision notes</label>
+            <textarea class="textarea" id="rv-text" rows="4" aria-describedby="rv-count"
+              placeholder="Example: Keep Brand US at $150/day, not $100. Drop the UK negative."></textarea>
+            <span class="field-hint num right" id="rv-count" aria-live="polite">0 / 4,000</span>
+          </div>
+          <div class="row">
+            <button class="btn btn-primary" id="rv-submit" type="submit" disabled>Submit revision</button>
+            <button class="btn btn-ghost" id="rv-cancel" type="button">Cancel</button>
+            <span class="muted" id="rv-eta"></span>
+          </div>
+        </form>
+        <div class="pl-job" data-job-slot="revise" hidden></div>
+        <div class="callout bad" id="rv-error" role="alert" hidden></div>
+      </div>
+    </section>
+
+    <!-- 4. Publish -->
+    <section class="card pl-step pl-publish" id="sec-publish" aria-labelledby="sec-publish-title">
+      <div class="card-head">
+        <h2 class="card-title pl-step-title" id="sec-publish-title"><span class="pl-num" aria-hidden="true">4</span>Publish</h2>
+        <span class="card-sub">Manual</span>
+      </div>
+      <div class="card-body stack" id="pb-body">
+        <p class="muted mt-0">Nothing to publish yet.</p>
+      </div>
+    </section>
+  </div>
+
+  <aside class="pl-side">
+    <section class="card" aria-labelledby="hist-title">
+      <div class="card-head"><h2 class="card-title" id="hist-title">Changesets</h2><span class="card-sub" id="hist-sub"></span></div>
+      <ul class="list pl-history" id="hist-list"><li class="muted">Loading&hellip;</li></ul>
+    </section>
+    <section class="card" aria-labelledby="conn-title">
+      <div class="card-head"><h2 class="card-title" id="conn-title">Connections</h2><span class="card-sub" id="conn-sub"></span></div>
+      <div class="card-body stack" id="conn-body"><p class="muted mt-0">Loading&hellip;</p></div>
+    </section>
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/static/js/planning.js"></script>
+{% endblock %}

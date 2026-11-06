@@ -1,0 +1,396 @@
+# Next month's paid build, as data. Edit this file; nothing else.
+# Every number traces to plan-final.md (findings F1-F7, section 2).
+# Budgets are MONTHLY dollars. Daily budgets are derived (monthly / days_in_month).
+
+account:
+  name: "AgentStack"            # B2B SaaS, trial signup
+  month: "2026-11"
+  days_in_month: 30
+  landing_url: "https://www.agentstack.example/trial"
+  display_url: "agentstack.example"
+  total_budget: 120000          # brief: ~$120K/month
+  cpa_band: [250, 280]          # brief: trial CPA target $250-280
+  campaign_cpa_ceiling: 350     # no single campaign may target/cap above this
+  reserve: 7000                 # held back, released week 3 (section 2)
+
+# Vin's preconditions (2026-11-05 review). The build ships paused until these
+# are true; the data in the five tabs is not trusted enough to skip them.
+preconditions:
+  - "Meta StartTrial event re-verified against PostHog daily (broke 2026-09-22, signup flow v3)"
+  - "UK conversion tag and PostHog verified under the UK consent banner before UK spends a dollar"
+  - "Dynamic UTMs on every keyword, ad, placement, landing page, CTA and offer, flowing into the CRM"
+  - "Trial-to-paid and LTV joined back to campaign and keyword; per-offering CPA targets replace the flat band when known"
+  - "Bot / invalid-traffic exclusion confirmed on every optimization event"
+  - "Legacy Meta campaigns (corrupt post-09-22 data) run one week beside the relaunch; budget moves only once the clean campaigns match them"
+
+platforms:
+  meta:
+    declared_total: 60000       # must equal the sum of meta campaign budgets
+    ceiling: 65000              # brief: ~$65K Meta
+    conversion_event: "StartTrial"
+    pixel_id: "PIXEL_ID_HERE"
+    page_id: "PAGE_ID_HERE"
+  google:
+    declared_total: 53000       # must equal the sum of google campaign budgets
+    ceiling: 55000              # brief: ~$55K Google
+
+# Entities deliberately removed. The validator refuses to build if any of these
+# reappear as a campaign, ad set, ad group, ad or shared budget name.
+cut:
+  - "Google_Main_Shared"        # F3: one shared budget cut the US 30.9%
+  # Search_NonBrand_UK is NOT cut (Vin, 2026-11-05): zero conversions from
+  # 4,944 clicks at a normal CTR reads as a tracking fault, not a market
+  # verdict. It is rebuilt below on its own budget, behind a tracking check.
+
+# ---------------------------------------------------------------- Meta creative
+# Proven = ran in the account with a readable true CPA (F5). Unproven = new.
+meta_ads:
+  UGC_Founder_v2:
+    proven: true
+    true_cpa: 215
+    title: "Stop stitching agents together by hand"
+    body: "Our founder built AgentStack after wiring the same five tools together for the tenth time. 14-day trial, no card."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_UGC_FOUNDER_V2"
+  UGC_Agency_Owner:
+    proven: true
+    true_cpa: 234
+    title: "How a 12-person agency ships agents in a week"
+    body: "Not a demo reel. The owner walks through the actual build. 14-day trial, no card."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_UGC_AGENCY_OWNER"
+  Static_AgentStack_Benefits:
+    proven: true
+    true_cpa: 261
+    title: "One stack for every agent you ship"
+    body: "Build, deploy and monitor production agents without gluing six vendors together."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "IMAGE"
+    asset_ref: "IMAGE_HASH_STATIC_BENEFITS"
+  Demo_Screen_Walkthrough:
+    proven: true
+    true_cpa: 265
+    title: "90 seconds inside AgentStack"
+    body: "Screen recording, no voiceover over stock footage. See the build, then try it."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_DEMO_WALKTHROUGH"
+  UGC_Founder_v3:
+    proven: false               # the refresh: goes in the test campaign, not Core
+    title: "The tenth time I wired the same five tools together"
+    body: "Founder cut of the v2 concept, new hook. 14-day trial, no card."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_UGC_FOUNDER_V3"
+  UGC_Agency_WhiteLabel_Hook:
+    proven: false
+    title: "White-label the whole agent stack for your clients"
+    body: "Agency owner shows the client-facing build. 14-day trial, no card."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_AGENCY_WHITELABEL"
+  UGC_Solo_Owner_Hook:
+    proven: false
+    title: "One person, three production agents, no engineer"
+    body: "Solo founder, real screen, real numbers. 14-day trial, no card."
+    link_description: "Start your free trial"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_SOLO_OWNER"
+  Retargeting_Testimonial:
+    proven: true
+    true_cpa: 367               # control only; worst true CPA in the account (F5)
+    title: "\"We shipped three agents in the first month\""
+    body: "You looked at AgentStack. Here is what happened to the team that didn't wait."
+    link_description: "Finish your signup"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_RETARGETING_TESTIMONIAL"
+  Retargeting_Objection_Handler:
+    proven: false
+    title: "Migrating off your current stack takes a weekend"
+    body: "The part everyone asks about, answered in 40 seconds."
+    link_description: "Finish your signup"
+    cta: "SIGN_UP"
+    creative_type: "VIDEO"
+    asset_ref: "VIDEO_ID_RETARGETING_OBJECTION"
+  Retargeting_Pricing_Clarity:
+    proven: false
+    title: "What AgentStack costs after the trial"
+    body: "No seat math, no surprise usage bill. Here is the whole price list."
+    link_description: "Finish your signup"
+    cta: "SIGN_UP"
+    creative_type: "IMAGE"
+    asset_ref: "IMAGE_HASH_PRICING_CLARITY"
+
+# ------------------------------------------------------------- Meta campaigns
+# One ad set per campaign. Budget sits on the AD SET, and each campaign has
+# exactly one, so no campaign shares a budget with another (F3).
+# Age floor 27 on prospecting (Vin): the $99/mo agency buyer is not 18-26; the
+# data has no age breakdown, so this is product knowledge, not a finding.
+# Every prospecting ad is direct response with a sign-up CTA; no branding plays
+# in acquisition.
+meta_campaigns:
+  - name: "Prospecting_Core"
+    objective: "OUTCOME_LEADS"
+    budget: 45000               # the four proven ads, +8% on their own run-rate
+    expected_cpa: 265           # central case, F5 blend
+    cap: 300                    # 7-day true-CPA trigger introduces a $300 cap
+    unproven_slot: false
+    launch_at_pct: 70           # steps to 100% within 48h of the event fix (F1)
+    ad_set:
+      name: "US_AdvantagePlus_27plus"
+      optimization_goal: "OFFSITE_CONVERSIONS"
+      bid_strategy: "LOWEST_COST_WITHOUT_CAP"
+      countries: ["US"]
+      age_min: 27
+      age_max: 65
+      gender: "All"
+      audience: "Advantage+ Audience (no interest stacking)"
+      excluded_audiences: ["Customers_All", "Trial_Starters_90d"]
+    ads:
+      - "UGC_Founder_v2"        # F6: never deleted; scaled, not paused (Vin)
+      - "UGC_Agency_Owner"
+      - "Static_AgentStack_Benefits"
+      - "Demo_Screen_Walkthrough"
+
+  - name: "Prospecting_Test"
+    objective: "OUTCOME_LEADS"
+    budget: 9000
+    expected_cpa: 300
+    cap: 330
+    unproven_slot: true
+    test_slots: 3               # Vin: one-at-a-time is too slow at $100K/mo; three hooks concurrently
+    ad_set:
+      name: "US_AdvantagePlus_Test_27plus"
+      optimization_goal: "OFFSITE_CONVERSIONS"
+      bid_strategy: "LOWEST_COST_WITHOUT_CAP"
+      countries: ["US"]
+      age_min: 27
+      age_max: 65
+      gender: "All"
+      audience: "Advantage+ Audience (no interest stacking)"
+      excluded_audiences: ["Customers_All", "Trial_Starters_90d"]
+    ads:
+      - "UGC_Founder_v3"
+      - "UGC_Agency_WhiteLabel_Hook"
+      - "UGC_Solo_Owner_Hook"
+    queue:                      # next occupants; one new hook or offer per slot as one retires
+      - "Offer_Variant_TBD_1"
+      - "Service_Specific_TBD_1"
+
+  # Retargeting (Vin): no cost cap on people already paid for in acquisition.
+  # Budget and audience do the limiting. Segmented by the pages visited, because
+  # an agency reading white-label pricing and a solo owner on the trial page do
+  # not get the same message. Days 1-14 and 15-30 are different conversations.
+  - name: "Retargeting_Agency_14d"
+    objective: "OUTCOME_LEADS"
+    budget: 2500
+    expected_cpa: 330
+    unproven_slot: false
+    allow_unproven_without_slot: true   # declared exception to rule 7 (challengers vs control)
+    ad_set:
+      name: "US_RT_Agency_Pages_14d"
+      optimization_goal: "OFFSITE_CONVERSIONS"
+      bid_strategy: "LOWEST_COST_WITHOUT_CAP"
+      countries: ["US"]
+      age_min: 18
+      age_max: 65
+      gender: "All"
+      audience: "Visited agency / white-label / agency-pricing pages, last 14 days"
+      custom_audiences: ["Agency_Pages_14d"]
+      excluded_audiences: ["Customers_All", "Trial_Starters_90d"]
+    ads:
+      - "Retargeting_Objection_Handler"
+      - "Retargeting_Testimonial"   # control
+
+  - name: "Retargeting_Individual_14d"
+    objective: "OUTCOME_LEADS"
+    budget: 2500
+    expected_cpa: 330
+    unproven_slot: false
+    allow_unproven_without_slot: true
+    ad_set:
+      name: "US_RT_Trial_Pricing_Pages_14d"
+      optimization_goal: "OFFSITE_CONVERSIONS"
+      bid_strategy: "LOWEST_COST_WITHOUT_CAP"
+      countries: ["US"]
+      age_min: 18
+      age_max: 65
+      gender: "All"
+      audience: "Visited trial / pricing / signup pages (not agency pages), last 14 days"
+      custom_audiences: ["Trial_Pricing_Pages_14d"]
+      excluded_audiences: ["Customers_All", "Trial_Starters_90d", "Agency_Pages_14d"]
+    ads:
+      - "Retargeting_Pricing_Clarity"
+      - "Retargeting_Testimonial"   # control
+
+  - name: "Retargeting_Lapsed_15to30d"
+    objective: "OUTCOME_LEADS"
+    budget: 1000
+    expected_cpa: 330
+    unproven_slot: false
+    ad_set:
+      name: "US_RT_All_Pages_15to30d"
+      optimization_goal: "OFFSITE_CONVERSIONS"
+      bid_strategy: "LOWEST_COST_WITHOUT_CAP"
+      countries: ["US"]
+      age_min: 18
+      age_max: 65
+      gender: "All"
+      audience: "Any site visit 15-30 days ago, not seen since"
+      custom_audiences: ["Site_Visitors_30d"]
+      excluded_audiences: ["Customers_All", "Trial_Starters_90d", "Site_Visitors_14d"]
+    ads:
+      - "Retargeting_Testimonial"
+
+# ----------------------------------------------------------- Google campaigns
+# Every campaign carries its own daily budget. There is no shared budget (F3).
+google_campaigns:
+  - name: "Search_Brand_US"
+    type: "Search"
+    budget: 3000                # halved (Vin): brand searchers already know us. Raise only if
+                                # search impression share drops below ~80% and a competitor is
+                                # on the term. No impression-share data exists in the tabs.
+    expected_cpa: 155
+    # Maximize Conversions does not accept a CPC cap in Google Ads; the
+    # $6,000 monthly budget is the control. Brand volume is supply-limited
+    # at 17-19% CTR, so the budget binds before any bid would.
+    bid_strategy: "Maximize conversions"
+    networks: "Google search"
+    locations: ["United States"]
+    languages: ["English"]
+    ad_groups:
+      - name: "Brand_Core"
+        keywords:
+          - { text: "agentstack", match: "Exact" }
+          - { text: "agent stack", match: "Exact" }
+          - { text: "agentstack pricing", match: "Phrase" }
+          - { text: "agentstack login", match: "Phrase" }
+        ads:
+          - headlines: ["AgentStack - Official Site", "Ship Production Agents", "Free 14-Day Trial"]
+            descriptions: ["Build, deploy and monitor agents in one stack. No card required.", "Start free. Invite your team. Ship this week."]
+            path1: "trial"
+            path2: ""
+    negatives:
+      - { text: "free", match: "Negative Phrase" }
+      - { text: "jobs", match: "Negative Phrase" }
+
+  - name: "Search_NonBrand_US"
+    type: "Search"
+    budget: 29000               # +18% on the pre-starvation $811/day (F3/F4)
+    expected_cpa: 310
+    bid_strategy: "Target CPA"
+    target_cpa: 280
+    networks: "Google search"
+    locations: ["United States"]
+    languages: ["English"]
+    ad_groups:
+      # Split by buyer (Vin): agency vs individual owner carry different LTV and
+      # deserve different bids. Campaign tCPA is interim until per-offering
+      # values are known; then each ad group gets its own target.
+      - name: "Agency_Keywords"
+        keywords:
+          - { text: "ai agent platform for agencies", match: "Phrase" }
+          - { text: "white label ai agents", match: "Phrase" }
+          - { text: "agency ai automation platform", match: "Phrase" }
+        ads:
+          - headlines: ["AI Agents For Your Clients", "White-Label Ready", "Free 14-Day Trial"]
+            descriptions: ["Build and run client agents under your brand. One stack, one invoice.", "Start free. No card. Onboard your first client this week."]
+            path1: "agencies"
+            path2: ""
+      - name: "Individual_Owner_Keywords"
+        keywords:
+          - { text: "ai agent platform", match: "Phrase" }
+          - { text: "build ai agents", match: "Phrase" }
+          - { text: "agent orchestration tool", match: "Exact" }
+          - { text: "deploy ai agents", match: "Phrase" }
+        ads:
+          - headlines: ["One Platform For AI Agents", "Build, Deploy, Monitor", "Free 14-Day Trial"]
+            descriptions: ["Stop gluing six vendors together. One stack for production agents.", "Start free. No card. Your first agent ships this week."]
+            path1: "ai-agents"
+            path2: "platform"
+      - name: "Competitor_Alternatives"
+        keywords:
+          - { text: "langchain alternative", match: "Phrase" }
+          - { text: "crewai alternative", match: "Phrase" }
+          - { text: "agent framework comparison", match: "Exact" }
+        ads:
+          - headlines: ["A Simpler Agent Stack", "Switch In A Weekend", "Free 14-Day Trial"]
+            descriptions: ["Migrate off your framework without rewriting your agents.", "See the side-by-side. Start free, no card."]
+            path1: "compare"
+            path2: ""
+    negatives:                  # the 40 negatives from 10-06, extended weekly (F7)
+      - { text: "free", match: "Negative Phrase" }
+      - { text: "course", match: "Negative Phrase" }
+      - { text: "tutorial", match: "Negative Phrase" }
+      - { text: "github", match: "Negative Phrase" }
+      - { text: "open source", match: "Negative Phrase" }
+      - { text: "jobs", match: "Negative Phrase" }
+      - { text: "salary", match: "Negative Phrase" }
+      - { text: "reddit", match: "Negative Phrase" }
+
+  - name: "PMax_US"
+    type: "Performance Max"
+    budget: 17000               # flat; tCPA honest about where it is (F4)
+    expected_cpa: 330
+    bid_strategy: "Target CPA"
+    target_cpa: 330
+    networks: "All"
+    locations: ["United States"]
+    languages: ["English"]
+    # Dedupe against NonBrand (Vin): brand exclusion list on, search themes
+    # limited to category terms NonBrand does not hold on Exact, and the
+    # NonBrand negatives mirrored here at campaign level.
+    brand_exclusions: ["AgentStack"]
+    search_themes: ["ai agent monitoring", "agent deployment platform"]
+    asset_groups:
+      - name: "PMax_US_Core"
+        headlines: ["Ship Production AI Agents", "One Stack, Not Six Vendors", "Free 14-Day Trial"]
+        long_headline: "Build, deploy and monitor production AI agents in one platform"
+        descriptions: ["Start free. No card required. Your first agent ships this week.", "Trusted by agencies and product teams shipping agents in production."]
+        business_name: "AgentStack"
+    negatives:                  # account-level brand negatives (hypothesis, F7)
+      - { text: "agentstack", match: "Negative Phrase" }
+
+  - name: "Search_NonBrand_UK"
+    type: "Search"
+    budget: 4000                # reinstated (Vin). Own budget. Spends nothing until the
+                                # UK tag + PostHog are verified under the consent banner.
+    expected_cpa: 330           # placeholder: no UK conversion ever recorded; replaced after 14 days
+    bid_strategy: "Maximize conversions"
+    networks: "Google search"
+    locations: ["United Kingdom"]
+    languages: ["English"]
+    ad_groups:
+      - name: "UK_Agency_Keywords"
+        keywords:
+          - { text: "ai agent platform for agencies", match: "Phrase" }
+          - { text: "white label ai agents", match: "Phrase" }
+        ads:
+          - headlines: ["AI Agents For Your Clients", "White-Label Ready", "Free 14-Day Trial"]
+            descriptions: ["Build and run client agents under your brand. One stack, one invoice.", "Start free. No card. Onboard your first client this week."]
+            path1: "agencies"
+            path2: ""
+      - name: "UK_Individual_Owner_Keywords"
+        keywords:
+          - { text: "ai agent platform", match: "Phrase" }
+          - { text: "build ai agents", match: "Phrase" }
+        ads:
+          - headlines: ["One Platform For AI Agents", "Build, Deploy, Monitor", "Free 14-Day Trial"]
+            descriptions: ["Stop gluing six vendors together. One stack for production agents.", "Start free. No card. Your first agent ships this week."]
+            path1: "ai-agents"
+            path2: "platform"
+    negatives:
+      - { text: "free", match: "Negative Phrase" }
+      - { text: "course", match: "Negative Phrase" }
+      - { text: "tutorial", match: "Negative Phrase" }
+      - { text: "jobs", match: "Negative Phrase" }

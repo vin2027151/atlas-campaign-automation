@@ -1,0 +1,15 @@
+{
+ "plan_status": [
+  "Stub analysis (ATLAS_LLM_MODE=stub); bullets below come from fixtures and the deterministic facts.",
+  "New build is live on both platforms; legacy Meta campaigns still run beside it at reduced budget."
+ ],
+ "state_summary": [
+  "Spend and cost per trial come from the state document; see the facts table for gaps.",
+  "Meta platform conversions remain unreliable after 2026-09-22; judge on PostHog trials."
+ ],
+ "recommendations": [
+  {"text": "Close the open tracking preconditions before moving budget between platforms.", "priority": "high", "platform": "both", "campaign_id": null},
+  {"text": "Keep legacy Meta campaigns running until the clean campaigns match them for a week.", "priority": "medium", "platform": "meta", "campaign_id": null},
+  {"text": "Review nonbrand search terms and add negatives for non-buyer intent.", "priority": "low", "platform": "google", "campaign_id": "g_search_nonbrand_us"}
+ ]
+}

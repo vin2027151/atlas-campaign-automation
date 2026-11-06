@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="ad.size" content="width=300,height=250">
+<meta name="viewport" content="width=300,height=250">
+<title>Search Atlas 300x250</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;700;800&display=swap">
+<script>var clickTag = "https://searchatlas.com/";</script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 300px; height: 250px; overflow: hidden; background: #121212; }
+  #ad {
+    position: relative; display: block; width: 300px; height: 250px; overflow: hidden; cursor: pointer;
+    border: 1px solid #2a2340; color: #fff; text-decoration: none;
+    font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: radial-gradient(120% 90% at 100% 0%, rgba(147,107,218,.55) 0%, rgba(147,107,218,0) 60%), #121212;
+  }
+  .glow { position: absolute; right: -40px; bottom: -60px; width: 180px; height: 180px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,255,212,.35), rgba(0,255,212,0) 70%); animation: pulse 3.2s ease-in-out infinite; }
+  .logo { position: absolute; left: 18px; top: 16px; display: flex; align-items: center; gap: 7px;
+    font-size: 13px; font-weight: 700; letter-spacing: .02em; opacity: 0; animation: fade .5s .1s forwards; }
+  .mark { width: 16px; height: 16px; border-radius: 4px; background: linear-gradient(135deg, #936BDA, #00FFD4); }
+  .eyebrow { position: absolute; left: 18px; top: 52px; color: #00FFD4; font-size: 10px; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase; opacity: 0; animation: rise .5s .4s forwards; }
+  h1 { position: absolute; left: 18px; right: 18px; top: 70px; font-size: 25px; line-height: 1.08; font-weight: 800;
+    letter-spacing: -.02em; opacity: 0; animation: rise .6s .6s forwards; }
+  h1 span { color: #b899ed; }
+  .sub { position: absolute; left: 18px; right: 70px; top: 134px; color: rgba(255,255,255,.74); font-size: 12px;
+    line-height: 1.35; font-weight: 500; opacity: 0; animation: rise .6s 1s forwards; }
+  .bars { position: absolute; right: 18px; top: 136px; display: flex; align-items: flex-end; gap: 4px; height: 44px; }
+  .bars i { display: block; width: 8px; border-radius: 2px 2px 0 0; background: #936BDA; transform-origin: bottom;
+    transform: scaleY(0); animation: grow .6s forwards; }
+  .bars i:nth-child(1) { height: 14px; animation-delay: 1.2s; }
+  .bars i:nth-child(2) { height: 24px; animation-delay: 1.35s; }
+  .bars i:nth-child(3) { height: 32px; animation-delay: 1.5s; }
+  .bars i:nth-child(4) { height: 44px; animation-delay: 1.65s; background: #00FFD4; }
+  .cta { position: absolute; left: 18px; bottom: 18px; display: inline-flex; align-items: center; height: 34px;
+    padding: 0 16px; border-radius: 999px; background: #00FFD4; color: #121212; font-size: 13px; font-weight: 800;
+    opacity: 0; animation: rise .5s 1.6s forwards, nudge 2.4s 3s ease-in-out 2; }
+  #ad:hover .cta { background: #4dffe1; }
+  @keyframes fade { to { opacity: 1; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes grow { to { transform: scaleY(1); } }
+  @keyframes pulse { 50% { transform: scale(1.12); opacity: .7; } }
+  @keyframes nudge { 0%, 100% { transform: none; } 50% { transform: translateX(4px); } }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: .01s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; } }
+</style>
+</head>
+<body>
+<a id="ad" href="https://searchatlas.com/" target="_blank" rel="noopener" aria-label="Search Atlas: start your free trial">
+  <div class="glow"></div>
+  <div class="logo"><span class="mark"></span>Search Atlas</div>
+  <div class="eyebrow">SEO · PPC · AI search</div>
+  <h1>Rank in Google <span>and AI search.</span></h1>
+  <p class="sub">One platform for SEO, local, content and ads.</p>
+  <div class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <span class="cta">Start free trial &rarr;</span>
+</a>
+<script>
+  document.getElementById("ad").addEventListener("click", function (e) {
+    e.preventDefault();
+    window.open(window.clickTag, "_blank");
+  });
+</script>
+</body>
+</html>
