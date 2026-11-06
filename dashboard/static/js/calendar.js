@@ -1,9 +1,9 @@
-// Calendar page: action queue, content pipeline board, month calendar, next-14-days list, tests panel.
-import { api, fmt, toast, badge, platformChip, esc, $, $$, tabs, modal, withBusy, parseDate, isoDate } from "/static/js/common.js";
+// Calendar page: month calendar, next-14-days list, tests panel. Items open an edit
+// modal (fields + status). The needs-action queue lives on Management.
+import { api, fmt, toast, badge, platformChip, esc, $, $$, modal, withBusy, parseDate, isoDate } from "/static/js/common.js";
 
 const API = "/api/calendar";
 let data = null;
-let freshId = null; // highlight the item just created
 
 const STATUS_SHORT = {
   running: "Running",
@@ -19,13 +19,10 @@ async function load() {
     data = await api(API + "/");
   } catch (e) {
     toast("Could not load calendar: " + e.message, "error");
-    $("#board").innerHTML = `<div class="empty">Could not load the calendar.</div>`;
-    $("#cal-action-list").innerHTML = `<div class="action-empty">Could not load the action queue: ${esc(e.message)}</div>`;
+    $("#month").innerHTML = `<div class="empty" style="grid-column:1/-1">Could not load the calendar.</div>`;
     return;
   }
   renderSummary();
-  renderActionQueue();
-  renderBoard();
   renderCalendar();
   renderTests();
   fillFormOptions();
@@ -34,150 +31,14 @@ async function load() {
 function renderSummary() {
   const c = data.counts;
   const ov = c.overdue ? `<span class="tone-bad"><b>${c.overdue}</b> overdue</span> · ` : "";
-  $("#cal-summary").innerHTML = `${ov}<b>${c.by_status.running}</b> running · <b>${c.by_status.pending_feedback}</b> waiting on Vin · <b>${c.by_status.final_pending_approval}</b> awaiting approval · <b>${c.tests_running}</b> tests live`;
+  $("#cal-summary").innerHTML = `${ov}<b>${c.by_status.running}</b> running · <b>${c.by_status.pending_feedback}</b> waiting on Vin · <b>${c.by_status.final_pending_approval}</b> awaiting approval · <b>${c.tests_running}</b> tests live · <a href="/management#mg-actions">Needs action in Management</a>`;
 }
 
-function renderActionQueue() {
-  const actions = [];
-  const seen = new Set();
-  data.overdue.forEach((item) => {
-    seen.add(item.id);
-    actions.push({ item, kind: "Overdue", tone: "bad", approve: item.status === "final_pending_approval" });
-  });
-  data.content.filter((item) => item.status === "final_pending_approval" && !seen.has(item.id)).forEach((item) => {
-    seen.add(item.id);
-    actions.push({ item, kind: "Final approval", tone: "watch", approve: true });
-  });
-  data.content.filter((item) => item.status === "pending_feedback" && !seen.has(item.id)).forEach((item) => {
-    actions.push({ item, kind: "Vin feedback", tone: "watch", approve: false });
-  });
-  const nFinal = data.counts.by_status.final_pending_approval;
-  $("#cal-action-sub").textContent = `${data.overdue.length} overdue · ${nFinal} final approval${nFinal === 1 ? "" : "s"} · ${data.counts.by_status.pending_feedback} feedback`;
-  if (!actions.length) {
-    $("#cal-action-list").innerHTML = `<div class="action-empty">Nothing overdue or waiting for review. Use the board to inspect scheduled and running work.</div>`;
-    return;
-  }
-  const shown = actions.slice(0, 8);
-  const more = actions.length - shown.length;
-  $("#cal-action-list").innerHTML = `<ul class="action-list">${shown.map(({ item, kind, tone, approve }) => `
-    <li class="action-item">
-      ${badge(tone, kind)}
-      <div class="action-copy">
-        <div class="action-title">${platformChip(item.platform)} ${esc(item.name)}</div>
-        <div class="action-meta">${esc(item.owner)} · due ${esc(fmt.date(item.due))} · ${esc(item.format)} / ${esc(item.segment)}${item.campaign_name ? ` · ${esc(item.campaign_name)}` : ""}</div>
-      </div>
-      <div class="action-controls">
-        ${approve ? `<button class="btn btn-sm btn-primary" type="button" data-cal-approve="${esc(item.id)}">Approve</button>` : ""}
-        <button class="btn btn-sm" type="button" data-cal-open="${esc(item.id)}">Open on board</button>
-      </div>
-    </li>`).join("")}</ul>${more > 0 ? `<div class="action-empty">${more} more on the board.</div>` : ""}`;
-}
-
-$("#cal-actions").addEventListener("click", async (event) => {
-  const approve = event.target.closest("[data-cal-approve]");
-  if (approve) {
-    await moveItem(approve.dataset.calApprove, "approved", approve);
-    return;
-  }
-  const open = event.target.closest("[data-cal-open]");
-  if (!open) return;
-  tabsCtl.select("board");
-  const card = $(`.ccard[data-id="${CSS.escape(open.dataset.calOpen)}"]`);
-  if (card) {
-    card.scrollIntoView({ block: "center", behavior: "smooth" });
-    const edit = card.querySelector("[data-edit]");
-    if (edit) edit.focus({ preventScroll: true });
-  }
-});
-
-// ------------------------------------------------------------------ board
-function cardHtml(item) {
-  const st = data.statuses;
-  const i = st.indexOf(item.status);
-  const prev = i > 0 ? st[i - 1] : null;
-  const next = i < st.length - 1 ? st[i + 1] : null;
-  const opts = st.map((s) => `<option value="${s}"${s === item.status ? " selected" : ""}>${esc(data.status_labels[s])}</option>`).join("");
-  const dueTxt = item.overdue ? `Overdue · ${fmt.date(item.due)}` : `Due ${fmt.date(item.due)}`;
-  const links = [];
-  if (item.campaign_name) links.push(`<span title="${esc(item.campaign_name)}">Campaign <b>${esc(item.campaign_name)}</b></span>`);
-  if (item.test_name) links.push(`<span title="${esc(item.test_name)}">Test <b>${esc(item.test_name)}</b></span>`);
-  return `<article class="ccard${item.overdue ? " is-overdue" : ""}${item.id === freshId ? " is-new" : ""}" draggable="true" data-id="${esc(item.id)}" title="${esc(item.notes || "")}">
-    <div class="ccard-name">${esc(item.name)}</div>
-    <div class="ccard-tags">${platformChip(item.platform)}<span class="tag">${esc(item.format)}</span><span class="tag">${esc(item.segment)}</span></div>
-    <div class="ccard-meta"><span>${esc(item.owner)}</span><span class="due${item.overdue ? " overdue" : ""}">${esc(dueTxt)}</span></div>
-    ${links.length ? `<div class="ccard-links">${links.join("")}</div>` : ""}
-    ${item.notes ? `<details><summary>Notes</summary><p>${esc(item.notes)}</p></details>` : ""}
-    <div class="ccard-move">
-      <button class="btn btn-sm btn-icon" type="button" data-move="${prev || ""}" ${prev ? "" : "disabled"} aria-label="Move back${prev ? " to " + esc(data.status_labels[prev]) : ""}" title="${prev ? "← " + esc(data.status_labels[prev]) : ""}">&larr;</button>
-      <select class="select" data-move-select aria-label="Move to status">${opts}</select>
-      <button class="btn btn-sm btn-icon" type="button" data-move="${next || ""}" ${next ? "" : "disabled"} aria-label="Move forward${next ? " to " + esc(data.status_labels[next]) : ""}" title="${next ? esc(data.status_labels[next]) + " →" : ""}">&rarr;</button>
-      <button class="btn btn-sm btn-ghost" type="button" data-edit>Edit</button>
-    </div>
-  </article>`;
-}
-
-function renderBoard() {
-  $("#board").innerHTML = data.columns.map((col) => `
-    <section class="col" data-status="${col.status}" aria-label="${esc(col.label)}">
-      <div class="col-head"><span class="col-title">${esc(col.label)}</span><span class="col-count">${col.items.length}</span></div>
-      <div class="col-body">${col.items.length ? col.items.map(cardHtml).join("") : `<div class="col-empty">Nothing here</div>`}</div>
-    </section>`).join("");
-}
-
-async function moveItem(id, status, el) {
-  if (!status) return;
+async function moveItem(id, status) {
   const item = data.content.find((c) => c.id === id);
-  if (!item || item.status === status) return;
-  try {
-    await withBusy(el, () => api(`${API}/content/${encodeURIComponent(id)}/move`, { body: { status } }),
-      `${item.name} → ${data.status_labels[status]}`);
-    await load();
-  } catch (e) {
-    await load(); // restore select/board to the server state
-  }
-}
-
-function wireBoard() {
-  const board = $("#board");
-  board.addEventListener("click", (e) => {
-    const card = e.target.closest(".ccard");
-    if (!card) return;
-    const btn = e.target.closest("[data-move]");
-    if (btn && btn.dataset.move) return moveItem(card.dataset.id, btn.dataset.move, btn);
-    if (e.target.closest("[data-edit]")) return openEdit(card.dataset.id);
-  });
-  board.addEventListener("change", (e) => {
-    const sel = e.target.closest("[data-move-select]");
-    if (sel) moveItem(sel.closest(".ccard").dataset.id, sel.value, sel);
-  });
-  // optional drag and drop
-  board.addEventListener("dragstart", (e) => {
-    const card = e.target.closest(".ccard");
-    if (!card || e.target.closest("select, button, details")) return;
-    card.classList.add("dragging");
-    e.dataTransfer.setData("text/plain", card.dataset.id);
-    e.dataTransfer.effectAllowed = "move";
-  });
-  board.addEventListener("dragend", (e) => {
-    const card = e.target.closest(".ccard");
-    if (card) card.classList.remove("dragging");
-    $$(".col.drop-over", board).forEach((c) => c.classList.remove("drop-over"));
-  });
-  board.addEventListener("dragover", (e) => {
-    const col = e.target.closest(".col");
-    if (!col) return;
-    e.preventDefault();
-    $$(".col.drop-over", board).forEach((c) => c !== col && c.classList.remove("drop-over"));
-    col.classList.add("drop-over");
-  });
-  board.addEventListener("drop", (e) => {
-    const col = e.target.closest(".col");
-    if (!col) return;
-    e.preventDefault();
-    col.classList.remove("drop-over");
-    const id = e.dataTransfer.getData("text/plain");
-    if (id) moveItem(id, col.dataset.status, null);
-  });
+  if (!item || !status || item.status === status) return;
+  await api(`${API}/content/${encodeURIComponent(id)}/move`, { body: { status } });
+  toast(`${item.name} → ${data.status_labels[status]}`, "success");
 }
 
 function openEdit(id) {
@@ -189,6 +50,7 @@ function openEdit(id) {
       <div class="field"><label for="ef-owner">Owner</label><input class="input" id="ef-owner" name="owner" maxlength="60" value="${esc(item.owner)}"></div>
       <div class="field"><label for="ef-due">Due</label><input class="input" id="ef-due" name="due" type="date" value="${esc(item.due)}"></div>
     </div>
+    <div class="field"><label for="ef-status">Status</label><select class="select" id="ef-status" name="status">${data.statuses.map((s) => `<option value="${s}"${s === item.status ? " selected" : ""}>${esc(data.status_labels[s])}</option>`).join("")}</select></div>
     <div class="field"><label for="ef-notes">Notes</label><textarea class="textarea" id="ef-notes" name="notes" maxlength="2000">${esc(item.notes || "")}</textarea></div>
   </form>`;
   modal({
@@ -205,9 +67,13 @@ function openEdit(id) {
             const v = f.elements[k].value;
             if (v !== (item[k] || "")) payload[k] = v;
           });
-          if (!Object.keys(payload).length) return true;
-          await api(`${API}/content/${encodeURIComponent(id)}`, { body: payload });
-          toast("Saved " + (payload.name || item.name));
+          const status = f.elements.status.value;
+          if (!Object.keys(payload).length && status === item.status) return true;
+          if (Object.keys(payload).length) {
+            await api(`${API}/content/${encodeURIComponent(id)}`, { body: payload });
+            toast("Saved " + (payload.name || item.name), "success");
+          }
+          if (status !== item.status) await moveItem(id, status);
           await load();
           return true;
         },
@@ -237,7 +103,7 @@ function renderCalendar() {
     const cls = ["day"];
     if (d.getMonth() !== m) cls.push("out");
     if (iso === data.today) cls.push("today");
-    const evs = items.map((c) => `<span class="ev ${c.status}${c.overdue ? " overdue" : ""}" title="${esc(`${c.name} · ${c.status_label}${c.overdue ? " · OVERDUE" : ""} · ${c.owner}`)}">${esc(c.name)}</span>`).join("");
+    const evs = items.map((c) => `<button type="button" class="ev ${c.status}${c.overdue ? " overdue" : ""}" data-open="${esc(c.id)}" title="${esc(`${c.name} · ${c.status_label}${c.overdue ? " · OVERDUE" : ""} · ${c.owner}`)}">${esc(c.name)}</button>`).join("");
     cells.push(`<div class="${cls.join(" ")}" role="gridcell" aria-label="${esc(fmt.date(iso, { dow: true }))}: ${items.length} item(s)"><span class="day-num">${d.getDate()}</span>${evs}</div>`);
   }
   $("#month").innerHTML = cells.join("");
@@ -253,7 +119,7 @@ function rowHtml(c, overdue) {
   const when = overdue ? `<span class="when tone-bad">Overdue ${esc(fmt.date(c.due))}</span>`
     : `<span class="when${c.due === data.today ? " today" : ""}">${c.due === data.today ? "Today" : esc(fmt.date(c.due, { dow: true }))}</span>`;
   const sub = [c.owner, c.format, c.segment, c.campaign_name].filter(Boolean).map(esc).join(" · ");
-  return `<li>${when}<span class="what"><span class="truncate strong">${platformChip(c.platform)} ${esc(c.name)}</span><span class="truncate muted small">${sub}</span></span>${badge(c.status)}</li>`;
+  return `<li>${when}<button type="button" class="what up-open" data-open="${esc(c.id)}" aria-label="${esc(`Edit ${c.name}`)}"><span class="truncate strong">${platformChip(c.platform)} ${esc(c.name)}</span><span class="truncate muted small">${sub}</span></button>${badge(c.status)}</li>`;
 }
 
 // ------------------------------------------------------------------ tests
@@ -350,21 +216,27 @@ function wireForm() {
     if (!body.campaign_id) delete body.campaign_id;
     if (!body.test_id) delete body.test_id;
     try {
-      const res = await withBusy($("#nf-submit"), () => api(API + "/content", { body }), `Created ${body.name}`);
-      freshId = res.item.id;
+      await withBusy($("#nf-submit"), () => api(API + "/content", { body }), `Created ${body.name}`);
       form.reset();
       $("#nf-due").value = data.today;
       show(false);
       await load();
-      tabsCtl.select("board");
-      const el = $(`.ccard[data-id="${CSS.escape(freshId)}"]`);
-      if (el) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
     } catch (err) { /* withBusy toasted it */ }
   });
 }
 
 // ------------------------------------------------------------------- boot
-const tabsCtl = tabs($("#views"));
-wireBoard();
+// Click any item (month grid or next-14-days list) to edit it; /calendar#<content id>
+// (linked from Management's Needs action) opens that item directly.
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-open]");
+  if (b) openEdit(b.dataset.open);
+});
+function openFromHash() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (id && data && data.content.some((c) => c.id === id)) openEdit(id);
+}
+window.addEventListener("hashchange", openFromHash);
+
 wireForm();
-load();
+load().then(openFromHash);

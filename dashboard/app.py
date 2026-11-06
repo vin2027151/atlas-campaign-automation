@@ -12,7 +12,7 @@ from typing import Any, Dict, List
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -24,22 +24,22 @@ log = logging.getLogger("atlas")
 PAGES = [
     # route name, path, nav label, title, one-line description
     ("home", "/", "Home", "Overview", "Headline numbers and where to go next."),
-    ("spend", "/spend", "Spend", "Spend & pacing",
-     "Month-to-date spend against budget by platform and campaign, with daily pacing."),
-    ("calendar", "/calendar", "Calendar", "30-day calendar",
-     "The November launch checklist, content pipeline and test schedule by day."),
-    ("reporting", "/reporting", "Reporting", "Reporting",
-     "Cost per trial and paid conversion by campaign, PostHog truth vs platform claims."),
-    ("management", "/management", "Management", "Management",
-     "Running tests against their benchmarks, results, and the lessons log."),
     ("campaigns", "/campaigns", "Campaigns", "Campaigns",
-     "Campaigns, ad sets and ads: pause, resume, budgets, search terms and negatives."),
+     "Every campaign's spend, budget, pacing and cost per trial, with pause, budget, ad set and negative-keyword controls."),
+    ("reporting", "/reporting", "Reporting", "Reporting",
+     "Cost per trial and paid conversion by campaign, daily spend and rolling 3-day cost per trial, PostHog truth vs platform claims."),
+    ("management", "/management", "Management", "Management",
+     "Today's checklist, everything that needs action, what's in play, and the test scoreboard."),
     ("planning", "/planning", "Campaign Planning", "Campaign planning",
      "Pull account state, compare it to the 30-day plan, draft API changes from a brief, review the diff, publish by hand."),
     ("media", "/media", "Media", "Media library",
      "Numbered image, video and HTML5 assets: requests, ready for review, approved."),
+    ("chat", "/chat", "Quick Chat", "Quick chat",
+     "Ask about the plan, the latest account state and Search Atlas offerings."),
+    ("calendar", "/calendar", "Calendar", "30-day calendar",
+     "The November launch schedule by day: checklist, content and tests."),
 ]
-API_PAGES = [p[0] for p in PAGES if p[0] != "home"]
+API_PAGES = ["spend", "campaigns", "reporting", "management", "planning", "media", "calendar", "chat"]
 
 app = FastAPI(title="Atlas Ops", version="1.0", docs_url="/api/docs", redoc_url=None)
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
@@ -141,3 +141,9 @@ def _page_route(name, path):
 for _n, _p, _l, _t, _d in PAGES:
     if _n != "home":
         _page_route(_n, _p)
+
+
+@app.get("/spend", include_in_schema=False)
+def spend_moved():
+    # The Spend page became Campaigns (2026-11-05).
+    return RedirectResponse("/campaigns", status_code=301)

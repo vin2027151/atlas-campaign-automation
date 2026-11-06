@@ -37,32 +37,39 @@ def _text(msg):
     return "".join(parts)
 
 
+ALLOWED_MODELS = {"claude-opus-5-5": "Opus 5.5", "claude-sonnet-5-5": "Sonnet 5.5"}
+
+
 def run(req):
     import anthropic  # imported only here, inside the worker process
 
     client = anthropic.Anthropic()  # key from env ANTHROPIC_API_KEY
-    kwargs = dict(model=MODEL, max_tokens=int(req.get("max_tokens") or 32000),
+    # Optional per-call model/effort (Quick Chat uses Sonnet 5.5 at low); whitelisted.
+    model = req.get("model") if req.get("model") in ALLOWED_MODELS else MODEL
+    effort = req.get("effort") if req.get("effort") in ("low", "medium", "high") else EFFORT
+    label = ALLOWED_MODELS.get(model, "the model")
+    kwargs = dict(model=model, max_tokens=int(req.get("max_tokens") or 32000),
                   betas=[FALLBACK_BETA], system=req["system"], messages=req["messages"])
     t0 = time.time()
     try:
-        stream_cm = client.beta.messages.stream(fallbacks="default", output_config={"effort": EFFORT}, **kwargs)
+        stream_cm = client.beta.messages.stream(fallbacks="default", output_config={"effort": effort}, **kwargs)
     except TypeError:
         # older SDK without the typed kwargs: send them in the raw body
         stream_cm = client.beta.messages.stream(
-            extra_body={"fallbacks": "default", "output_config": {"effort": EFFORT}}, **kwargs)
+            extra_body={"fallbacks": "default", "output_config": {"effort": effort}}, **kwargs)
     with stream_cm as stream:
         msg = stream.get_final_message()
     seconds = round(time.time() - t0, 2)
     stop = getattr(msg, "stop_reason", None)
     out = {"ok": True, "text": "", "stop_reason": stop, "usage": _usage(msg),
-           "model": getattr(msg, "model", MODEL), "seconds": seconds}
+           "model": getattr(msg, "model", model), "seconds": seconds}
     if stop == "refusal":
         details = getattr(msg, "stop_details", None)
         cat = getattr(details, "category", None) if details is not None else None
-        out.update(ok=False, error="Opus 5.5 declined the request (refusal%s)" % (", " + cat if cat else ""))
+        out.update(ok=False, error=label + " declined the request (refusal%s)" % (", " + cat if cat else ""))
         return out
     if stop == "max_tokens":
-        out.update(ok=False, error="Opus 5.5 hit max_tokens before finishing; output truncated")
+        out.update(ok=False, error=label + " hit max_tokens before finishing; output truncated")
         return out
     out["text"] = _text(msg)
     return out

@@ -17,9 +17,11 @@ Return only a JSON object:
 - recommendations: concrete ways to adapt the plan, most important first. 3-8 items. campaign_id is the dashboard id (e.g. "g_search_brand_us") or null.
 - Every bullet is one short sentence, under 25 words. No narration, no preamble, no hedging.
 - Use only numbers that appear in the inputs. Never invent or extrapolate figures. Trials are PostHog-attributed truth; platform conversions are claims.
-- You only advise. You cannot change the account."""
+- You only advise. You cannot change the account.
 
-CHANGESET_SYSTEM = """You turn a media buyer's brief into a changeset for a Google Ads + Meta account.
+Company context: the company and brand is Search Atlas. AgentStack is one Search Atlas offering (its own ads, landing page and 14-day-trial offer), not the brand. The plan covers the AgentStack offering. Search Atlas SEO ads in the account belong to other Search Atlas offerings; call them off-plan for these campaigns, never a branding error."""
+
+CHANGESET_SYSTEM = """You turn a media buyer's brief into a changeset for a Google Ads + Meta account. Company context: the company and brand is Search Atlas. AgentStack is one Search Atlas offering (its own ads, landing page and 14-day-trial offer), not the brand. The plan covers the AgentStack offering. Search Atlas SEO ads in the account belong to other Search Atlas offerings; call them off-plan for these campaigns, never a branding error.
 
 The changeset is YAML whose operations are shaped exactly like Google Ads API and Meta Marketing API requests, following the schema document you are given. Code validates it, computes a diff against the current state, and shows the diff to a human.
 

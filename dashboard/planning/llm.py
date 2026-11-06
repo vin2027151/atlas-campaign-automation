@@ -57,8 +57,8 @@ def _command():
     raise LLMNotConfigured("LLM not configured: set ATLAS_LLM_CMD or ANTHROPIC_API_KEY (or ATLAS_LLM_MODE=stub for fixtures)")
 
 
-def call(system, messages, max_tokens=MAX_TOKENS, stub=None):
-    # type: (str, List[Dict[str, Any]], int, Optional[Callable[[], str]]) -> Dict[str, Any]
+def call(system, messages, max_tokens=MAX_TOKENS, stub=None, model=None, effort=None):
+    # type: (Any, List[Dict[str, Any]], int, Optional[Callable[[], str]], Optional[str], Optional[str]) -> Dict[str, Any]
     """One model call. Returns {ok, text, stop_reason, usage, model, seconds}; raises LLMError."""
     if mode() == "stub":
         t0 = time.time()
@@ -68,12 +68,17 @@ def call(system, messages, max_tokens=MAX_TOKENS, stub=None):
         return {"ok": True, "text": stub(), "stop_reason": "end_turn", "usage": {}, "model": MODEL + " (stub)",
                 "seconds": round(time.time() - t0, 2)}
     cmd = _command()
-    payload = json.dumps({"system": system, "messages": messages, "max_tokens": max_tokens})
+    req = {"system": system, "messages": messages, "max_tokens": max_tokens}
+    if model:
+        req["model"] = model
+    if effort:
+        req["effort"] = effort
+    payload = json.dumps(req)
     t0 = time.time()
     try:
         proc = subprocess.run(cmd, input=payload, capture_output=True, text=True, timeout=TIMEOUT_S, cwd=BASE_DIR)
     except subprocess.TimeoutExpired:
-        raise LLMError("Opus 5.5 call timed out after %d s" % TIMEOUT_S)
+        raise LLMError("model call timed out after %d s" % TIMEOUT_S)
     except OSError as exc:
         raise LLMError("could not start the LLM worker: %s" % exc)
     out = None

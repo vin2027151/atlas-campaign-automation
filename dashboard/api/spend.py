@@ -1,8 +1,12 @@
-"""Spend page API: where the money goes, by platform, campaign and day.
+"""Spend metrics: where the money goes, by platform, campaign and day.
 
-GET /api/spend/?window=3d|7d|14d|30d|mtd returns everything the page needs in
-one call. All windows are trailing and inclusive, ending today (meta.today);
-"mtd" runs from the 1st of today's month.
+The Spend page itself is gone (it became /campaigns, and its two charts moved
+to /reporting). This module stays as the shared metrics layer: api/campaigns.py
+and api/reporting.py import its helpers, and GET /api/spend/?window=... still
+returns the old one-call payload for any external caller.
+
+All windows are trailing and inclusive, ending today (meta.today); "mtd" runs
+from the 1st of today's month.
 
 The 3-day and 7-day cost per trial on each campaign row are always the
 trailing 3 / 7 days ending today, whatever the window: they are the active
@@ -28,6 +32,11 @@ PLATFORM_LABELS = {"google": "Google Ads", "meta": "Meta"}
 # platform-reported conversions vs PostHog trials: outside this band is flagged
 RATIO_BAND = (80.0, 120.0)
 METRIC_KEYS = ("spend", "impressions", "clicks", "platform_conversions", "trials", "paid")
+NOTES = {
+    "paid_lag": "Paid memberships lag trials by about 7-14 days, so recent days and short windows understate paid.",
+    "adset_allocation": "No ad-set-level daily data in the sample: ad set totals are the campaign total split by ad set budget, or evenly where ad groups have no budget of their own.",
+    "monitor": "3-day and 7-day CPT are trailing windows ending today, independent of the selected window.",
+}
 
 
 def _window_bounds(window):
@@ -126,7 +135,7 @@ def _campaign_row(c, win):
         "cost_per_trial": t["cost_per_trial"], "cost_per_paid": t["cost_per_paid"],
         "click_to_trial": t["click_to_trial"], "trial_to_paid": t["trial_to_paid"],
         "cpt_3d": w3["cost_per_trial"], "trials_3d": w3["trials"], "spend_3d": w3["spend"],
-        "cpt_7d": w7["cost_per_trial"], "trials_7d": w7["trials"],
+        "cpt_7d": w7["cost_per_trial"], "trials_7d": w7["trials"], "spend_7d": w7["spend"],
         "platform_conversions": t["platform_conversions"],
         "platform_vs_posthog_pct": t["platform_vs_posthog_pct"],
         "ratio_flag": _ratio_flag(t["platform_conversions"], t["trials"]),
@@ -150,25 +159,21 @@ def _platform_block(platform, win, total_spend):
     }
 
 
-@router.get("/")
-def index(window: str = Query("7d")):
-    win = _window_bounds(window)
-    meta = store.get_state()["meta"]
-    dates = store.date_range(win["start"], win["end"])
-
-    # Google first, then Meta new build, then Meta legacy; seed order within each.
+def ordered_campaigns():
+    # type: () -> List[Dict[str, Any]]
+    """Google first, then Meta new build, then Meta legacy; seed order within each."""
     order = {"google": 0, "meta": 1}
-    camps = sorted(store.campaigns(), key=lambda c: (order.get(c["platform"], 9), bool(c.get("legacy"))))
-    rows = [_campaign_row(c, win) for c in camps]
+    return sorted(store.campaigns(), key=lambda c: (order.get(c["platform"], 9), bool(c.get("legacy"))))
 
-    account = _totals(store.daily_for(None, None, win["start"], win["end"]))
-    platforms = [_platform_block(p, win, account["spend"]) for p in PLATFORMS]
 
-    # daily stacked spend: one series per campaign, aligned to `dates`
+def daily_spend_block(win, camps):
+    # type: (Dict[str, Any], List[Dict[str, Any]]) -> Dict[str, Any]
+    """Stacked daily spend: one series per campaign, aligned to the window's dates."""
+    dates = store.date_range(win["start"], win["end"])
     by_key = {}  # type: Dict[Any, float]
     for r in store.daily_for(None, None, win["start"], win["end"]):
         by_key[(r["campaign_id"], r["date"])] = r["spend"]
-    daily = {
+    return {
         "dates": dates,
         "series": [{"campaign_id": c["id"], "name": c["name"], "platform": c["platform"],
                     "legacy": bool(c.get("legacy")),
@@ -177,7 +182,11 @@ def index(window: str = Query("7d")):
         "totals": [round(sum(by_key.get((c["id"], d), 0.0) for c in camps), 2) for d in dates],
     }
 
-    # rolling 3-day cost per trial per campaign over the window; None = no trials (gap)
+
+def rolling_cpt_block(win, camps):
+    # type: (Dict[str, Any], List[Dict[str, Any]]) -> Dict[str, Any]
+    """Rolling 3-day cost per trial per campaign over the window; None = no trials (gap)."""
+    dates = store.date_range(win["start"], win["end"])
     rolling = {"days": 3, "dates": dates, "series": []}  # type: Dict[str, Any]
     for c in camps:
         pts = store.rolling_cost_per_trial(c["id"], 3, None, win["start"], win["end"])
@@ -191,6 +200,26 @@ def index(window: str = Query("7d")):
         })
     acct_roll = store.rolling_cost_per_trial(None, 3, None, win["start"], win["end"])
     rolling["account"] = [p["cost_per_trial"] for p in acct_roll]
+    return rolling
+
+
+# Public names for the Campaigns and Reporting routers, which reuse these.
+window_bounds = _window_bounds
+campaign_row = _campaign_row
+platform_block = _platform_block
+totals = _totals
+
+
+@router.get("/")
+def index(window: str = Query("7d")):
+    """Legacy one-call payload of the old Spend page (now Campaigns + Reporting)."""
+    win = _window_bounds(window)
+    meta = store.get_state()["meta"]
+    camps = ordered_campaigns()
+    rows = [_campaign_row(c, win) for c in camps]
+
+    account = _totals(store.daily_for(None, None, win["start"], win["end"]))
+    platforms = [_platform_block(p, win, account["spend"]) for p in PLATFORMS]
 
     funnel = {
         "spend": account["spend"], "impressions": account["impressions"],
@@ -217,12 +246,8 @@ def index(window: str = Query("7d")):
         },
         "platforms": platforms,
         "campaigns": rows,
-        "daily": daily,
-        "rolling_cpt": rolling,
+        "daily": daily_spend_block(win, camps),
+        "rolling_cpt": rolling_cpt_block(win, camps),
         "funnel": funnel,
-        "notes": {
-            "paid_lag": "Paid memberships lag trials by about 7-14 days, so recent days and short windows understate paid.",
-            "adset_allocation": "No ad-set-level daily data in the sample: ad set totals are the campaign total split by ad set budget, or evenly where ad groups have no budget of their own.",
-            "monitor": "3-day and 7-day CPT are trailing windows ending today, independent of the selected window.",
-        },
+        "notes": NOTES,
     }

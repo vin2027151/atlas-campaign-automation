@@ -32,6 +32,7 @@
   .rp-legend i.proj { background: var(--accent-soft); border: 1px dashed var(--accent-line); }
   .rp-legend i.mark { width: 2px; background: var(--ink); }
   .rp-legend i.bud { width: 2px; background: var(--ink-2); }
+  .rp-legend i.band { background: var(--good-soft); border: 1px dashed var(--good); }
 
   .rp-trust { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4); }
   .rp-trust-item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s2) var(--s4); align-items: center; }
@@ -61,6 +62,10 @@
     .rp-pace-row { grid-template-columns: minmax(0, 1fr); gap: var(--s1); }
     .rp-pace-name { flex-direction: row; align-items: baseline; justify-content: space-between; }
   }
+  @media (max-width: 640px) {
+    /* 13-campaign legends need room on phones */
+    .rp-camp-chart .chart-box.lg { height: 460px; }
+  }
   @media (max-width: 420px) {
     .rp-pace-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .rp-trust-item .dl { grid-template-columns: max-content 1fr; }
@@ -81,6 +86,7 @@
     .kpi-value { font-size: 18px; }
     .rp-charts { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     .rp-charts .chart-box { height: 200px; }
+    .chart-box.lg { height: 240px; }
     .rp-trust { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     .table-wrap { overflow: visible; }
     .table th, .table td { padding: 3px 6px; }
@@ -133,6 +139,22 @@
     <div class="card-head"><h2 class="card-title">Cost per trial, rolling 7 days <span class="card-sub">shaded: target band</span></h2></div>
     <div class="card-body"><div class="chart-box"><canvas id="rp-chart-cpt" aria-label="Rolling 7-day cost per trial for the account, Google and Meta" role="img"></canvas></div></div>
   </div>
+</section>
+
+<section class="card rp-camp-chart" aria-labelledby="rp-daily-title">
+  <div class="card-head">
+    <h2 class="card-title" id="rp-daily-title">Daily spend by campaign <span class="card-sub" id="rp-daily-sub">last 30 days · platform-reported spend</span></h2>
+    <span class="card-sub">Click a legend item to hide or show a campaign in both charts</span>
+  </div>
+  <div class="card-body"><div class="chart-box lg"><canvas id="rp-chart-daily" aria-label="Stacked daily spend by campaign, last 30 days" role="img"></canvas></div></div>
+</section>
+
+<section class="card rp-camp-chart" aria-labelledby="rp-cpt3-title">
+  <div class="card-head">
+    <h2 class="card-title" id="rp-cpt3-title">Rolling 3-day cost per trial <span class="card-sub" id="rp-cpt3-sub">last 30 days · spend ÷ PostHog trials</span></h2>
+    <div class="rp-legend"><span><i class="band"></i>Target band</span><span>Gaps are days with no trials in the trailing 3 days</span></div>
+  </div>
+  <div class="card-body"><div class="chart-box lg"><canvas id="rp-chart-cpt3" aria-label="Rolling 3-day cost per trial by campaign, last 30 days" role="img"></canvas></div></div>
 </section>
 
 <section class="card" aria-labelledby="rp-acct-title">

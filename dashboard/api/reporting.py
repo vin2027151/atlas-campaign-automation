@@ -16,6 +16,7 @@ from fastapi import APIRouter
 from fastapi.responses import Response
 
 import store
+from api import spend
 
 router = APIRouter(prefix="/api/reporting", tags=["reporting"])
 
@@ -123,6 +124,19 @@ def _trends():
         "spend": [r["spend"] for r in series],
         "trials": [r["trials"] for r in series],
         "cpt_7d": roll,
+        "cpa_target": store.get_state()["meta"]["cpa_target"],
+    }
+
+
+def _campaign_charts():
+    # type: () -> Dict[str, Any]
+    """The two per-campaign charts that used to sit on the Spend page, over the trend window."""
+    win = spend.window_bounds("%dd" % TREND_DAYS)
+    camps = spend.ordered_campaigns()
+    return {
+        "window": win,
+        "daily": spend.daily_spend_block(win, camps),
+        "rolling_cpt": spend.rolling_cpt_block(win, camps),
         "cpa_target": store.get_state()["meta"]["cpa_target"],
     }
 
@@ -286,6 +300,7 @@ def index():
         "kpis": _kpis(),
         "pacing": _pacing_rows(),
         "trends": _trends(),
+        "campaign_charts": _campaign_charts(),
         "accounts": _accounts(),
         "trust": _trust(),
         "changes": _changes(),

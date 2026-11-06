@@ -6,22 +6,11 @@
   .mg-section-title { display: flex; align-items: baseline; gap: var(--s2); flex-wrap: wrap; }
   .mg-section-title .card-sub { font-weight: 400; }
 
-  /* 1. Today strip */
-  .mg-today { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; }
-  .mg-today > div { padding: var(--s3) var(--s4); border-right: 1px solid var(--line); min-width: 0; }
-  .mg-today > div:last-child { border-right: 0; }
-  .mg-today .lbl { color: var(--muted); font-size: var(--fs-sm); font-weight: 500; white-space: nowrap; }
-  .mg-today .big { font-size: var(--fs-kpi); font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .mg-today .big small { font-size: var(--fs-md); color: var(--muted); font-weight: 500; }
-  .mg-today .sub { color: var(--muted); font-size: var(--fs-sm); }
-  .mg-status-line { font-size: var(--fs-md); color: var(--ink); margin-top: 4px; }
-  .mg-status-line .num { text-align: left; }
-  .mg-today .kpi-bar { width: 140px; max-width: 100%; }
-
   /* 2. Checklist */
-  .mg-rail { display: flex; gap: 6px; overflow-x: auto; padding: var(--s3) var(--s4); scroll-snap-type: x proximity; scrollbar-width: thin; border-bottom: 1px solid var(--line); }
+  /* 30-day rail: a wrapping grid (no inner scroll region, so the wheel always scrolls the page) */
+  .mg-rail { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 6px; padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
   .mg-day {
-    flex: none; scroll-snap-align: center; width: 58px;
+    min-width: 0;
     display: flex; flex-direction: column; align-items: center; gap: 2px;
     padding: 6px 0 7px; border-radius: var(--r); cursor: pointer;
     border: 1px solid var(--line); background: var(--surface); color: var(--ink-2);
@@ -72,7 +61,13 @@
   .mg-camp .tag { margin-left: 4px; }
   .table td.mg-why { color: var(--muted); font-size: var(--fs-sm); white-space: normal; min-width: 180px; }
   .table td.mg-camp { white-space: normal; min-width: 220px; }
-  #mg-inplay thead th { white-space: normal; vertical-align: bottom; }
+  #mg-inplay thead th { white-space: normal; vertical-align: bottom; position: static; }
+  /* In play grows with its rows: no inner scroll region, no wheel capture. */
+  #mg-inplay .table-wrap { overflow: visible; overscroll-behavior: auto; max-height: none; }
+  .main .table-wrap { overscroll-behavior: auto; }
+
+  /* Needs action */
+  #mg-actions .action-meta a { color: var(--ink-2); }
   .mg-rule { margin: 0; padding: var(--s3) var(--s4); display: grid; grid-template-columns: max-content 1fr; gap: 6px var(--s3); font-size: var(--fs-sm); color: var(--ink-2); }
   .mg-rule dd { margin: 0; }
   .mg-row-actions { display: inline-flex; gap: 4px; align-items: center; justify-content: flex-end; white-space: nowrap; }
@@ -103,6 +98,7 @@
   .mg-lesson-form { display: grid; grid-template-columns: minmax(0, 1fr) 220px auto; gap: var(--s2); align-items: start; padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); background: var(--surface-2); }
   .mg-lesson-form .textarea { min-height: 30px; height: 30px; padding: 5px var(--s2); }
   .mg-lesson-form .textarea:focus { height: 72px; }
+  .mg-lesson-form .textarea:not(:focus) { overflow: hidden; }
   .mg-filter { display: flex; gap: 6px; flex-wrap: wrap; padding: var(--s3) var(--s4) 0; }
   .mg-chip { appearance: none; display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 11px;
     border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font: 500 var(--fs-xs)/1 var(--font); cursor: pointer; }
@@ -132,16 +128,23 @@
     .mg-two { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 900px) {
-    .mg-today { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .mg-today > div:last-child { grid-column: 1 / -1; border-top: 1px solid var(--line); }
-    .mg-today > div:nth-child(3) { border-right: 0; }
     .mg-check-grid { grid-template-columns: minmax(0, 1fr); }
     .mg-check-grid > div + div { border-left: 0; border-top: 1px solid var(--line); border-radius: 0 0 var(--r-lg) var(--r-lg); }
     .mg-lesson-form { grid-template-columns: minmax(0, 1fr) 160px auto; }
+    #mg-inplay .table thead { display: none; }
+    #mg-inplay .table, #mg-inplay .table tbody, #mg-inplay .table tr, #mg-inplay .table td { display: block; width: auto; }
+    #mg-inplay .table tr { border-bottom: 1px solid var(--line); padding: var(--s2) var(--s3); }
+    #mg-inplay .table td { border: 0; padding: 2px 0; text-align: left; min-width: 0; }
+    #mg-inplay .table td:empty { display: none; }
+    #mg-inplay .table td[data-l]::before { content: attr(data-l); display: inline-block; min-width: 128px; color: var(--muted); font-size: var(--fs-sm); font-weight: 500; }
+    #mg-inplay .table td.mg-camp, #mg-inplay .table td.mg-why { min-width: 0; }
+    #mg-inplay .table td.actions .mg-row-actions { justify-content: flex-start; padding-top: 4px; }
+    #mg-inplay .mg-group-row td { background: transparent !important; }
+    #mg-inplay .table tr.mg-group-row { background: var(--surface-2); }
   }
   @media (max-width: 640px) {
-    .mg-today > div { padding: var(--s2) var(--s3); }
-    .mg-today .big { font-size: var(--fs-xl); }
+    .mg-rail { grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 4px; }
+    .mg-day .d-ct { display: none; }
     .mg-rail, .mg-pane-head, .mg-items, .mg-filter, .mg-lessons, .mg-activity, .mg-sub-head { padding-left: var(--s3); padding-right: var(--s3); }
     .mg-tests { grid-template-columns: minmax(0, 1fr); padding: var(--s3); }
     .mg-lesson-form { grid-template-columns: minmax(0, 1fr); padding: var(--s3); }
@@ -151,20 +154,38 @@
     .mg-rule { grid-template-columns: minmax(0, 1fr); padding: var(--s3); }
   }
   @media (max-width: 420px) {
-    .mg-today { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .mg-today > div:nth-child(2) { border-right: 0; }
-    .mg-today > div:nth-child(3) { grid-column: 1 / -1; border-top: 1px solid var(--line); }
     .mg-lessons li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   }
 </style>
 {% endblock %}
 
-{% block subtitle %}<p class="page-sub">What is in play, what is being tracked, what is winning and what is not, and what to check today. Day-by-day plan for the November build; cost per trial is PostHog-attributed against the {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }} band.</p>{% endblock %}
+{% block subtitle %}<p class="page-sub">Today&rsquo;s checklist, what needs a decision, and what is in play. Day-by-day plan for the November build; cost per trial is PostHog-attributed against the {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }} band.</p>{% endblock %}
 {% block actions %}<button class="btn btn-sm" id="mg-refresh" type="button">Refresh</button>{% endblock %}
 
 {% block content %}
-<section class="card mg-today" id="mg-today" aria-label="Today">
-  <div class="mg-loading"><div class="skeleton" style="width:220px"></div></div>
+<section class="card" id="mg-checklist" aria-labelledby="mg-checklist-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-checklist-title">Daily checklist</h2><span class="card-sub" id="mg-checklist-sub"></span></div>
+    <button class="btn btn-sm btn-ghost" type="button" id="mg-goto-today">Jump to today</button>
+  </div>
+  <div class="mg-rail" id="mg-rail" role="listbox" aria-label="30-day plan"><div class="skeleton" style="height:48px;grid-column:1/-1"></div></div>
+  <div class="mg-check-grid">
+    <div>
+      <div class="mg-pane-head"><h3 id="mg-day-title">&nbsp;</h3><span class="card-sub" id="mg-day-count"></span></div>
+      <ul class="mg-items" id="mg-day-items"></ul>
+    </div>
+    <div>
+      <div class="mg-pane-head"><h3>Carried over</h3><span class="card-sub" id="mg-carry-count"></span></div>
+      <ul class="mg-items" id="mg-carry"></ul>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="mg-actions" aria-labelledby="mg-actions-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-actions-title">Needs action</h2><span class="card-sub" id="mg-actions-sub">Overdue, final approvals and Vin feedback</span></div>
+  </div>
+  <div id="mg-action-list"><div class="card-body"><div class="skeleton" style="height:64px"></div></div></div>
 </section>
 
 <section class="card" id="mg-inplay" aria-labelledby="mg-inplay-title">
@@ -180,24 +201,6 @@
   </div>
   <details class="mg-fold" id="mg-paused"><summary>Paused campaigns</summary><div id="mg-paused-body"></div></details>
   <details class="mg-fold"><summary>How the read is computed</summary><dl class="mg-rule" id="mg-rule"></dl></details>
-</section>
-
-<section class="card" id="mg-checklist" aria-labelledby="mg-checklist-title">
-  <div class="card-head">
-    <div class="mg-section-title"><h2 class="card-title" id="mg-checklist-title">Daily checklist</h2><span class="card-sub" id="mg-checklist-sub"></span></div>
-    <button class="btn btn-sm btn-ghost" type="button" id="mg-goto-today">Jump to today</button>
-  </div>
-  <div class="mg-rail" id="mg-rail" role="listbox" aria-label="30-day plan"></div>
-  <div class="mg-check-grid">
-    <div>
-      <div class="mg-pane-head"><h3 id="mg-day-title">&nbsp;</h3><span class="card-sub" id="mg-day-count"></span></div>
-      <ul class="mg-items" id="mg-day-items"></ul>
-    </div>
-    <div>
-      <div class="mg-pane-head"><h3>Carried over</h3><span class="card-sub" id="mg-carry-count"></span></div>
-      <ul class="mg-items" id="mg-carry"></ul>
-    </div>
-  </div>
 </section>
 
 <section class="card" id="mg-tests" aria-labelledby="mg-tests-title">

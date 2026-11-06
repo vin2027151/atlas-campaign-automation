@@ -353,6 +353,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: var(--s4) 0; }
 .nav-icon[data-icon="planning"]::before { width: 10px; height: 10px; border-radius: 50%; background: transparent; border: 2px solid var(--sa-purple-soft); }
 .nav-link.active .nav-icon[data-icon="planning"]::before { border-color: var(--sa-mint); background: transparent; }
 .nav-icon[data-icon="media"]::before { width: 11px; height: 8px; border-radius: 2px; box-shadow: inset 0 -3px 0 0 var(--sa-purple-dark); }
+.nav-icon[data-icon="chat"]::before { width: 11px; height: 8px; border-radius: 6px 6px 6px 1px; }
 .sidebar-foot {
   display: flex;
   flex-direction: column;

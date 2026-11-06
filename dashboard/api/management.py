@@ -1,6 +1,7 @@
 """Management page API: the media buyer's daily cockpit.
 
 GET  /api/management/                          everything the page needs, in one call
+                                               (includes needs_action: content waiting on Vin)
 POST /api/management/checklist/{item_id}/toggle  flip (or set, with {"done": bool}) a checklist item
 POST /api/management/lessons                   {text, tags} -> append a lesson
 
@@ -13,6 +14,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Body
 
 import store
+from api.calendar import _decorate_content
 
 router = APIRouter(prefix="/api/management", tags=["management"])
 
@@ -253,6 +255,34 @@ def _lessons():
     return {"items": ls, "tags": sorted(tags.items(), key=lambda kv: (-kv[1], kv[0]))}
 
 
+def _needs_action():
+    # type: () -> Dict[str, Any]
+    """Content that is waiting on a person: overdue first, then final approvals, then Vin feedback.
+
+    Same rules the Calendar page used for its queue (moved here); decoration comes from
+    api.calendar so overdue / labels stay identical. Approve uses POST /api/calendar/content/{id}/move.
+    """
+    items = sorted((_decorate_content(c) for c in store.get_state()["content"]),
+                   key=lambda c: (c.get("due") or "", c["id"]))
+    out = []  # type: List[Dict[str, Any]]
+    seen = set()
+    for c in items:
+        if c["overdue"]:
+            seen.add(c["id"])
+            out.append({"kind": "Overdue", "tone": "bad", "approve": c["status"] == "final_pending_approval", "item": c})
+    for status, kind, approve in (("final_pending_approval", "Final approval", True),
+                                  ("pending_feedback", "Vin feedback", False)):
+        for c in items:
+            if c["status"] == status and c["id"] not in seen:
+                seen.add(c["id"])
+                out.append({"kind": kind, "tone": "watch", "approve": approve, "item": c})
+    return {"items": out, "counts": {
+        "overdue": sum(1 for a in out if a["kind"] == "Overdue"),
+        "final_approval": sum(1 for c in items if c["status"] == "final_pending_approval"),
+        "feedback": sum(1 for c in items if c["status"] == "pending_feedback"),
+    }}
+
+
 def _today(today, checklist, band):
     # type: (str, Dict[str, Any], List[float]) -> Dict[str, Any]
     day = next((d for d in checklist["days"] if d["date"] == today), None)
@@ -295,6 +325,7 @@ def build():
         "ok": True,
         "today": _today(today, checklist, band),
         "checklist": checklist,
+        "needs_action": _needs_action(),
         "in_play": _in_play(band),
         "tests": _tests(today),
         "tracking": _tracking(today),

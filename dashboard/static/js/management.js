@@ -1,7 +1,7 @@
-// Management page: the media buyer's morning cockpit.
+// Management page: checklist, needs action, in play, then the scoreboard and logs.
 // One GET (/api/management/) renders every section; checklist toggles and new
 // lessons update the UI immediately, then reconcile with the server response.
-import { api, fmt, toast, esc, badge, cptTone, platformChip, confirmButton, $, $$ } from "/static/js/common.js";
+import { api, fmt, toast, esc, badge, cptTone, platformChip, confirmButton, withBusy, $, $$ } from "/static/js/common.js";
 
 const S = { data: null, selectedDay: null, tag: null, newLesson: null };
 const TONE_BADGE = { good: "good", watch: "watch", bad: "bad", idle: "idle" };
@@ -16,13 +16,13 @@ async function load({ quiet = false } = {}) {
     renderAll();
   } catch (e) {
     toast("Could not load management data: " + e.message, "error");
-    if (!quiet) $("#mg-today").innerHTML = `<div class="mg-loading muted">Could not load: ${esc(e.message)}</div>`;
+    if (!quiet) $("#mg-action-list").innerHTML = `<div class="action-empty">Could not load: ${esc(e.message)}</div>`;
   }
 }
 
 function renderAll() {
-  renderToday();
   renderChecklist();
+  renderNeedsAction();
   renderInPlay();
   renderTests();
   renderTracking();
@@ -30,41 +30,7 @@ function renderAll() {
   renderActivity();
 }
 
-// -------------------------------------------------------------- 1. today
-function renderToday() {
-  const t = S.data.today;
-  const pctDone = t.total ? Math.round((t.done / t.total) * 100) : 0;
-  const band = S.data.band;
-  $("#mg-today").innerHTML = `
-    <div>
-      <div class="lbl">Plan day</div>
-      <div class="big">${t.day ?? fmt.none}<small> / ${t.total_days}</small></div>
-      <div class="sub">${esc(fmt.date(t.date, { dow: true }))}</div>
-    </div>
-    <div>
-      <div class="lbl">Done today</div>
-      <div class="big" id="mg-today-done">${t.done}<small> / ${t.total}</small></div>
-      <div class="kpi-bar"><span style="width:${pctDone}%;background:var(--good)"></span></div>
-    </div>
-    <div>
-      <div class="lbl">Carried over</div>
-      <div class="big ${t.carry_over ? "tone-watch" : "tone-good"}">${t.carry_over}</div>
-      <div class="sub">${t.carry_over ? "open from earlier days" : "nothing left behind"}</div>
-    </div>
-    <div>
-      <div class="lbl">Account status</div>
-      <div class="mg-status-line">
-        7d CPT <strong class="num ${cptTone(t.cpt_7d, band)}">${fmt.cpt(t.cpt_7d)}</strong>
-        <span class="badge ${TONE_BADGE[t.cpt_tone]}">${esc(t.cpt_state)}</span>
-        <span class="muted">vs ${fmt.money(band[0])}&ndash;${fmt.money(band[1])}</span>
-        &middot; pace <strong class="num tone-${t.pace_tone}">${fmt.pct(t.pace_pct)}</strong>
-        <span class="muted">(${fmt.moneyShort(t.projected)} of ${fmt.moneyShort(t.monthly_budget)})</span>
-      </div>
-      <div class="sub">${fmt.int(t.trials_7d)} trials on ${fmt.money(t.spend_7d)} in the last 7 days</div>
-    </div>`;
-}
-
-// ---------------------------------------------------------- 2. checklist
+// ---------------------------------------------------------- 1. checklist
 function renderChecklist() {
   const c = S.data.checklist;
   const rail = $("#mg-rail");
@@ -84,13 +50,6 @@ function renderChecklist() {
   $("#mg-checklist-sub").textContent = `${doneAll} of ${totAll} items done across 30 days`;
   renderDay();
   renderCarry();
-}
-
-function scrollRailTo(day, smooth) {
-  const el = $(`#mg-rail [data-day="${day}"]`);
-  if (!el) return;
-  const rail = $("#mg-rail");
-  rail.scrollTo({ left: el.offsetLeft - rail.clientWidth / 2 + el.clientWidth / 2, behavior: smooth ? "smooth" : "auto" });
 }
 
 function itemHtml(it, meta, metaCls) {
@@ -148,21 +107,56 @@ async function toggleItem(input) {
   const id = input.dataset.item;
   const done = input.checked;
   const day = applyLocal(id, done);
-  renderToday(); renderChecklist();
+  renderChecklist();
   try {
     const res = await api(`/api/management/checklist/${encodeURIComponent(id)}/toggle`, { body: { done } });
     S.data.today = res.today;
     S.data.today.carry_over = S.data.checklist.carry_over.filter((x) => !x.done).length;
     S.data.activity = res.activity;
-    renderToday(); renderActivity();
+    renderActivity();
     toast(`${done ? "Done" : "Reopened"}: ${res.item.text} (day ${res.day})`, "success");
   } catch (e) {
     applyLocal(id, !done);
-    renderToday(); renderChecklist();
+    renderChecklist();
     toast("Could not update checklist: " + e.message, "error");
   }
   return day;
 }
+
+// ------------------------------------------------------------ 2. needs action
+// Content waiting on a person (moved here from Calendar). Approve uses the
+// existing Calendar move route; Open goes to the item on the Calendar.
+function renderNeedsAction() {
+  const N = S.data.needs_action;
+  const c = N.counts;
+  $("#mg-actions-sub").textContent = `${c.overdue} overdue · ${c.final_approval} final approval${c.final_approval === 1 ? "" : "s"} · ${c.feedback} feedback`;
+  if (!N.items.length) {
+    $("#mg-action-list").innerHTML = `<div class="action-empty">Nothing overdue or waiting for review.</div>`;
+    return;
+  }
+  $("#mg-action-list").innerHTML = `<ul class="action-list">${N.items.map(({ item, kind, tone, approve }) => `
+    <li class="action-item">
+      ${badge(tone, kind)}
+      <div class="action-copy">
+        <div class="action-title">${platformChip(item.platform)} ${esc(item.name)}</div>
+        <div class="action-meta">${esc(item.owner)} · due ${esc(fmt.date(item.due))} · ${esc(item.format)} / ${esc(item.segment)}${item.campaign_id ? ` · ${campLink(item.campaign_id, item.campaign_name)}` : ""}</div>
+      </div>
+      <div class="action-controls">
+        ${approve ? `<button class="btn btn-sm btn-primary" type="button" data-mg-approve="${esc(item.id)}" data-name="${esc(item.name)}">Approve</button>` : ""}
+        <a class="btn btn-sm" href="/calendar#${encodeURIComponent(item.id)}" aria-label="${esc(`Open ${item.name} on the calendar`)}">Open</a>
+      </div>
+    </li>`).join("")}</ul>`;
+}
+
+$("#mg-actions").addEventListener("click", async (ev) => {
+  const btn = ev.target.closest("[data-mg-approve]");
+  if (!btn || btn.disabled) return;
+  try {
+    await withBusy(btn, () => api(`/api/calendar/content/${encodeURIComponent(btn.dataset.mgApprove)}/move`, { body: { status: "approved" } }),
+      `Approved: ${btn.dataset.name}`);
+    await load({ quiet: true });
+  } catch (e) { /* withBusy toasted the error */ }
+});
 
 // ------------------------------------------------------------- 3. in play
 // "+10% / day": current daily budget x 1.10, rounded to cents.
@@ -182,8 +176,8 @@ function renderInPlay() {
   ip.groups.forEach((g) => {
     const t = g.totals;
     rows.push(`<tr class="mg-group-row"><td>${platformChip(g.platform)} ${esc(g.label)} <span class="muted">&middot; ${g.campaigns.length} active</span></td>
-      <td class="num">${fmt.money(t.daily_budget)}</td><td class="num">${fmt.money(t.spend_7d)}</td>
-      <td class="num ${cptTone(t.cpt_7d, band)}">${fmt.cpt(t.cpt_7d)}</td><td class="num">${fmt.int(t.trials_7d)}</td><td></td><td></td><td></td></tr>`);
+      <td class="num" data-l="Budget / day">${fmt.money(t.daily_budget)}</td><td class="num" data-l="Spend (7d)">${fmt.money(t.spend_7d)}</td>
+      <td class="num ${cptTone(t.cpt_7d, band)}" data-l="Cost / trial (7d)">${fmt.cpt(t.cpt_7d)}</td><td class="num" data-l="Trials (7d)">${fmt.int(t.trials_7d)}</td><td></td><td></td><td></td></tr>`);
     if (!g.campaigns.length) rows.push(`<tr><td colspan="8" class="muted">No active campaigns.</td></tr>`);
     g.campaigns.forEach((c) => {
       const tags = [c.legacy ? `<span class="tag" title="Legacy campaign running at reduced budget alongside the new build">legacy</span>` : "",
@@ -193,16 +187,15 @@ function renderInPlay() {
       const scaleTo = scaledBudget(c.daily_budget);
       rows.push(`<tr>
         <td class="mg-camp">${platformChip(c.platform)} ${campLink(c.id, c.name)}${tags} <span class="muted small">${esc(c.type || "")}</span></td>
-        <td class="num">${fmt.money(c.daily_budget)}</td>
-        <td class="num">${fmt.money(c.spend_7d)}</td>
-        <td class="num strong mg-cpt ${cptTone(c.cpt_7d, band)}" title="${esc(`${fmt.money(c.spend_7d)} over ${n} PostHog trial${n === 1 ? "" : "s"}`)}">${fmt.cpt(c.cpt_7d)}${thin}</td>
-        <td class="num">${fmt.int(c.trials_7d)}</td>
-        <td>${readPill(c.read, c.why)}</td>
+        <td class="num" data-l="Budget / day">${fmt.money(c.daily_budget)}</td>
+        <td class="num" data-l="Spend (7d)">${fmt.money(c.spend_7d)}</td>
+        <td data-l="Cost / trial (7d)" class="num strong mg-cpt ${cptTone(c.cpt_7d, band)}" title="${esc(`${fmt.money(c.spend_7d)} over ${n} PostHog trial${n === 1 ? "" : "s"}`)}">${fmt.cpt(c.cpt_7d)}${thin}</td>
+        <td class="num" data-l="Trials (7d)">${fmt.int(c.trials_7d)}</td>
+        <td data-l="Read">${readPill(c.read, c.why)}</td>
         <td class="mg-why">${esc(c.why)}</td>
         <td class="actions"><span class="mg-row-actions">
           ${c.read === "scaling" ? `<button class="btn btn-sm" type="button" data-mg-scale="${esc(c.id)}" aria-label="${esc(`+10% / day for ${c.name}`)}" title="${esc(`Raise daily budget from ${fmt.money(c.daily_budget)} to ${fmt.money(scaleTo)}`)}">+10% / day</button>` : ""}
           <button class="btn btn-sm btn-danger" type="button" data-mg-pause="${esc(c.id)}" data-name="${esc(c.name)}" data-confirm-label="Confirm pause?" aria-label="${esc(`Pause ${c.name}`)}">Pause</button>
-          <a class="btn btn-sm btn-ghost" href="/campaigns#${encodeURIComponent(c.id)}" aria-label="${esc(`Controls for ${c.name}`)}">Controls</a>
         </span></td></tr>`);
     });
   });
@@ -352,12 +345,10 @@ $("#mg-rail").addEventListener("click", (ev) => {
   if (!b) return;
   S.selectedDay = Number(b.dataset.day);
   renderChecklist();
-  scrollRailTo(S.selectedDay, true);
 });
 $("#mg-goto-today").addEventListener("click", () => {
   S.selectedDay = S.data.checklist.today_day || 1;
   renderChecklist();
-  scrollRailTo(S.selectedDay, true);
 });
 $("#mg-lessons-card").addEventListener("click", (ev) => {
   const c = ev.target.closest("[data-tag]");
@@ -403,9 +394,8 @@ $("#mg-rail").addEventListener("keydown", (ev) => {
   else i = Math.max(0, Math.min(days.length - 1, i + (ev.key === "ArrowRight" ? 1 : -1)));
   S.selectedDay = days[i].day;
   renderChecklist();
-  scrollRailTo(S.selectedDay, true);
   const sel = $(`#mg-rail [data-day="${S.selectedDay}"]`);
   if (sel) sel.focus({ preventScroll: true });
 });
 
-load().then(() => S.data && scrollRailTo(S.selectedDay, false));
+load();

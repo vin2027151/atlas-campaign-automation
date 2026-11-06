@@ -1,9 +1,12 @@
-"""Campaigns page API: the centralized control surface.
+"""Campaigns page API: every campaign's numbers and its controls, in one place.
 
-Lists every campaign on every platform with trailing metrics, drills into ad
-sets / ad groups / asset groups and their ads, and exposes the mutations a
-media buyer needs (status, budget, ad set and ad status, negative keywords).
-All mutations go through the store helpers, which persist and log activity.
+GET /api/campaigns/?window=3d|7d|14d|30d|mtd returns the campaign table (spend,
+budget, pacing, 3-day / 7-day cost per trial, ad sets and their ads), the
+pacing summary, and the search terms / negatives for review. The metrics come
+from api/spend.py (the shared metrics layer of the former Spend page).
+
+Mutations (campaign status and budget, ad set and ad status, negative
+keywords) go through the store helpers, which persist and log activity.
 
 Ad sets have no daily rows in the sample data, so ad set metrics are the
 campaign's window totals apportioned by ad set budget share (equal split when
@@ -13,10 +16,11 @@ the ad sets carry no budget of their own, as Google ad groups do).
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from pydantic import BaseModel
 
 import store
+from api import spend
 
 router = APIRouter(prefix="/api/campaigns", tags=["campaigns"])
 
@@ -40,25 +44,35 @@ class NegativeBody(BaseModel):
 
 # ------------------------------------------------------------------ helpers
 
-def _metrics(campaign_id):
-    # type: (str) -> Dict[str, Any]
-    w7 = store.window_totals(campaign_id, 7)
-    w3 = store.window_totals(campaign_id, 3)
-    return {
-        "spend_7d": w7["spend"], "trials_7d": w7["trials"], "cpt_7d": w7["cost_per_trial"],
-        "clicks_7d": w7["clicks"], "impressions_7d": w7["impressions"], "ctr_7d": w7["ctr"],
-        "spend_3d": w3["spend"], "trials_3d": w3["trials"], "cpt_3d": w3["cost_per_trial"],
-    }
+def _search_terms_all():
+    # type: () -> List[Dict[str, Any]]
+    return store.get_state()["search_terms"]
 
 
-def _campaign_row(c):
-    # type: (Dict[str, Any]) -> Dict[str, Any]
-    row = dict(c)
-    row.update(_metrics(c["id"]))
-    row["adset_count"] = len(store.adsets_for(c["id"]))
-    row["recommended_negatives"] = sum(
-        1 for st in store.get_state()["search_terms"]
-        if st["campaign_id"] == c["id"] and st.get("recommend_negative") and not st.get("negated"))
+def _pending_negatives(campaign_id):
+    # type: (str) -> int
+    return sum(1 for st in _search_terms_all()
+               if st["campaign_id"] == campaign_id and st.get("recommend_negative") and not st.get("negated"))
+
+
+def _campaign_row(c, win=None):
+    # type: (Dict[str, Any], Optional[Dict[str, Any]]) -> Dict[str, Any]
+    """One table row: the spend metrics for the window plus the control fields.
+
+    ``pace_pct`` is average spend per live day in the window as a share of the
+    current daily budget (how fully the campaign is spending its budget).
+    """
+    win = win or spend.window_bounds("7d")
+    row = spend.campaign_row(c, win)
+    adsets = row.pop("adsets")
+    ads_by_set = dict((a["id"], [dict(ad) for ad in store.ads_for(a["id"])]) for a in adsets)
+    for a in adsets:
+        a["ads"] = ads_by_set[a["id"]]
+    row["adsets"] = adsets
+    row["adset_count"] = len(adsets)
+    row["recommended_negatives"] = _pending_negatives(c["id"]) if c["platform"] == "google" else 0
+    row["supports_negatives"] = c["platform"] == "google"
+    row["pace_pct"] = store.safe_div(row["spend_per_day"], c["daily_budget"], 100.0, 0) if row["spend_per_day"] is not None else None
     return row
 
 
@@ -67,89 +81,88 @@ def _activity():
     return store.recent_activity(ACTIVITY_SHOWN)
 
 
-def _summary():
-    # type: () -> Dict[str, Any]
+def _summary(win=None):
+    # type: (Optional[Dict[str, Any]]) -> Dict[str, Any]
+    """Pacing summary: window spend and CPT, active daily budget vs target, month pace."""
+    win = win or spend.window_bounds("7d")
     cs = store.campaigns()
-    by_platform = {}
-    for pl in ("google", "meta"):
-        mine = [c for c in cs if c["platform"] == pl]
+    account = spend.totals(store.daily_for(None, None, win["start"], win["end"]))
+    blocks = {}
+    for pl in (None, "google", "meta"):
+        mine = [c for c in cs if pl is None or c["platform"] == pl]
+        if pl:
+            b = spend.platform_block(pl, win, account["spend"])
+        else:
+            b = {"platform": "account", "label": "Account", "spend": account["spend"], "share_pct": 100.0,
+                 "trials": account["trials"], "cost_per_trial": account["cost_per_trial"],
+                 "paid": account["paid"], "campaigns": len(cs)}
         active_daily = round(sum(float(c["daily_budget"] or 0) for c in mine if c["status"] == "ACTIVE"), 2)
-        budget = store.platform_budget(pl)
-        target = round(budget / 30.0, 2)
-        by_platform[pl] = {
+        pace = store.pacing(pl)
+        target = round(pace["monthly_budget"] / float(pace["days_in_month"]), 2)
+        b.update({
             "active_daily_budget": active_daily,
-            "monthly_budget": budget,
             "daily_target": target,
             "pct_of_target": store.safe_div(active_daily, target, 100.0, 1),
             "active": sum(1 for c in mine if c["status"] == "ACTIVE"),
             "paused": sum(1 for c in mine if c["status"] == "PAUSED"),
-        }
+            "month_pace_pct": pace["pace_pct"],
+            "projected_month_end": pace["projected_month_end"],
+            "month_to_date_spend": pace["month_to_date_spend"],
+            "monthly_budget": pace["monthly_budget"],
+        })
+        blocks[pl or "account"] = b
     changes = sum(1 for a in store.get_state().get("activity", []) if a.get("ts", "") >= SESSION_START)
     return {
-        "active": sum(1 for c in cs if c["status"] == "ACTIVE"),
-        "paused": sum(1 for c in cs if c["status"] == "PAUSED"),
+        "active": blocks["account"]["active"],
+        "paused": blocks["account"]["paused"],
         "legacy": sum(1 for c in cs if c.get("legacy")),
-        "platforms": by_platform,
+        "platforms": {"google": blocks["google"], "meta": blocks["meta"]},
+        "account": blocks["account"],
         "changes_this_session": changes,
         "session_start": SESSION_START,
     }
 
 
-def _adsets_detail(c, metrics):
-    # type: (Dict[str, Any], Dict[str, Any]) -> List[Dict[str, Any]]
-    adsets = store.adsets_for(c["id"])
-    budgets = [float(a["daily_budget"]) if a.get("daily_budget") else 0.0 for a in adsets]
-    total = sum(budgets)
-    out = []
-    for a, b in zip(adsets, budgets):
-        if total > 0:
-            share, basis = b / total, "budget share"
-        else:
-            share, basis = (1.0 / len(adsets)) if adsets else 0.0, "equal split"
-        spend = round(metrics["spend_7d"] * share, 2)
-        trials = round(metrics["trials_7d"] * share, 1)
-        row = dict(a)
-        row.update({
-            "share": round(share * 100.0, 1),
-            "apportion_basis": basis,
-            "spend_7d": spend,
-            "trials_7d": trials,
-            "cpt_7d": store.safe_div(spend, trials),
-            "ads": [dict(ad) for ad in store.ads_for(a["id"])],
-        })
-        out.append(row)
-    return out
-
-
-def _search_terms(campaign_id):
-    # type: (str) -> List[Dict[str, Any]]
+def _search_terms(campaign_id=None):
+    # type: (Optional[str]) -> List[Dict[str, Any]]
+    """Search terms (one campaign or all), recommended-and-pending first, then by cost."""
+    names = dict((c["id"], c["name"]) for c in store.campaigns())
     rows = []
-    for st in store.get_state()["search_terms"]:
-        if st["campaign_id"] != campaign_id:
+    for st in _search_terms_all():
+        if campaign_id and st["campaign_id"] != campaign_id:
             continue
         r = dict(st)
+        r["campaign_name"] = names.get(st["campaign_id"], st["campaign_id"])
         r["cpt"] = store.safe_div(st["cost"], st["trials"])
+        r["pending"] = bool(st.get("recommend_negative") and not st.get("negated"))
         rows.append(r)
-    rows.sort(key=lambda r: -float(r["cost"]))
+    rows.sort(key=lambda r: (0 if r["pending"] else 1, -float(r["cost"])))
     return rows
 
 
-def _negatives(campaign_id):
-    # type: (str) -> List[Dict[str, Any]]
-    rows = [dict(n) for n in store.get_state()["negatives"] if n["campaign_id"] == campaign_id]
+def _negatives(campaign_id=None):
+    # type: (Optional[str]) -> List[Dict[str, Any]]
+    names = dict((c["id"], c["name"]) for c in store.campaigns())
+    rows = []
+    for n in store.get_state()["negatives"]:
+        if campaign_id and n["campaign_id"] != campaign_id:
+            continue
+        r = dict(n)
+        r["campaign_name"] = names.get(n["campaign_id"], n["campaign_id"])
+        rows.append(r)
     rows.sort(key=lambda n: (n["added"], n["text"]), reverse=True)
     return rows
 
 
-def _detail(campaign_id):
-    # type: (str) -> Dict[str, Any]
+def _detail(campaign_id, win=None):
+    # type: (str, Optional[Dict[str, Any]]) -> Dict[str, Any]
     c = store.campaign(campaign_id)
-    row = _campaign_row(c)
+    row = _campaign_row(c, win)
     is_google = c["platform"] == "google"
     return {
         "ok": True,
         "campaign": row,
-        "adsets": _adsets_detail(c, row),
+        "adsets": row["adsets"],
         "search_terms": _search_terms(campaign_id) if is_google else [],
         "negatives": _negatives(campaign_id) if is_google else [],
         "supports_negatives": is_google,
@@ -167,14 +180,24 @@ def _mutation_response(**extra):
 # -------------------------------------------------------------------- reads
 
 @router.get("/")
-def index():
-    rows = [_campaign_row(c) for c in store.campaigns()]
+def index(window: str = Query("7d")):
+    """Everything the Campaigns page needs in one call (window: 3d|7d|14d|30d|mtd)."""
+    win = spend.window_bounds(window)
+    meta = store.get_state()["meta"]
+    rows = [_campaign_row(c, win) for c in spend.ordered_campaigns()]
     return {
         "ok": True,
         "today": store.today(),
-        "cpa_target": store.get_state()["meta"].get("cpa_target", [250, 280]),
+        "window": win,
+        "windows": list(spend.WINDOWS),
+        "cpa_target": meta.get("cpa_target", [250, 280]),
+        "ratio_band": list(spend.RATIO_BAND),
         "campaigns": rows,
-        "summary": _summary(),
+        "summary": _summary(win),
+        "search_terms": _search_terms(),
+        "negatives": _negatives(),
+        "match_types": list(store.NEGATIVE_MATCH_TYPES),
+        "notes": spend.NOTES,
         "activity": _activity(),
     }
 
@@ -185,9 +208,9 @@ def activity():
 
 
 @router.get("/{campaign_id}")
-def detail(campaign_id):
-    # type: (str) -> Dict[str, Any]
-    return _detail(campaign_id)
+def detail(campaign_id, window: str = Query("7d")):
+    # type: (str, str) -> Dict[str, Any]
+    return _detail(campaign_id, spend.window_bounds(window))
 
 
 # ---------------------------------------------------------------- mutations

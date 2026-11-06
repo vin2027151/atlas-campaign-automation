@@ -3,7 +3,8 @@
 # Budgets are MONTHLY dollars. Daily budgets are derived (monthly / days_in_month).
 
 account:
-  name: "AgentStack"            # B2B SaaS, trial signup
+  name: "Search Atlas"          # company and brand (B2B SaaS, trial signup)
+  offering: "AgentStack"        # the offering this plan sells: its own ads, landing page, 14-day trial
   month: "2026-11"
   days_in_month: 30
   landing_url: "https://www.agentstack.example/trial"
@@ -350,7 +351,7 @@ google_campaigns:
     # Dedupe against NonBrand (Vin): brand exclusion list on, search themes
     # limited to category terms NonBrand does not hold on Exact, and the
     # NonBrand negatives mirrored here at campaign level.
-    brand_exclusions: ["AgentStack"]
+    brand_exclusions: ["Search Atlas", "AgentStack"]
     search_themes: ["ai agent monitoring", "agent deployment platform"]
     asset_groups:
       - name: "PMax_US_Core"

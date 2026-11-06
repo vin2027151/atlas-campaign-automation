@@ -1,5 +1,5 @@
 // Reporting page: one GET /api/reporting/ call renders every section.
-import { api, fmt, toast, esc, $, token, platformChip, cptTone, tick, chartDefaults, badge } from "/static/js/common.js";
+import { api, fmt, toast, esc, $, token, platformChip, cptTone, tick, chartDefaults, badge, seriesColors } from "/static/js/common.js";
 
 const charts = [];
 let DATA = null;
@@ -173,6 +173,127 @@ function renderCharts(d) {
   }));
 }
 
+// ------------------------------------------------------ campaign charts
+// Daily spend by campaign and rolling 3-day cost per trial (moved here from the
+// old Spend page). Hiding a campaign in one legend hides it in both charts.
+const hiddenCampaigns = new Set();
+const campaignCharts = { daily: null, cpt: null };
+
+function hexToRgb(h) {
+  const s = h.replace("#", "").trim();
+  const v = s.length === 3 ? s.split("").map((c) => c + c).join("") : s;
+  const n = parseInt(v, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function mix(a, b, t) {
+  try {
+    const x = hexToRgb(a), y = hexToRgb(b);
+    const c = x.map((v, i) => Math.round(v * (1 - t) + y[i] * t));
+    return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+  } catch (e) { return a; }
+}
+/** One stable color per campaign: the series tokens plus tinted and shaded variants. */
+function campaignColors(ids) {
+  const base = seriesColors();
+  const surface = token("--surface") || "#ffffff";
+  const ink = token("--ink") || "#000000";
+  const palette = [...base, ...base.map((c) => mix(c, surface, 0.45)), ...base.map((c) => mix(c, ink, 0.3))];
+  const out = {};
+  ids.forEach((id, i) => { out[id] = palette[i % palette.length]; });
+  return out;
+}
+
+function legendToggle(e, item, legend) {
+  const id = legend.chart.data.datasets[item.datasetIndex].campaignId;
+  if (!id) {
+    legend.chart.setDatasetVisibility(item.datasetIndex, !legend.chart.isDatasetVisible(item.datasetIndex));
+    legend.chart.update();
+    return;
+  }
+  if (hiddenCampaigns.has(id)) hiddenCampaigns.delete(id); else hiddenCampaigns.add(id);
+  Object.values(campaignCharts).forEach((ch) => {
+    if (!ch) return;
+    ch.data.datasets.forEach((ds, i) => { if (ds.campaignId === id) ch.setDatasetVisibility(i, !hiddenCampaigns.has(id)); });
+    ch.update();
+  });
+}
+
+function renderCampaignCharts(d) {
+  const Chart = window.Chart;
+  const cc = d.campaign_charts;
+  if (!Chart || !cc) return;
+  const winTxt = cc.window.label.toLowerCase();
+  $("#rp-daily-sub").textContent = `${winTxt}, ${range(cc.window)} · platform-reported spend`;
+  $("#rp-cpt3-sub").textContent = `${winTxt}, ${range(cc.window)} · spend ÷ PostHog trials`;
+  const labels = cc.daily.dates.map((x) => fmt.date(x));
+  const colors = campaignColors(cc.daily.series.map((s) => s.campaign_id));
+  const name = (s) => s.name + (s.legacy ? " (legacy)" : "");
+
+  const daily = new Chart($("#rp-chart-daily"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: cc.daily.series.map((s) => ({
+        label: name(s), campaignId: s.campaign_id, data: s.spend, backgroundColor: colors[s.campaign_id],
+        borderWidth: 0, stack: "spend", hidden: hiddenCampaigns.has(s.campaign_id),
+      })),
+    },
+    options: {
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 12 } },
+        y: { stacked: true, beginAtZero: true, ticks: { callback: tick.money } },
+      },
+      plugins: {
+        legend: { onClick: legendToggle },
+        tooltip: {
+          filter: (item) => item.raw > 0,
+          itemSort: (a, b) => b.raw - a.raw,
+          callbacks: {
+            label: (c) => ` ${c.dataset.label}: ${fmt.money(c.raw)}`,
+            footer: (items) => (items.length ? `Total ${fmt.money(cc.daily.totals[items[0].dataIndex])}` : ""),
+          },
+        },
+      },
+    },
+  });
+
+  const r = cc.rolling_cpt;
+  const datasets = r.series.map((s) => ({
+    label: name(s), campaignId: s.campaign_id, data: s.cost_per_trial,
+    borderColor: colors[s.campaign_id], backgroundColor: colors[s.campaign_id],
+    borderDash: s.legacy ? [5, 3] : [], spanGaps: false, tension: 0, pointRadius: 0,
+    hidden: hiddenCampaigns.has(s.campaign_id),
+  }));
+  datasets.push({ label: "Account", data: r.account, borderColor: token("--ink"), backgroundColor: token("--ink"),
+    borderWidth: 3, spanGaps: false, tension: 0, pointRadius: 0 });
+  const vals = datasets.flatMap((x) => x.data).filter((v) => v !== null && v !== undefined);
+  // Clip extreme 3-day spikes (a trial-less stretch can make $2K+) so the band stays readable.
+  const yMax = Math.min(Math.max(cc.cpa_target[1] * 1.6, ...vals.map((v) => Math.ceil(v / 50) * 50)), 900);
+  const cpt = new Chart($("#rp-chart-cpt3"), {
+    type: "line",
+    plugins: [bandPlugin],
+    data: { labels, datasets },
+    options: {
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkipPadding: 12 } },
+        y: { beginAtZero: true, max: yMax, ticks: { callback: tick.money } },
+      },
+      plugins: {
+        targetBand: { range: cc.cpa_target, color: token("--good-soft"), labelColor: token("--good") },
+        legend: { onClick: legendToggle },
+        tooltip: {
+          filter: (item) => item.raw !== null && item.raw !== undefined,
+          itemSort: (a, b) => b.raw - a.raw,
+          callbacks: { label: (c) => ` ${c.dataset.label}: ${fmt.cpt(c.raw)}` },
+        },
+      },
+    },
+  });
+  campaignCharts.daily = daily;
+  campaignCharts.cpt = cpt;
+  charts.push(daily, cpt);
+}
+
 // -------------------------------------------------------------- accounts
 function renderAccounts(d) {
   const tgt = d.cpa_target;
@@ -251,6 +372,7 @@ async function load() {
   renderTrust(d);
   renderChanges(d);
   renderCharts(d);
+  renderCampaignCharts(d);
 }
 
 $("#rp-print").addEventListener("click", () => window.print());
