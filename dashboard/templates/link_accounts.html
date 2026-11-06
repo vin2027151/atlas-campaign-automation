@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+  /* ---- link accounts page (tokens only) ---- */
+  .la-banner { padding: var(--s3) var(--s4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); font-size: var(--fs-sm); color: var(--ink-2); }
+  .la-banner.warn { border-color: var(--watch-line); background: var(--watch-soft); color: var(--ink); }
+  .la-banner code { font-size: var(--fs-sm); word-break: break-all; }
+  .la-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4); }
+  .la-card .card-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); flex-wrap: wrap; }
+  .la-meta { margin: 0 0 var(--s3); color: var(--muted); font-size: var(--fs-sm); }
+  .la-meta b { color: var(--ink); }
+  .la-sect { margin: var(--s3) 0 var(--s2); font-size: var(--fs-sm); font-weight: 600; color: var(--ink); }
+  .la-req { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: var(--fs-sm); color: var(--ink-2); }
+  .la-req li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 6px; }
+  .la-req li::before { content: ""; width: 10px; height: 10px; margin-top: 3px; border: 1.5px solid var(--accent-line); border-radius: 3px; }
+  .la-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s2); }
+  .la-field label { display: flex; justify-content: space-between; gap: var(--s2); font-size: var(--fs-sm); color: var(--ink-2); margin-bottom: 3px; }
+  .la-field .set { color: var(--good); font-size: var(--fs-xs); }
+  .la-field .unset { color: var(--muted); font-size: var(--fs-xs); }
+  .la-field .input { width: 100%; }
+  .la-redirect { display: flex; gap: var(--s2); align-items: center; }
+  .la-redirect code { flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface-2); font-size: var(--fs-xs); overflow-wrap: anywhere; }
+  .la-actions { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s3); }
+  .la-result { margin-top: var(--s2); font-size: var(--fs-sm); color: var(--muted); overflow-wrap: anywhere; }
+  .la-result.bad { color: var(--bad); }
+  .la-result.good { color: var(--good); }
+  .la-docs { font-size: var(--fs-sm); }
+  @media (max-width: 900px) { .la-grid { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 640px) { .la-actions .btn { flex: 1 1 auto; min-height: 38px; } }
+</style>
+{% endblock %}
+{% block subtitle %}<p class="card-sub">Link ad accounts for read-only live data. Secrets are stored on the server outside the repo and are never shown again.</p>{% endblock %}
+{% block content %}
+<div class="la-banner" id="la-admin" hidden></div>
+<div class="la-banner" id="la-mode"></div>
+<div class="la-grid" id="la-grid" aria-live="polite"><p class="muted">Loading…</p></div>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="/s/{{ asset_v }}/js/link_accounts.js"></script>
+{% endblock %}

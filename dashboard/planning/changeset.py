@@ -397,8 +397,10 @@ def _norm_text(s):
 
 
 class _Sim(object):
-    def __init__(self, doc, snap):
+    def __init__(self, doc, snap, guardrails=True, total_rise=True):
         self.doc = doc or {}
+        self.use_guardrails = guardrails
+        self.use_total_rise = guardrails and total_rise
         self.before = snap
         self.after = copy.deepcopy(snap)
         self.idx = _index(self.after)
@@ -453,6 +455,8 @@ class _Sim(object):
         t["ops"].append(ref)
 
     def check_bid(self, ref, name, before, after):
+        if not self.use_guardrails:
+            return
         try:
             b, a = float(before), float(after)
         except (TypeError, ValueError):
@@ -506,13 +510,14 @@ class _Sim(object):
                 self.outputs.pop(ref, None)
                 self.failed.add(ref)
                 self.issue(ref, "error", str(exc))
-        self.guardrails()
+        if self.use_guardrails:
+            self.guardrails()
         snapshot_mod.recompute(self.after)
-        b = (self.before.get("totals") or {}).get("all", {}).get("daily_budget")
-        if b is None:
-            b = snapshot_mod.recompute(copy.deepcopy(self.before))["totals"]["all"]["daily_budget"]
+        # recount the before total with the same rule as the after total (a stored total
+        # in an older snapshot may predate the current counting rule)
+        b = snapshot_mod.recompute(copy.deepcopy(self.before))["totals"]["all"]["daily_budget"]
         a = self.after["totals"]["all"]["daily_budget"]
-        if b and a > b * (1 + TOTAL_WARN_RISE):
+        if self.use_total_rise and b and a > b * (1 + TOTAL_WARN_RISE):
             self.issue(None, "warn", "total daily budget rises %s -> %s (+%.0f%%, above +%d%%)" % (
                 _fmt_money(b), _fmt_money(a), (a / b - 1) * 100, TOTAL_WARN_RISE * 100))
         return self
@@ -596,7 +601,10 @@ class _Sim(object):
                     bidding = ent.setdefault("bidding", {})
                     if bidding.get("strategy") != want:
                         raise _OpError("%s uses %s; %s needs %s" % (ent["name"], bidding.get("strategy"), path, want))
-                    new = _micros_to_dollars(v, path)
+                    if want == "MAXIMIZE_CONVERSIONS" and not isinstance(v, bool) and str(v).strip() == "0":
+                        new = None  # 0 clears the optional target CPA (Google Ads semantics)
+                    else:
+                        new = _micros_to_dollars(v, path)
                     self.check_bid(ref, ent["name"], bidding.get("target_cpa"), new)
                     self.row(ref, "google", "campaign", ent["id"], ent["name"], "update", "bidding.target_cpa",
                              bidding.get("target_cpa"), new)
@@ -963,9 +971,14 @@ def _doc_or_issue(doc):
     return doc
 
 
-def validate(doc, snapshot):
-    # type: (Dict[str, Any], Dict[str, Any]) -> List[Dict[str, Any]]
-    """Every problem with a changeset against a snapshot: allowlist, unknown resources, refs, media, guardrails."""
+def validate(doc, snapshot, guardrails=True, total_rise=True):
+    # type: (Dict[str, Any], Dict[str, Any], bool, bool) -> List[Dict[str, Any]]
+    """Every problem with a changeset against a snapshot: allowlist, unknown resources, refs, media, guardrails.
+
+    ``guardrails=False`` skips every guardrail: the budget step / minimum / total-rise
+    checks and the bid-move warning (an undo that restores values the account held
+    moments ago, or direct controls with guardrails off); ``total_rise=False`` skips only the total
+    daily budget rise check (direct status flips: see planning.direct)."""
     if _doc_or_issue(doc) is None:
         return [{"op": None, "level": "error", "message": "no changeset to validate"}]
     issues = []  # type: List[Dict[str, Any]]
@@ -973,7 +986,7 @@ def validate(doc, snapshot):
     _d, errs = parse(doc)
     for e in errs:
         issues.append({"op": None, "level": "error", "message": e})
-    sim = _Sim(doc, snapshot).run()
+    sim = _Sim(doc, snapshot, guardrails=guardrails, total_rise=total_rise).run()
     for i in sim.issues:
         if i not in issues:
             issues.append(i)

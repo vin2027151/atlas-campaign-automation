@@ -41,7 +41,10 @@ PAGES = [
     ("chat", "/chat", "Quick Chat", "Quick chat",
      "Ask about the plan, the latest account state and Search Atlas offerings."),
 ]
-API_PAGES = ["spend", "campaigns", "reporting", "management", "planning", "media", "calendar", "chat"]
+# Pinned to the bottom of the sidebar, apart from the page list (templates/base.html).
+LINK_PAGE = ("link_accounts", "/link-accounts", "Link Accounts", "Link Accounts",
+             "Connect Google Ads, Meta, LinkedIn, TikTok and X; switch between sample and live data.")
+API_PAGES = ["spend", "campaigns", "reporting", "management", "planning", "media", "calendar", "chat", "accounts"]
 
 app = FastAPI(title="Atlas Ops", version="1.0", docs_url="/api/docs", redoc_url=None)
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
@@ -59,6 +62,28 @@ async def _no_edge_cache_for_code(request, call_next):
         response.headers["Cache-Control"] = "no-cache"
     return response
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+
+def _data_mode():
+    # type: () -> str
+    try:
+        import accounts
+        return accounts.get_data_mode()
+    except Exception:  # never let the secrets dir break page rendering
+        return "sample"
+
+
+def _live_available():
+    # type: () -> bool
+    try:
+        import accounts
+        return accounts.any_tested()
+    except Exception:
+        return False
+
+
+templates.env.globals["data_mode"] = _data_mode
+templates.env.globals["live_available"] = _live_available
 
 
 # ------------------------------------------------------------------ error map
@@ -114,8 +139,9 @@ def _nav():
 
 def _context(request, page, **extra):
     # type: (Request, str, Any) -> Dict[str, Any]
-    title = [p[3] for p in PAGES if p[0] == page][0]
+    title = [p[3] for p in PAGES + [LINK_PAGE] if p[0] == page][0]
     ctx = {"request": request, "page": page, "title": title, "nav": _nav(),
+           "link_nav": {"name": LINK_PAGE[0], "path": LINK_PAGE[1], "label": LINK_PAGE[2]},
            "today": store.today(), "meta": store.get_state()["meta"], "store": store, "asset_v": ASSET_V}
     ctx.update(extra)
     return ctx
@@ -156,6 +182,11 @@ def _page_route(name, path):
 for _n, _p, _l, _t, _d in PAGES:
     if _n != "home":
         _page_route(_n, _p)
+
+
+@app.get("/link-accounts", response_class=HTMLResponse, include_in_schema=False)
+def page_link_accounts(request: Request):
+    return _render(request, "link_accounts.html", "link_accounts")
 
 
 @app.get("/spend", include_in_schema=False)

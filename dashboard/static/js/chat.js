@@ -61,17 +61,25 @@ function empty() {
     <div class="qc-starters">${STARTERS.map(s => `<button type="button" class="btn btn-sm btn-ghost" data-starter="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`;
 }
 
-// The log grows with the conversation (no inner scroll region); keep the newest turn and the input in view.
+// The log is the page's only scroll area; keep it pinned to the newest message.
 function reveal() {
-  const last = log.lastElementChild;
-  if (last) last.scrollIntoView({ block: "nearest" });
-  form.scrollIntoView({ block: "nearest" });
+  log.scrollTop = log.scrollHeight;
+  pinned = true; lastTop = log.scrollTop;
 }
+// When the textarea or window resizes the log, stay at the bottom unless the reader scrolled up.
+let pinned = true, lastTop = 0;
+log.addEventListener("scroll", () => {
+  const gap = log.scrollHeight - log.scrollTop - log.clientHeight;
+  if (gap < 24) pinned = true; else if (log.scrollTop < lastTop) pinned = false;
+  lastTop = log.scrollTop;
+});
+if ("ResizeObserver" in window) new ResizeObserver(() => { if (pinned) reveal(); }).observe(log);
 
 function draw() {
   if (!history.length) { empty(); return; }
   log.innerHTML = "";
   history.forEach(m => log.appendChild(bubble(m)));
+  reveal();
 }
 
 function payload() {
@@ -137,5 +145,6 @@ window.addEventListener("storage", e => { if (e.key === KEY) { history = load();
   try {
     const info = await api("/api/chat/");
     $("#qc-config").hidden = !!info.llm_configured;
+    if (pinned) reveal();
   } catch (e) { /* the send path reports errors */ }
 })();

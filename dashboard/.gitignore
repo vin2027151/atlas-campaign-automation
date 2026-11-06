@@ -5,3 +5,9 @@ data/.state-*.json
 
 data/planning/
 static/media/library/uploads/
+
+# Link Accounts secrets live in ~/.config/atlas-dashboard (ATLAS_SECRETS_DIR); backstop only.
+credentials.json
+admin.json
+.atlas-secrets/
+*.secrets.json

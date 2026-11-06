@@ -28,3 +28,14 @@ meta:
   instagram_actor_id: "17840000000000000"
   required_permissions: [ads_management, ads_read, business_management, pages_read_engagement, pages_manage_ads, pages_show_list]
   media_access: "ad account /adimages and /advideos (upload), page for object_story_spec"
+# Campaigns-page direct controls (planning/direct.py): Vin's own clicks.
+# guardrails: off  -> every pause / enable / budget / bid change applies on the first click; only
+#                     data-validity errors (not a number, zero or negative, unknown id) and the
+#                     stale-value 409 conflict refuse a change. (Vin, 2026-11-06: "full control until I
+#                     give rules myself.")
+# guardrails: on   -> the same rules as Plan & Adapt changesets (values live in planning/changeset.py:
+#                     BUDGET_MIN, BUDGET_MAX_STEP, BUDGET_WARN_STEP, BID_WARN_STEP, TOTAL_WARN_RISE,
+#                     plus direct.MAX_VALUE), with a confirm for warnings.
+# Plan & Adapt (LLM changesets) always keeps its guardrails; this switch does not touch them.
+direct_controls:
+  guardrails: off

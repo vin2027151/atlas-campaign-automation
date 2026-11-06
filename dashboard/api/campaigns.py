@@ -53,6 +53,7 @@ class ActionBody(BaseModel):
     expected: Any = None
     actions: Any = None
     confirm: Any = False
+    undo_token: Any = None
 
 
 class NegativeBody(BaseModel):
@@ -81,9 +82,7 @@ AD_METRIC_KEYS = ("spend", "impressions", "clicks", "ctr", "trials", "paid", "co
 def _ads_with_metrics(row, adset):
     # type: (Dict[str, Any], Dict[str, Any]) -> List[Dict[str, Any]]
     """The ad set's ads, each with its own window metrics (its seeded share of the ad set)."""
-    w = float(adset.get("share_pct") or 0) / 100.0
-    raw = dict((k, float(row.get(k) or 0) * w) for k in store.AD_SPLIT_KEYS)
-    raw["spend"] = round(float(adset.get("spend") or 0), 2)  # the ad set's own (rounded) spend
+    raw = dict((k, adset.get(k) or 0) for k in store.AD_SPLIT_KEYS)  # the ad set's own (rounded) totals
     ads = [dict(ad) for ad in store.ads_for(adset["id"])]
     for ad, m in zip(ads, store.split_ad_metrics(raw, ads)):
         ad.pop("metrics_split", None)
@@ -121,7 +120,7 @@ def _campaign_row(c, win=None, ctl=None):
     row["adset_count"] = len(adsets)
     row["recommended_negatives"] = _pending_negatives(c["id"]) if c["platform"] == "google" else 0
     row["supports_negatives"] = c["platform"] == "google"
-    row["pace_pct"] = store.safe_div(row["spend_per_day"], c["daily_budget"], 100.0, 0) if row["spend_per_day"] is not None else None
+    row["pace_pct"] = store.safe_div(row["spend_per_day"], row["daily_budget"], 100.0, 0) if row["spend_per_day"] is not None else None
     return row
 
 
@@ -153,8 +152,9 @@ def _summary(win=None):
             b = {"platform": "account", "label": "Account", "spend": account["spend"], "share_pct": 100.0,
                  "trials": account["trials"], "cost_per_trial": account["cost_per_trial"],
                  "paid": account["paid"], "campaigns": len(cs)}
-        active_daily = round(sum(float(c["daily_budget"] or 0) for c in mine if c["status"] == "ACTIVE"), 2)
         pace = store.pacing(pl)
+        # one figure: the effective daily budgets pacing projects (store.effective_daily_budget)
+        active_daily = pace["active_daily_budget"]
         target = round(pace["monthly_budget"] / float(pace["days_in_month"]), 2)
         b.update({
             "active_daily_budget": active_daily,
@@ -292,13 +292,15 @@ def detail(campaign_id, window: str = Query("7d")):
 def actions(body: ActionBody):
     """Direct control: one action ({kind, id, action, value, expected}) or {actions: [...]}.
 
-    200 {ok, applied, requests, changes, undo, ...}; when guardrails warn and
-    ``confirm`` is not true: 200 {ok: false, needs_confirm: true, warnings, requests}
-    (nothing applied); when the value moved since the page loaded: 409 conflict.
+    200 {ok, summary, activity, result: {applied, requests, changes, undo: {actions, token}, ...}};
+    when guardrails warn and ``confirm`` is not true: 200 with result {applied: false,
+    needs_confirm: true, warnings, requests} (nothing applied, no undo); when the value
+    moved since the page loaded: 409 conflict. An undo posts ``{actions, undo_token}``
+    exactly as an applied result gave them (see planning.direct for what that skips).
     """
     acts = body.actions if body.actions is not None else [
         {"kind": body.kind, "id": body.id, "action": body.action, "value": body.value, "expected": body.expected}]
-    res = direct.apply(acts, confirm=body.confirm is True)
+    res = direct.apply(acts, confirm=body.confirm is True, undo_token=body.undo_token)
     if res.get("conflict"):
         return JSONResponse(dict(res, summary=_summary()), status_code=409)
     if res.get("error") and not res.get("needs_confirm") and not res.get("applied"):

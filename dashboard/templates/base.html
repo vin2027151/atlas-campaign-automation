@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="/s/{{ asset_v }}/css/app.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script type="module" src="/static/js/common.js"></script>
+  <script type="module" src="/s/{{ asset_v }}/js/datamode.js"></script>
   {% block head %}{% endblock %}
 </head>
 <body class="page-{{ page }}" data-page="{{ page }}" data-today="{{ today }}">
@@ -36,8 +37,16 @@
         <span class="brand-title-main">Advertising Command Center</span>
         <span class="brand-title-by">by Vincent J. Guarino III</span>
       </div>
-      <span class="pill pill-sample mobile-sample" title="Every number is generated sample data; no ad account is connected.">Sample data</span>
+      {% set dm = data_mode() %}{% set la = live_available() %}
+      {% macro mode_toggle(extra) %}
+      <div class="mode-toggle {{ extra }}" role="group" aria-label="Data source" data-mode="{{ dm }}" data-live-available="{{ '1' if la else '0' }}">
+        <button type="button" class="mode-opt{% if dm == 'sample' %} on{% endif %}" data-mode-set="sample" aria-pressed="{{ 'true' if dm == 'sample' else 'false' }}" title="Every number is generated sample data.">Sample data</button>
+        <button type="button" class="mode-opt{% if dm == 'live' %} on{% endif %}{% if not la %} locked{% endif %}" data-mode-set="live" aria-pressed="{{ 'true' if dm == 'live' else 'false' }}"{% if la %} title="Read-only data from linked ad accounts."{% else %} aria-disabled="true" aria-label="Live data, locked: add API keys in Link Accounts to enable live data"{% endif %}>{% if not la %}<span class="mode-lock" aria-hidden="true"></span>{% endif %}Live data</button>
+        <div class="mode-msg" role="status" hidden></div>
+      </div>
+      {% endmacro %}
       <div class="sidebar-tools">
+        {{ mode_toggle("nav-mode") }}
         <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch color theme" title="Switch color theme">◐</button>
         <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-expanded="false" aria-controls="sidebar-nav" aria-label="Open navigation">
           <span></span><span></span><span></span>
@@ -54,9 +63,15 @@
       {% endfor %}
     </nav>
 
+    <nav class="sidebar-pinned" aria-label="Settings">
+      <a href="{{ link_nav.path }}" class="nav-link nav-{{ link_nav.name }}{% if page == link_nav.name %} active{% endif %}"{% if page == link_nav.name %} aria-current="page"{% endif %}>
+        <span class="nav-icon" aria-hidden="true" data-icon="link"></span>
+        <span class="nav-label">{{ link_nav.label }}</span>
+      </a>
+    </nav>
+
     <div class="sidebar-foot">
-      <span class="pill pill-sample" title="Every number is generated sample data; no ad account is connected.">Sample data</span>
-      <span class="sidebar-date" title="Sample-data date">As of {{ today }}</span>
+      <span class="sidebar-date" title="{{ 'Sample-data date' if dm == 'sample' else 'Data date' }}">As of {{ today }}</span>
       <span class="sidebar-adapter">Adapter: {{ meta.adapter or "local" }}</span>
     </div>
   </aside>
@@ -77,9 +92,16 @@
 
     <footer class="footer">
       <div class="footer-inner">
+        {% if dm == "live" %}
+        <span class="pill pill-sample pill-live">Live data</span>
+        <span>Search Atlas paid media · Google Ads + Meta · as of {{ today }}</span>
+        <span class="muted">Live data selected (read-only). Pages still show sample numbers until the live adapters are wired in. Writes to ad accounts stay off unless ATLAS_ALLOW_LIVE=1.</span>
+        {% else %}
         <span class="pill pill-sample">Sample data</span>
         <span>Search Atlas paid media · Google Ads + Meta · as of {{ today }}</span>
         <span class="muted">Platform adapter: {{ meta.adapter or "local" }} sample state, not a live account</span>
+        {% endif %}
+        <span class="footer-credit">Built by: Vincent J. Guarino III</span>
       </div>
     </footer>
   </div>

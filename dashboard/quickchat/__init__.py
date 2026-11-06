@@ -6,6 +6,7 @@ the Studio: calls go through planning.llm (ATLAS_LLM_CMD -> owner-vault secret.s
 """
 
 import datetime
+import hashlib
 import json
 import os
 import threading
@@ -71,6 +72,11 @@ def _num(x):
     return "—" if x is None else "{:,}".format(x)
 
 
+def meta_campaign_daily(c):
+    from planning.snapshot import meta_campaign_daily as f
+    return f(c)
+
+
 def _campaign_table(snap):
     rows = ["| Platform | Campaign | Status | Daily budget | Spend 7d | Trials 7d | CPT 7d | Spend MTD | Trials MTD | CPT MTD | Bidding |",
             "|---|---|---|---|---|---|---|---|---|---|---|"]
@@ -81,9 +87,7 @@ def _campaign_table(snap):
                 daily = (c.get("budget") or {}).get("daily")
                 bid = (c.get("bidding") or {}).get("strategy")
             else:
-                daily = c.get("daily_budget")
-                if daily is None:
-                    daily = sum((a.get("daily_budget") or 0) for a in c.get("ad_sets", []) if a.get("status") == "ACTIVE") or None
+                daily = meta_campaign_daily(c)  # CBO budget, or its active ad sets' budgets (ABO)
                 bid = c.get("bid_strategy")
             name = c["name"] + (" (legacy)" if c.get("legacy") else "")
             rows.append("| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |" % (
@@ -169,13 +173,36 @@ def _activity():
     return "\n".join("- %s %s: %s %s" % (a.get("ts"), a.get("actor"), a.get("action"), a.get("target")) for a in acts)
 
 
+def _account_inputs():
+    # type: () -> Tuple[Any, ...]
+    """What the account state is built from: state.json and the sample overlay (bids,
+    targets and other platform fields that state.json does not hold). Their content
+    hashes key the cache, so any direct control change or publish rebuilds the context
+    (an mtime can repeat within a second; a hash cannot miss a change)."""
+    from planning.adapters import sample
+    out = []
+    for path in (store.STATE_PATH, sample.overlay_path()):
+        try:
+            with open(path, "rb") as fh:
+                out.append(hashlib.sha256(fh.read()).hexdigest())
+        except OSError:
+            out.append(None)
+    return tuple(out)
+
+
 def _snapshot():
+    """The account state as it is now (built from the live sample state, not saved), plus
+    the latest saved Analyze snapshot for reference. Quick Chat must never answer from a
+    snapshot older than the last change."""
     from planning import snapshot
-    snap = snapshot.latest()
-    label = None
-    if snap is None:
-        snap = snapshot.pull("quick chat")    # saved, so later messages reuse the same state document
-        label = "pulled for Quick Chat (no Analyze pull yet)"
+    snap = snapshot.build()
+    try:
+        saved = snapshot.latest()
+    except Exception:
+        saved = None
+    label = "current account state"
+    if saved:
+        label += "; latest Analyze snapshot %s (%s)" % (saved.get("id"), saved.get("taken_at"))
     return snap, label
 
 
@@ -183,16 +210,17 @@ def build_context(force=False):
     # type: (bool) -> Tuple[str, Dict[str, Any]]
     """The single context document (Markdown) and its metadata. Cached until an input changes."""
     from planning import snapshot as snapmod, plan_compare
-    snap, label = _snapshot()
     try:
         from planning import records
         analyses_m = _mtime(records.path(records.ANALYSES_FILE))
     except Exception:
         analyses_m = 0
-    key = (snap.get("id"), _mtime(PLAN_PATH), _mtime(store.STATE_PATH), _mtime(MEDIA_PATH), _mtime(WEBSITE_PATH), analyses_m)
+    key = (_account_inputs(), store.today(), _mtime(PLAN_PATH), _mtime(MEDIA_PATH), _mtime(WEBSITE_PATH),
+           analyses_m, store.STATE_PATH)
     with _lock:
         if not force and _cache["key"] == key:
             return _cache["doc"], _cache["meta"]
+    snap, label = _snapshot()
     plan_text = open(PLAN_PATH).read()
     try:
         facts = plan_compare.compare(plan_compare.load_plan(), snap)

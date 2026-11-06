@@ -7,17 +7,40 @@ guardrails (planning.changeset), rendered as the exact HTTP request(s)
 data/state.json through store; live: sent, behind the unchanged live gate), and logged.
 
     controls(snapshot=None) -> {entity_id: {"kind", "platform", "status", "budget", "bid"}}
-    apply(actions, confirm=False) -> result
+    apply(actions, confirm=False, undo_token=None) -> result
 
 action = {"kind": "campaign"|"adset"|"ad", "id": dashboard id,
           "action": "status"|"budget"|"bid", "value": "ACTIVE"|"PAUSED"|dollars,
           "expected": current value the user saw (optional; a mismatch is a conflict)}
 result = {"ok", "applied": bool, "needs_confirm", "conflict", "warnings", "requests": [rendered],
-          "responses", "changes": [{entity, field, before, after}], "undo": {"actions": [...]}, "mode"}
+          "responses", "changes": [{entity, field, before, after}], "undo": {"actions": [...], "token"},
+          "pacing": {"before", "after"} (effective daily budgets, account), "mode"}
+
+Guardrails are switched by ``direct_controls.guardrails`` in config/platforms.yaml
+(:func:`guardrails_on`). Off (Vin, 2026-11-06, until he sets rules himself): every
+change applies on the first click; only data-validity errors (not a number, zero or
+negative, unknown id, wrong kind) and the stale-``expected`` 409 conflict refuse one.
+Nothing ever needs a confirm. Plan & Adapt changesets keep their guardrails regardless.
+
+When on, guardrails (planning.changeset) and when they ask for a confirm:
+- A budget or bid edit runs every guardrail; a warning needs ``confirm``.
+- A status-only batch (pause / enable) skips the "total daily budget rises >10%"
+  check. Enabling something spends the budget it already has, which nobody is
+  changing; pausing never asked for a confirm, so asking on the way back made a
+  re-enable silently not happen. The pacing move is still reported in ``pacing``.
+- An undo (``undo_token`` from an applied result, with exactly its actions) restores
+  values the account held moments ago, so it skips the budget guardrails too (an
+  undo of a -40% cut is +67%, which the per-change limit would refuse). The stale
+  check still applies: if the value moved since, the undo is a 409 conflict.
+  ``undo`` is only offered for a change that was applied.
 
 Never imports planning.llm, planning.llm_worker, planning.prompts or anthropic.
 """
 
+import json
+import threading
+import uuid
+from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Tuple
 
 import planning
@@ -28,6 +51,10 @@ from planning.adapters.base import outputs_from_response
 KINDS = ("campaign", "adset", "ad")
 ACTIONS = ("status", "budget", "bid")
 MAX_ACTIONS = 40
+MAX_VALUE = 1000000  # "implausibly large" dollars: a guardrail, applied only when guardrails are on
+UNDO_KEEP = 500
+_undo_lock = threading.Lock()
+_undo_tokens = OrderedDict()  # type: OrderedDict
 META_BID_STRATEGIES = {"COST_CAP": "Cost cap", "LOWEST_COST_WITH_BID_CAP": "Bid cap"}
 
 
@@ -167,11 +194,19 @@ def _number(value, what):
         v = round(float(str(value).replace(",", "").replace("$", "")), 2)
     except (TypeError, ValueError):
         raise store.BadInput("%s must be a number" % what)
-    if v != v or v <= 0:  # NaN or not positive
+    if v != v or v in (float("inf"), float("-inf")) or v <= 0:  # NaN, infinite or not positive
         raise store.BadInput("%s must be greater than 0" % what)
-    if v > 1000000:
-        raise store.BadInput("%s is implausibly large" % what)
     return v
+
+
+def guardrails_on(cfg=None):
+    # type: (Optional[Dict[str, Any]]) -> bool
+    """config/platforms.yaml ``direct_controls.guardrails`` (YAML off/false/no -> False). Default on."""
+    cfg = cfg if cfg is not None else adapters.load_config()
+    v = (cfg.get("direct_controls") or {}).get("guardrails", True)
+    if isinstance(v, str):
+        return v.strip().lower() not in ("off", "false", "no", "0")
+    return bool(v)
 
 
 def _change(kind, eid, name, field, before, after, undo_value=None, undo_kind=None, undo_id=None, undo_action=None):
@@ -253,16 +288,21 @@ def _ops_for(snap, act):
         return ops, changes
 
     # bid
+    if platform == "google" and etype == "campaign":
+        ctl = _google_campaign_bid(ent)
+        if not ctl.get("editable"):
+            raise store.BadInput("%s uses %s; there is no bid target to edit" % (name, ctl.get("label")))
+        top = ctl["field"].split(".")[0]
+        if act.get("value") is None and top == "maximize_conversions":
+            new, micros = None, 0  # clear the optional target (how an undo restores "no target")
+        else:
+            new = _number(act.get("value"), "bid")
+            micros = _micros(new)
+        ops = [_g_update("CampaignService", ent["resource_name"], {top: {"target_cpa_micros": micros}},
+                         [ctl["field"]], reason)]
+        return ops, [_change(kind, eid, name, "bid", _money((ent.get("bidding") or {}).get("target_cpa")), new)]
     new = _number(act.get("value"), "bid")
     if platform == "google":
-        if etype == "campaign":
-            ctl = _google_campaign_bid(ent)
-            if not ctl.get("editable"):
-                raise store.BadInput("%s uses %s; there is no bid target to edit" % (name, ctl.get("label")))
-            top = ctl["field"].split(".")[0]
-            ops = [_g_update("CampaignService", ent["resource_name"], {top: {"target_cpa_micros": _micros(new)}},
-                             [ctl["field"]], reason)]
-            return ops, [_change(kind, eid, name, "bid", _money((ent.get("bidding") or {}).get("target_cpa")), new)]
         if etype != "ad_group":
             raise store.BadInput("asset groups have no bid of their own")
         ops = [_g_update("AdGroupService", ent["resource_name"], {"cpc_bid_micros": _micros(new)},
@@ -283,9 +323,9 @@ def _ops_for(snap, act):
     return ops, changes
 
 
-def _current(snap, change):
-    # type: (Dict[str, Any], Dict[str, Any]) -> Any
-    ctl = controls(snap).get(change["id"]) or {}
+def _current(snap, change, ctl_all=None):
+    # type: (Dict[str, Any], Dict[str, Any], Optional[Dict[str, Any]]) -> Any
+    ctl = (ctl_all if ctl_all is not None else controls(snap)).get(change["id"]) or {}
     if change["field"] == "status":
         return ctl.get("status")
     return (ctl.get(change["field"]) or {}).get("value")
@@ -299,8 +339,40 @@ def _same(a, b):
 
 # -------------------------------------------------------------------- apply
 
-def apply(actions, confirm=False):
-    # type: (Any, bool) -> Dict[str, Any]
+def _undo_key(actions):
+    # type: (List[Dict[str, Any]]) -> str
+    norm = [{"kind": a.get("kind"), "id": str(a.get("id") or ""), "action": a.get("action"),
+             "value": a.get("value"), "expected": a.get("expected")} for a in actions]
+    return json.dumps(norm, sort_keys=True)
+
+
+def _issue_undo(actions):
+    # type: (List[Dict[str, Any]]) -> Optional[str]
+    if not actions:
+        return None
+    token = uuid.uuid4().hex
+    with _undo_lock:
+        _undo_tokens[token] = _undo_key(actions)
+        while len(_undo_tokens) > UNDO_KEEP:
+            _undo_tokens.popitem(last=False)
+    return token
+
+
+def _is_undo(token, actions):
+    # type: (Any, List[Dict[str, Any]]) -> bool
+    if not token or not isinstance(token, str):
+        return False
+    with _undo_lock:
+        return _undo_tokens.get(token) == _undo_key(actions)
+
+
+def _spend_undo(token):
+    with _undo_lock:
+        _undo_tokens.pop(token, None)
+
+
+def apply(actions, confirm=False, undo_token=None):
+    # type: (Any, bool, Optional[str]) -> Dict[str, Any]
     """Validate, render and run one or more direct actions as one batch (see module doc)."""
     if isinstance(actions, dict):
         actions = [actions]
@@ -308,22 +380,32 @@ def apply(actions, confirm=False):
         raise store.BadInput("give at least one action")
     if len(actions) > MAX_ACTIONS:
         raise store.BadInput("too many actions in one request (%d > %d)" % (len(actions), MAX_ACTIONS))
-    with planning.ACCOUNT_LOCK:
-        return _apply(actions, bool(confirm))
-
-
-def _apply(actions, confirm):
-    cfg = adapters.load_config()
-    snap = snapshot.build()
-    ops, changes, conflicts = [], [], []
     for act in actions:
         if not isinstance(act, dict):
             raise store.BadInput("each action must be an object")
+    with planning.ACCOUNT_LOCK:
+        undo = _is_undo(undo_token, actions)
+        res = _apply(actions, bool(confirm), undo)
+        if undo and res.get("applied"):
+            _spend_undo(undo_token)
+        res["is_undo"] = undo
+        return res
+
+
+def _apply(actions, confirm, is_undo=False):
+    cfg = adapters.load_config()
+    snap = snapshot.build()
+    ctl_now = controls(snap)
+    ops, changes, conflicts = [], [], []
+    for act in actions:
         o, ch = _ops_for(snap, act)
-        if "expected" in act and act["expected"] is not None and len(ch) == 1:
-            if not _same(act["expected"], ch[0]["before"]):
-                conflicts.append({"id": ch[0]["id"], "name": ch[0]["name"], "field": ch[0]["field"],
-                                  "expected": act["expected"], "actual": ch[0]["before"]})
+        if "expected" in act and act["expected"] is not None:
+            # the value the user saw: the control's current value for this action (for a Meta
+            # ABO campaign budget that is the sum of its active ad sets, not any single change)
+            seen = _current(snap, {"id": str(act.get("id") or ""), "field": act.get("action")}, ctl_now)
+            if not _same(act["expected"], seen):
+                conflicts.append({"id": str(act.get("id")), "name": ch[0]["name"] if ch else act.get("id"),
+                                  "field": act.get("action"), "expected": act["expected"], "actual": seen})
         ops.extend(o)
         changes.extend(ch)
     for i, op in enumerate(ops):
@@ -332,9 +414,12 @@ def _apply(actions, confirm):
     doc = {"changeset": {"title": title or "direct change", "based_on_snapshot": snap["id"],
                          "rationale": ["Campaigns page direct control"]}, "operations": ops}
     requests = api_requests.render_all(doc, snap, cfg)
+    pace_before = store.active_daily_budget()
     base = {"ok": False, "applied": False, "mode": cfg["mode"], "requests": requests, "changes": changes,
             "warnings": [], "needs_confirm": False, "conflict": False, "responses": [],
-            "undo": {"actions": [c["undo"] for c in changes if not _same(c["before"], c["after"])]}}
+            "undo": {"actions": [], "token": None},  # filled in only once the change is applied
+            "pacing": {"before": pace_before, "after": pace_before}}
+    undo_actions = [c["undo"] for c in changes if not _same(c["before"], c["after"])]
     if conflicts:
         base.update(conflict=True, conflicts=conflicts, error="%s changed since you loaded the page (now %s)" % (
             conflicts[0]["name"], conflicts[0]["actual"]))
@@ -343,14 +428,21 @@ def _apply(actions, confirm):
     if len(noop) == len(changes):
         base.update(ok=True, error=None, message="nothing to change")
         return base
-    issues = changeset.validate(doc, snap)
+    status_only = all(c["field"] == "status" for c in changes)
+    guarded = guardrails_on(cfg) and not is_undo
+    base["guardrails"] = guarded
+    if guarded:
+        for c in changes:
+            if c["field"] in ("budget", "bid") and c["after"] is not None and c["after"] > MAX_VALUE:
+                raise store.BadInput("%s %s is implausibly large" % (c["name"], c["field"]))
+    issues = changeset.validate(doc, snap, guardrails=guarded, total_rise=not status_only)
     errors = [i for i in issues if i["level"] == "error"]
     if errors:
         raise store.BadInput("; ".join(i["message"] for i in errors))
     warnings = [i["message"] for i in issues if i["level"] == "warn" and "based on" not in i["message"]
                 and "shared budget" not in i["message"]]
     base["warnings"] = warnings
-    if warnings and not confirm:
+    if warnings and not confirm and guarded:
         base.update(needs_confirm=True, error="confirm this change: " + "; ".join(warnings))
         return base
     for r in requests:
@@ -367,6 +459,8 @@ def _apply(actions, confirm):
             resp = adapter.execute_request(req, ctx)
         except adapters.LiveRefused as exc:
             base.update(error=str(exc), responses=base["responses"], sent=sent)
+            if sent:  # part of the batch went out: offer the undo for what did
+                base["undo"] = {"actions": undo_actions, "token": _issue_undo(undo_actions)}
             return base
         except Exception as exc:
             store.log_activity("api request failed", changes[0]["id"], "%s: %s" % (api_requests.log_line(real), exc))
@@ -377,8 +471,11 @@ def _apply(actions, confirm):
         base["responses"].append(resp)
         store.log_activity("api request", _target(op, changes), api_requests.log_line(real), actor="vin")
     after = snapshot.build()
+    ctl_after = controls(after)
     for c in changes:
-        c["now"] = _current(after, c)
+        c["now"] = _current(after, c, ctl_after)
+    base["undo"] = {"actions": undo_actions, "token": _issue_undo(undo_actions)}
+    base["pacing"]["after"] = store.active_daily_budget()
     base.update(ok=True, applied=True, error=None,
                 verified=all(_same(c["now"], c["after"]) for c in changes))
     return base

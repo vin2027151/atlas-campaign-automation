@@ -64,6 +64,25 @@ def _days(plan, snapshot):
     return calendar.monthrange(d.year, d.month)[1]
 
 
+def pacing(plan, snapshot):
+    # type: (Dict[str, Any], Dict[str, Any]) -> Dict[str, Any]
+    """The projection the pacing facts use, per platform and for the account: MTD spend +
+    days remaining x the effective daily budgets in the snapshot's totals (same rule and
+    same cents arithmetic as store.pacing)."""
+    totals = snapshot.get("totals") or {}
+    dim = _days(plan, snapshot)
+    as_of = snapshot.get("as_of") or store.today()
+    remaining = max(0, dim - int(as_of[8:10]))
+    out = {"days_remaining": remaining, "days_in_month": dim}  # type: Dict[str, Any]
+    for key in ("google", "meta", "all"):
+        t = totals.get(key) or {}
+        mtd, daily = t.get("spend_mtd"), t.get("daily_budget") or 0
+        out[key] = {"month_to_date_spend": mtd, "active_daily_budget": daily,
+                    "projected_month_end": None if mtd is None else
+                    (store.cents(mtd) + store.cents(daily) * remaining) / 100.0}
+    return out
+
+
 def compare(plan, snapshot):
     # type: (Dict[str, Any], Dict[str, Any]) -> List[Dict[str, Any]]
     facts = []  # type: List[Dict[str, Any]]
@@ -185,26 +204,25 @@ def compare(plan, snapshot):
                                    "Day %s: %s [%s]" % (day["day"], it["text"], it["id"])))
 
     # pacing: MTD spend + days remaining x current daily budgets of what is enabled (reacts at once)
-    totals = snapshot.get("totals") or {}
+    pace = pacing(plan, snapshot)
     plats = plan.get("platforms") or {}
-    remaining = max(0, dim - elapsed)
+    remaining = pace["days_remaining"]
     for platform in ("google", "meta"):
         target = (plats.get(platform) or {}).get("declared_total")
-        mtd = (totals.get(platform) or {}).get("spend_mtd")
+        mtd = pace[platform]["month_to_date_spend"]
         if not target or mtd is None or not elapsed:
             continue
-        daily_sum = (totals.get(platform) or {}).get("daily_budget") or 0
-        proj = round(float(mtd) + float(daily_sum) * remaining, 2)
+        daily_sum = pace[platform]["active_daily_budget"]
+        proj = pace[platform]["projected_month_end"]
         if abs(proj / float(target) - 1) > PACING_TOLERANCE:
             facts.append(_fact("pacing", platform, None, float(target), proj,
                                "projected month-end at current daily budgets: MTD %s + %d days x %s/day = %s vs plan %s (%+.0f%%)" % (
                                    _money(mtd), remaining, _money(daily_sum), _money(proj), _money(target),
                                    (proj / float(target) - 1) * 100)))
     total = acct.get("total_budget")
-    mtd_all = (totals.get("all") or {}).get("spend_mtd")
+    mtd_all = pace["all"]["month_to_date_spend"]
     if total and mtd_all is not None and elapsed:
-        daily_all = (totals.get("all") or {}).get("daily_budget") or 0
-        proj = round(float(mtd_all) + float(daily_all) * remaining, 2)
+        proj = pace["all"]["projected_month_end"]
         if abs(proj / float(total) - 1) > PACING_TOLERANCE:
             facts.append(_fact("pacing", "both", None, float(total), proj,
                                "account projects %s at current daily budgets vs %s plan (%+.0f%%), reserve %s" % (

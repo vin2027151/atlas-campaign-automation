@@ -124,7 +124,8 @@ def _in_play(band):
             "id": c["id"], "name": c["name"], "platform": c["platform"], "type": c.get("type"),
             "country": c.get("country"), "segment": c.get("segment"), "legacy": bool(c.get("legacy")),
             "start_date": c.get("start_date"), "status": c["status"],
-            "daily_budget": c["daily_budget"], "spend_7d": w7["spend"], "trials_7d": w7["trials"],
+            "daily_budget": store.campaign_daily_budget(c),
+            "effective_daily_budget": store.effective_daily_budget(c), "spend_7d": w7["spend"], "trials_7d": w7["trials"],
             "cpt_7d": w7["cost_per_trial"], "clicks_7d": w7["clicks"], "click_to_trial_7d": w7["click_to_trial"],
         }
         if c["status"] != "ACTIVE":
@@ -140,7 +141,8 @@ def _in_play(band):
         rows.sort(key=lambda r: -r["spend_7d"])
         tot = store.window_totals(None, 7, platform=pl)
         out.append({"platform": pl, "label": PLATFORM_LABELS[pl], "campaigns": rows,
-                    "totals": {"daily_budget": round(sum(r["daily_budget"] for r in rows), 2),
+                    # what pacing projects for this platform (store.active_daily_budget)
+                    "totals": {"daily_budget": store.money_sum(r["effective_daily_budget"] for r in rows),
                                "spend_7d": tot["spend"], "trials_7d": tot["trials"], "cpt_7d": tot["cost_per_trial"]}})
     return {"groups": out, "paused": paused, "counts": counts, "rule": read_rule(band)}
 

@@ -88,6 +88,17 @@ def index():
                        "max_calls_per_day": jobs.MAX_CALLS_PER_DAY}}
 
 
+@router.get("/facts")
+def facts():
+    """Plan-vs-state facts against the account as it is now (not the last saved snapshot),
+    with the totals and pacing projection they use. No LLM, nothing saved."""
+    snap = _mod("snapshot").build()
+    pc = _mod("plan_compare")
+    plan = pc.load_plan()
+    return {"ok": True, "state_id": snap["id"], "as_of": snap.get("as_of"), "totals": snap.get("totals"),
+            "pacing": pc.pacing(plan, snap), "facts": pc.compare(plan, snap)}
+
+
 # ------------------------------------------------------------------ analyze
 
 @router.post("/analyze")

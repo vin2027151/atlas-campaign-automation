@@ -139,7 +139,9 @@ class DirectControls(unittest.TestCase):
                             in ("MARKETING_IMAGE", "YOUTUBE_VIDEO"))
 
     def test_budget_and_bid_with_guardrails(self):
-        with sandbox():
+        # guardrails are off in config/platforms.yaml (Vin's call); this checks the layer still works when on
+        from unittest import mock
+        with sandbox(), mock.patch.object(direct, "guardrails_on", lambda cfg=None: True):
             # +10% Google budget: no confirm needed, micros in the request
             res = direct.apply({"kind": "campaign", "id": "g_search_brand_us", "action": "budget", "value": 220})
             self.assertTrue(res["applied"], res)

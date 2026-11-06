@@ -6,6 +6,14 @@
 > and publish refuses unless re-rendering against fresh state gives byte-identical requests. Direct Campaigns-page
 > controls (pause/enable, budget, bid) use the same renderer and guardrails via `planning/direct.py` and
 > `POST /api/campaigns/actions`. Where this spec still says "YAML" for changesets, read JSON.
+>
+> **Direct controls, 2026-11-06:** guardrails for Vin's own clicks are switched by `direct_controls.guardrails`
+> in `config/platforms.yaml` (now `off`: every change applies on the first click; only invalid values, unknown
+> ids and the stale-value 409 refuse). Plan & Adapt changesets keep their guardrails. Undo posts the
+> `undo_token` from the applied result and restores without guardrails. Pacing counts *effective* daily
+> budgets (`store.effective_daily_budget`): 0 unless the campaign is ACTIVE and an ad set delivers (ACTIVE
+> with an ACTIVE ad); Meta ad-set budgets (ABO) are the source of truth, summed in whole cents. Quick Chat
+> and `GET /api/planning/facts` read the live state, not the last saved snapshot.
 
 Read SPEC.md and AGENT-CONTRACT.md first: same stack, same Python 3.9 rules, same UI
 conventions, same visual style (read static/css/app.css and templates/campaigns.html +

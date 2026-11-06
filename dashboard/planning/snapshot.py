@@ -161,8 +161,43 @@ def meta_campaign_daily(c):
     # type: (Dict[str, Any]) -> float
     """A Meta campaign's effective daily budget: CBO budget, else its active ad sets' budgets."""
     if c.get("daily_budget") is not None:
-        return float(c["daily_budget"])
-    return round(sum(float(s.get("daily_budget") or 0) for s in c.get("ad_sets", []) if s.get("status") == "ACTIVE"), 2)
+        return store.money_sum([c["daily_budget"]])
+    return store.money_sum(s.get("daily_budget") for s in c.get("ad_sets", []) if s.get("status") == "ACTIVE")
+
+
+def _group_delivers(grp, on):
+    # type: (Dict[str, Any], str) -> bool
+    """Same rule as store.adset_delivers: enabled and, if it has ads / assets, one of them enabled."""
+    if grp.get("status") != on:
+        return False
+    ads = grp.get("ads") if "ads" in grp else grp.get("assets")
+    return not ads or any(a.get("status") == on for a in ads)
+
+
+def google_campaign_effective_daily(c):
+    # type: (Dict[str, Any]) -> float
+    """store.effective_daily_budget in state-document shape (Google)."""
+    if c.get("status") != "ENABLED":
+        return 0.0
+    groups = list(c.get("ad_groups") or []) + list(c.get("asset_groups") or [])
+    if groups and not any(_group_delivers(g, "ENABLED") for g in groups):
+        return 0.0
+    return store.money_sum([(c.get("budget") or {}).get("daily")])
+
+
+def meta_campaign_effective_daily(c):
+    # type: (Dict[str, Any]) -> float
+    """store.effective_daily_budget in state-document shape (Meta): CBO budget, or the
+    delivering ad sets' budgets (ABO); 0 when paused or when no ad set delivers."""
+    if c.get("status") != "ACTIVE":
+        return 0.0
+    sets = c.get("ad_sets") or []
+    live = [s for s in sets if _group_delivers(s, "ACTIVE")]
+    if sets and not live:
+        return 0.0
+    if c.get("daily_budget") is not None:
+        return store.money_sum([c["daily_budget"]])
+    return store.money_sum(s.get("daily_budget") for s in live)
 
 
 def recompute(doc):
@@ -171,19 +206,21 @@ def recompute(doc):
     g = doc.get("google") or {"campaigns": []}
     m = doc.get("meta") or {"campaigns": []}
     seen = set()
-    g_daily = 0.0
+    g_parts = []
     for c in g["campaigns"]:
         b = c.get("budget") or {}
-        if c.get("status") == "ENABLED" and b.get("resource_name") not in seen:
+        eff = google_campaign_effective_daily(c)
+        if eff and b.get("resource_name") not in seen:  # a shared budget counts once
             seen.add(b.get("resource_name"))
-            g_daily += float(b.get("daily") or 0)
-    m_daily = sum(meta_campaign_daily(c) for c in m["campaigns"] if c.get("status") == "ACTIVE")
-    g_mtd = sum(float((c.get("metrics") or {}).get("spend_mtd") or 0) for c in g["campaigns"])
-    m_mtd = sum(float((c.get("metrics") or {}).get("spend_mtd") or 0) for c in m["campaigns"])
+            g_parts.append(eff)
+    g_daily = store.money_sum(g_parts)
+    m_daily = store.money_sum(meta_campaign_effective_daily(c) for c in m["campaigns"])
+    g_mtd = store.money_sum((c.get("metrics") or {}).get("spend_mtd") for c in g["campaigns"])
+    m_mtd = store.money_sum((c.get("metrics") or {}).get("spend_mtd") for c in m["campaigns"])
     doc["totals"] = {
-        "google": {"daily_budget": round(g_daily, 2), "spend_mtd": round(g_mtd, 2)},
-        "meta": {"daily_budget": round(m_daily, 2), "spend_mtd": round(m_mtd, 2)},
-        "all": {"daily_budget": round(g_daily + m_daily, 2), "spend_mtd": round(g_mtd + m_mtd, 2)},
+        "google": {"daily_budget": g_daily, "spend_mtd": g_mtd},
+        "meta": {"daily_budget": m_daily, "spend_mtd": m_mtd},
+        "all": {"daily_budget": store.money_sum([g_daily, m_daily]), "spend_mtd": store.money_sum([g_mtd, m_mtd])},
     }
     ad_groups = sum(len(c.get("ad_groups") or []) + len(c.get("asset_groups") or []) for c in g["campaigns"])
     ad_sets = sum(len(c.get("ad_sets") or []) for c in m["campaigns"])

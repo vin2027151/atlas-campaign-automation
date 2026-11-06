@@ -474,7 +474,8 @@ class SampleAdapter(Adapter):
                 micros = (fields.get(key) or {}).get("target_cpa_micros")
                 if micros is not None:
                     def _bid(o, cid=cid, micros=micros):
-                        o["google"]["campaigns"][cid]["bidding"]["target_cpa"] = round(int(micros) / 1e6, 2)
+                        o["google"]["campaigns"][cid]["bidding"]["target_cpa"] = (
+                            round(int(micros) / 1e6, 2) if int(micros) else None)  # 0 clears it
                         return o["google"]["campaigns"][cid]["bidding"]
                     bidding = update_overlay(_bid)
                     label = _bid_label(bidding)

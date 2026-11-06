@@ -96,21 +96,16 @@ def _split_adsets(c, totals):
     else:
         weights = [1.0 / len(adsets)] * len(adsets)
         method = "even"
+    # each metric apportioned so the ad sets add up to the campaign's window totals exactly
+    parts = store.split_totals(totals, dict((k, weights) for k in store.AD_SPLIT_KEYS))
     out = []
-    for a, w in zip(adsets, weights):
-        t = {k: totals[k] * w for k in METRIC_KEYS}
-        t["spend"] = round(t["spend"], 2)
-        t["platform_conversions"] = round(t["platform_conversions"], 1)
-        for k in ("impressions", "clicks"):
-            t[k] = int(round(t[k]))
-        for k in ("trials", "paid"):
-            t[k] = round(t[k], 1)
-        store.derive(t)
+    for a, w, t in zip(adsets, weights, parts):
         out.append({
             "id": a["id"], "name": a["name"], "kind": a.get("kind"), "status": a["status"],
             "daily_budget": a.get("daily_budget"), "targeting": a.get("targeting"),
             "share_pct": round(w * 100.0, 1), "allocation": method,
-            "spend": t["spend"], "clicks": t["clicks"], "trials": t["trials"], "paid": t["paid"],
+            "spend": t["spend"], "impressions": t["impressions"], "clicks": t["clicks"],
+            "platform_conversions": t["platform_conversions"], "trials": t["trials"], "paid": t["paid"],
             "cost_per_trial": t["cost_per_trial"], "cost_per_paid": t["cost_per_paid"],
             "trial_to_paid": t["trial_to_paid"], "ctr": t["ctr"],
         })
@@ -126,7 +121,8 @@ def _campaign_row(c, win):
     return {
         "id": c["id"], "platform": c["platform"], "name": c["name"], "country": c["country"],
         "type": c["type"], "status": c["status"], "legacy": bool(c.get("legacy")),
-        "start_date": c.get("start_date"), "daily_budget": c["daily_budget"],
+        "start_date": c.get("start_date"), "daily_budget": store.campaign_daily_budget(c),
+        "effective_daily_budget": store.effective_daily_budget(c),
         "monthly_budget": c["monthly_budget"], "bid_strategy": c.get("bid_strategy"),
         "active_days": active,
         "spend": t["spend"], "spend_per_day": store.safe_div(t["spend"], active),

@@ -23,6 +23,7 @@ const S = {
   target: null,           // deep-linked campaign id to highlight once
   edit: null,             // open inline editor {kind, id, field}
   pending: new Set(),     // "kind:id" with a request in flight
+  seq: 0,                 // bumped by every load and every saved change: a load answers only if still the latest
 };
 
 try {
@@ -41,7 +42,12 @@ async function load(win = S.window) {
     b.classList.toggle("active", on);
     b.setAttribute("aria-pressed", on ? "true" : "false");
   });
-  S.data = await api(`/api/campaigns/?window=${encodeURIComponent(win)}`);
+  const mine = ++S.seq;
+  const data = await api(`/api/campaigns/?window=${encodeURIComponent(win)}`);
+  // A load that started before a later change (or a later load) landed is stale:
+  // drop it, so the table never falls back to a status that is no longer saved.
+  if (mine !== S.seq) return;
+  S.data = data;
   const w = S.data.window;
   $("#win-label").textContent = `${w.label}: ${fmt.date(w.start)} – ${fmt.date(w.end, { year: true })}`;
   render();
@@ -92,7 +98,7 @@ function renderPace() {
           ${stat("Trials", fmt.int(p.trials))}
           ${stat("Cost / trial", fmt.cpt(p.cost_per_trial), cptTone(p.cost_per_trial, tgt))}
         </div>
-        <div class="pace-line" title="Sum of daily budgets on active campaigns vs monthly budget / days in month">
+        <div class="pace-line" title="Daily budgets that can spend now (the figure pacing projects) vs monthly budget / days in month">
           <span>Active budget <span class="v">${fmt.money(p.active_daily_budget)}</span>/day vs ${fmt.money(p.daily_target)} target</span>
           <span class="v ${pct > 105 || pct < 90 ? "tone-watch" : ""}">${fmt.pct(p.pct_of_target, 0)}</span>
         </div>
@@ -139,8 +145,9 @@ function sumRows(rows) {
     t.spend += r.spend; t.trials += r.trials;
     t.spend_3d += r.spend_3d; t.trials_3d += r.trials_3d;
     t.spend_7d += r.spend_7d; t.trials_7d += r.trials_7d;
-    if (r.status === "ACTIVE") t.daily_budget += r.daily_budget;
+    t.daily_budget += Number(r.effective_daily_budget || 0); // what pacing counts (0 when paused or nothing delivers)
   });
+  t.daily_budget = Math.round(t.daily_budget * 100) / 100;
   t.cpt_3d = t.trials_3d ? t.spend_3d / t.trials_3d : null;
   t.cpt_7d = t.trials_7d ? t.spend_7d / t.trials_7d : null;
   return t;
@@ -253,7 +260,7 @@ function renderTable() {
     const t = sumRows(rows);
     html += `<tr class="group-row${g.legacy ? " legacy" : ""}">
       <td colspan="3">${g.legacy ? "&#9888; " : ""}${esc(g.label)} · ${plural(rows.length, "campaign")}</td>
-      <td class="num" title="Active campaigns only">${fmt.money(t.daily_budget)}</td>
+      <td class="num" title="Daily budgets that can spend now (what pacing projects)">${fmt.money(t.daily_budget)}</td>
       <td></td>
       <td class="num">${fmt.money(t.spend)}</td>
       <td class="num">${fmt.int(t.trials)}</td>
@@ -440,9 +447,12 @@ function itemName(kind, id) {
 }
 
 // Apply the server's answer locally (status, budget, bid) so the table shows it
-// before the background reload lands, and refresh the pacing cards.
+// before the background reload lands, and refresh the pacing cards. Only an
+// applied change is shown: anything else leaves the table on the saved state.
 function applyLocal(res) {
   const r = res.result || res;
+  S.seq += 1; // a load already in flight predates this change
+  if (!r.applied) return;
   (r.changes || []).forEach((ch) => {
     const it = findItem(ch.kind, ch.id);
     if (!it) return;
@@ -469,28 +479,89 @@ function setLocalStatus(kind, id, status) {
   if (it) it.status = status;
 }
 
+function pacingNote(r) {
+  const p = (r && r.pacing) || {};
+  if (p.before === undefined || p.after === undefined || Math.abs(p.after - p.before) < 0.005) return "";
+  return ` · daily budgets enabled ${fmt.money(p.before)} → ${fmt.money(p.after)}`;
+}
+
 async function onStatus(btn) {
   const { kind, id, next, name } = btn.dataset;
   const prev = next === "PAUSED" ? "ACTIVE" : "PAUSED";
+  const verb = next === "PAUSED" ? "pause" : "enable";
   const key = `${kind}:${id}`;
   if (S.pending.has(key)) return;
   S.pending.add(key);
-  setLocalStatus(kind, id, next);     // show it now; the server confirms below
+  setLocalStatus(kind, id, next);     // show it now; the server's answer decides below
   render();
+  const settle = () => { S.pending.delete(key); };
   try {
     const res = await postAction([{ kind, id, action: "status", value: next, expected: prev }]);
-    S.pending.delete(key);
+    settle();
+    const r = res.result || {};
+    if (!r.applied) {
+      // Not saved (a guardrail wants a confirm, or nothing to change): put the saved
+      // status back at once and reload, never leave the optimistic one on screen.
+      setLocalStatus(kind, id, prev);
+      applyLocal(res);
+      render();
+      if (r.needs_confirm) confirmToast(`${next === "PAUSED" ? "Pause" : "Enable"} ${name}?`, r,
+        [{ kind, id, action: "status", value: next, expected: prev }], `${name} ${next === "PAUSED" ? "paused" : "enabled"}`);
+      else toast(r.message || r.error || `${name} was not changed`, r.error ? "error" : "info");
+      refresh();
+      return;
+    }
     applyLocal(res);
     render();
-    actionToast(`${name} ${next === "PAUSED" ? "paused" : "enabled"}`, res.result);
+    actionToast(`${name} ${next === "PAUSED" ? "paused" : "enabled"}${pacingNote(r)}`, r);
     refresh();
   } catch (e) {
-    S.pending.delete(key);
+    settle();
     setLocalStatus(kind, id, prev);
+    S.seq += 1;
     render();
-    toast(e.status === 409 ? `${name} changed in another window. Reloaded the latest state.` : `Could not ${next === "PAUSED" ? "pause" : "enable"} ${name}: ${e.message}`, "error");
-    if (e.status === 409) refresh();
+    toast(e.status === 409 ? `${name} changed in another window. Reloaded the latest state.` : `Could not ${verb} ${name}: ${e.message}`, "error");
+    refresh();
   }
+}
+
+// A guardrail warning on a change made outside an inline editor: show what it
+// would do and wait for an explicit Confirm. Nothing is applied until then.
+function confirmToast(question, r, actions, doneMsg) {
+  const el = document.createElement("div");
+  el.className = "cmp-toast";
+  el.setAttribute("role", "alertdialog");
+  el.setAttribute("aria-label", question);
+  const reqs = r.requests || [];
+  el.innerHTML = `<div class="cmp-toast-head"><span class="cmp-toast-msg">${esc(question)} Nothing has changed yet.</span>
+      <button class="cmp-toast-x" type="button" aria-label="Dismiss">&times;</button></div>
+    <div class="tone-watch small">${(r.warnings || []).map(esc).join("<br>")}</div>
+    ${reqs.length ? `<details class="ctl-req"><summary>${reqs.length === 1 ? "API request" : `${reqs.length} API requests`} it will send</summary>${requestsHtml(reqs)}</details>` : ""}
+    <div class="row-actions"><button class="btn btn-sm btn-danger" type="button" data-confirm-go>Confirm</button>
+      <button class="btn btn-sm btn-ghost" type="button" data-confirm-no>Cancel</button></div>`;
+  toastStack().appendChild(el);
+  wireCopy(el, reqs);
+  const close = () => { el.classList.add("leaving"); setTimeout(() => el.remove(), 220); };
+  el.querySelector(".cmp-toast-x").addEventListener("click", close);
+  el.querySelector("[data-confirm-no]").addEventListener("click", close);
+  const go = el.querySelector("[data-confirm-go]");
+  go.addEventListener("click", async () => {
+    go.disabled = true;
+    try {
+      const res = await postAction(actions, true);
+      const rr = res.result || {};
+      applyLocal(res);
+      render();
+      close();
+      if (rr.applied) actionToast(`${doneMsg}${pacingNote(rr)}`, rr);
+      else toast(rr.error || rr.message || "Nothing was changed", rr.error ? "error" : "info");
+    } catch (e) {
+      close();
+      toast(e.status === 409 ? `Changed in another window; reloaded. Nothing was applied.` : e.message, "error");
+    }
+    refresh();
+  });
+  go.focus();
 }
 
 async function refresh() {
@@ -555,13 +626,14 @@ async function saveEditor(ed, confirm = false) {
     S.edit = null;
     applyLocal(res);
     render();
+    if (!r.applied) { toast(r.message || r.error || `${name} was not changed`, "info"); refresh(); return; }
     const label = field === "budget" ? "daily budget" : (((findItem(kind, id) || {}).controls || {}).bid || {}).label || "bid";
-    actionToast(`${name}: ${label} ${before === null ? "" : fmt.money(before) + " → "}${fmt.money(v)}`, r);
+    actionToast(`${name}: ${label} ${before === null ? "" : fmt.money(before) + " → "}${fmt.money(v)}${pacingNote(r)}`, r);
     refresh();
   } catch (e) {
     ed.querySelectorAll("button, input").forEach((x) => { x.disabled = false; });
     toast(e.status === 409 ? `${name} changed in another window; reloaded. Try again.` : e.message, "error");
-    if (e.status === 409) { S.edit = null; refresh(); }
+    if (e.status === 409) { S.edit = null; S.seq += 1; refresh(); }
   }
 }
 
@@ -639,7 +711,8 @@ function toastStack() {
 function actionToast(msg, r, { undoable = true } = {}) {
   r = r || {};
   const reqs = r.requests || [];
-  const undo = (r.undo || {}).actions || [];
+  const undo = r.applied ? ((r.undo || {}).actions || []) : [];
+  const undoToken = (r.undo || {}).token || null;
   const el = document.createElement("div");
   el.className = "cmp-toast";
   el.setAttribute("role", "status");
@@ -662,18 +735,23 @@ function actionToast(msg, r, { undoable = true } = {}) {
     ub.disabled = true;
     ub.textContent = "Undoing…";
     try {
-      // the undo carries the exact before values; confirm is implied (the user made the change)
-      const res = await postAction(undo, true);
+      // The undo carries the exact before values and the server's undo token, so it
+      // restores them without the budget guardrails (it puts back what was there);
+      // if a value moved since, the server answers 409 and nothing changes.
+      const res = await api("/api/campaigns/actions", { body: { actions: undo, confirm: true, undo_token: undoToken } });
+      const rr = res.result || {};
       applyLocal(res);
       render();
       close();
-      actionToast(`Undone: ${msg}`, res.result, { undoable: false });
+      if (rr.applied) actionToast(`Undone: ${msg.split(" · daily budgets enabled")[0]}${pacingNote(rr)}`, rr, { undoable: false });
+      else toast(`Undo did not apply: ${rr.error || rr.message || "nothing to change"}`, "warn");
       refresh();
     } catch (e) {
       ub.disabled = false;
       ub.textContent = "Undo";
-      toast(`Undo failed: ${e.message}`, "error");
-      if (e.status === 409) refresh();
+      S.seq += 1;
+      toast(e.status === 409 ? `Undo refused: ${e.message}. Reloaded the latest state.` : `Undo failed: ${e.message}`, "error");
+      refresh();
     }
   });
   arm();

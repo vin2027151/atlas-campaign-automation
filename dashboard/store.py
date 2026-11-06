@@ -462,27 +462,80 @@ def platform_budget(platform=None):
         raise BadInput("unknown platform: %s" % platform)
 
 
+# Money rule (one rule, used everywhere): every budget is held in whole cents per
+# entity (what the platform stores: Google micros are a multiple of 10,000, Meta
+# takes cents). A total is the sum of those cent amounts, added as integers, never
+# a re-derived figure (monthly / days) and never a rounded sum of unrounded floats.
+# Source of truth for a Meta campaign with ad-set budgets (ABO) is its ad sets;
+# the campaign's own ``daily_budget`` field in state.json is only a mirror.
+
+def cents(v):
+    # type: (Any) -> int
+    """Dollars -> whole cents (half away from zero on the cent)."""
+    return int(round(float(v or 0) * 100 + (1e-9 if float(v or 0) >= 0 else -1e-9)))
+
+
+def money_sum(values):
+    # type: (Any) -> float
+    """Sum of dollar amounts, each taken to the cent first, added as integer cents."""
+    return sum(cents(v) for v in values) / 100.0
+
+
+def uses_adset_budgets(c, sets=None):
+    # type: (Dict[str, Any], Optional[List[Dict[str, Any]]]) -> bool
+    """A Meta campaign whose budget lives on its ad sets (ABO)."""
+    if c.get("platform") != "meta":
+        return False
+    sets = adsets_for(c["id"]) if sets is None else sets
+    return any(a.get("daily_budget") is not None for a in sets)
+
+
+def adset_delivers(a):
+    # type: (Dict[str, Any]) -> bool
+    """An ad set / ad group / asset group can spend: it is ACTIVE and, if it has ads, one is ACTIVE."""
+    if a.get("status") != "ACTIVE":
+        return False
+    ads = ads_for(a["id"])
+    return not ads or any(x.get("status") == "ACTIVE" for x in ads)
+
+
+def campaign_daily_budget(c):
+    # type: (Dict[str, Any]) -> float
+    """A campaign's configured daily budget (what its budget control shows).
+
+    Meta ABO: the sum of its ACTIVE ad sets' budgets (the set the budget control
+    scales). Everything else: the campaign's own daily budget.
+    """
+    sets = adsets_for(c["id"])
+    if uses_adset_budgets(c, sets):
+        return money_sum(a.get("daily_budget") for a in sets if a.get("status") == "ACTIVE")
+    return money_sum([c.get("daily_budget")])
+
+
+def effective_daily_budget(c):
+    # type: (Dict[str, Any]) -> float
+    """What a campaign can spend per day right now; this is what pacing projects.
+
+    0 unless the campaign is ACTIVE and at least one of its ad sets delivers (a
+    paused parent stops its active children; an active parent whose children are
+    all paused, or whose ad sets have no active ad, spends nothing). Meta ABO counts
+    only its delivering ad sets' budgets. A campaign with no ad sets counts its budget.
+    """
+    if c.get("status") != "ACTIVE":
+        return 0.0
+    sets = adsets_for(c["id"])
+    live = [a for a in sets if adset_delivers(a)]
+    if sets and not live:
+        return 0.0
+    if uses_adset_budgets(c, sets):
+        return money_sum(a.get("daily_budget") for a in live)
+    return money_sum([c.get("daily_budget")])
+
+
 def active_daily_budget(platform=None):
     # type: (Optional[str]) -> float
-    """Sum of the daily budgets that are spending right now (account or one platform).
-
-    Only ACTIVE campaigns count. A campaign whose ad sets / ad groups are all
-    paused counts 0. Meta campaigns with ad-set budgets (ABO) count their ACTIVE
-    ad sets' budgets; everything else counts the campaign's daily budget.
-    """
-    total = 0.0
-    for c in campaigns(platform):
-        if c.get("status") != "ACTIVE":
-            continue
-        sets = adsets_for(c["id"])
-        live = [a for a in sets if a.get("status") == "ACTIVE"]
-        if sets and not live:
-            continue
-        if c["platform"] == "meta" and any(a.get("daily_budget") is not None for a in sets):
-            total += sum(float(a.get("daily_budget") or 0) for a in live)
-        else:
-            total += float(c.get("daily_budget") or 0)
-    return round(total, 2)
+    """Sum of the effective daily budgets (:func:`effective_daily_budget`), account or one platform."""
+    return money_sum(effective_daily_budget(c) for c in campaigns(platform))
 
 
 def pacing(platform=None):
@@ -508,10 +561,10 @@ def pacing(platform=None):
     dim = calendar.monthrange(t.year, t.month)[1]
     elapsed = t.day
     remaining = dim - elapsed
-    mtd = round(sum(r["spend"] for r in daily_for(None, platform, month_start, today())), 2)
+    mtd = money_sum(r["spend"] for r in daily_for(None, platform, month_start, today()))
     rate = round(window_totals(None, 7, platform)["spend"] / 7.0, 2)
     daily = active_daily_budget(platform)
-    projected = round(mtd + daily * remaining, 2)
+    projected = (cents(mtd) + cents(daily) * remaining) / 100.0
     budget = platform_budget(platform)
     to_date = round(budget * elapsed / float(dim), 2)
     return {
@@ -608,32 +661,60 @@ def ensure_ad_splits():
     return mutate(_apply)
 
 
+# How each apportioned metric is rounded: spend to cents, counts to whole numbers,
+# trials / paid / platform conversions to tenths (the sample splits are fractional).
+SPLIT_DIGITS = {"spend": 2, "impressions": 0, "clicks": 0, "platform_conversions": 1, "trials": 1, "paid": 1}
+
+
+def apportion(total, weights, digits):
+    # type: (Any, List[float], int) -> List[Any]
+    """Split ``total`` by ``weights`` into parts rounded to ``digits`` that add up to ``total`` exactly.
+
+    Largest-remainder method on integer units (cents for digits=2), so the parts of a
+    rounded total always sum back to it, whatever the weights."""
+    scale = 10 ** digits
+    units = int(round(float(total or 0) * scale))
+    wsum = float(sum(max(0.0, float(w or 0)) for w in weights))
+    if not weights:
+        return []
+    if wsum <= 0:
+        raw = [0.0] * len(weights)
+        raw[0] = float(units)
+    else:
+        raw = [units * max(0.0, float(w or 0)) / wsum for w in weights]
+    base = [int(x // 1) for x in raw]
+    left = units - sum(base)
+    order = sorted(range(len(raw)), key=lambda i: (-(raw[i] - base[i]), -raw[i], i))
+    for i in order[:max(0, left)]:
+        base[i] += 1
+    if digits == 0:
+        return [int(b) for b in base]
+    return [round(b / float(scale), digits) for b in base]
+
+
+def split_totals(totals, weights_by_key):
+    # type: (Dict[str, Any], Dict[str, List[float]]) -> List[Dict[str, Any]]
+    """Apportion every AD_SPLIT_KEYS total by its own weights; parts sum to the totals exactly."""
+    n = len(next(iter(weights_by_key.values()))) if weights_by_key else 0
+    parts = [dict() for _ in range(n)]  # type: List[Dict[str, Any]]
+    for k in AD_SPLIT_KEYS:
+        for p, v in zip(parts, apportion(totals.get(k) or 0, weights_by_key[k], SPLIT_DIGITS[k])):
+            p[k] = v
+    return [derive(p) for p in parts]
+
+
 def split_ad_metrics(adset_totals, ads):
     # type: (Dict[str, Any], List[Dict[str, Any]]) -> List[Dict[str, Any]]
     """Split an ad set's totals across its ads by ``metrics_split``; derived metrics added.
 
     Returns one dict per ad (same order) with the raw sums and :func:`derive` metrics.
-    Spend is rounded to cents with the remainder on the largest share, so the ads'
-    spend adds up to the ad set's exactly.
+    Every metric is apportioned with :func:`apportion`, so the ads add up to the ad
+    set's (already rounded) totals exactly, metric by metric.
     """
-    out = []
-    for a in ads:
-        sp = a.get("metrics_split") or {}
-        t = dict((k, float(adset_totals.get(k) or 0) * float(sp.get(k) or 0)) for k in AD_SPLIT_KEYS)
-        t["spend"] = round(t["spend"], 2)
-        t["platform_conversions"] = round(t["platform_conversions"], 1)
-        t["impressions"] = int(round(t["impressions"]))
-        t["clicks"] = int(round(t["clicks"]))
-        t["trials"] = round(t["trials"], 1)
-        t["paid"] = round(t["paid"], 1)
-        out.append(derive(t))
-    if out:
-        diff = round(float(adset_totals.get("spend") or 0) - sum(t["spend"] for t in out), 2)
-        if diff:
-            i = max(range(len(ads)), key=lambda j: float((ads[j].get("metrics_split") or {}).get("spend") or 0))
-            out[i]["spend"] = round(out[i]["spend"] + diff, 2)
-            derive(out[i])
-    return out
+    if not ads:
+        return []
+    weights = dict((k, [float((a.get("metrics_split") or {}).get(k) or 0) for a in ads]) for k in AD_SPLIT_KEYS)
+    return split_totals(adset_totals, weights)
 
 
 def month_to_date(campaign_id=None, platform=None):
@@ -713,12 +794,18 @@ def set_campaign_budget(campaign_id, daily_budget=None, monthly_budget=None):
             if c["id"] == campaign_id:
                 old = (c["daily_budget"], c["monthly_budget"])
                 c["daily_budget"] = daily
-                c["monthly_budget"] = monthly
+                if daily_budget is not None and c.get("monthly_budget") is not None:
+                    # move the monthly figure by the same delta x days (not daily x days), so a
+                    # change and its undo, in any order, restore the stored figures exactly
+                    m = (cents(c["monthly_budget"]) + (cents(daily) - cents(old[0])) * dim) / 100.0
+                    c["monthly_budget"] = int(m) if float(m).is_integer() else m
+                else:
+                    c["monthly_budget"] = monthly
                 return c, old
 
     c, old = mutate(_apply)
     log_activity("campaign.budget", campaign_id, "%s: $%s/day -> $%s/day ($%s/mo)" % (
-        c["name"], _n(old[0]), _n(daily), _n(monthly)))
+        c["name"], _n(old[0]), _n(daily), _n(c["monthly_budget"])))
     return c
 
 
