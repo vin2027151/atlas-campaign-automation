@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
-<link rel="stylesheet" href="/static/css/campaigns.css">
+<link rel="stylesheet" href="/s/{{ asset_v }}/css/campaigns.css">
 {% endblock %}
 
 {% block subtitle %}<p class="page-sub">Every campaign's spend, budget and cost per trial, with its controls on the row. Trials are PostHog-attributed signups; 3-day cost per trial is the active monitor against the {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }} target. Changes go through the platform adapter ({{ meta.adapter or "local" }} sample state) and are logged.</p>{% endblock %}
@@ -64,5 +64,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="module" src="/static/js/campaigns.js"></script>
+<script type="module" src="/s/{{ asset_v }}/js/campaigns.js"></script>
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
-<link rel="stylesheet" href="/static/css/planning.css">
+<link rel="stylesheet" href="/s/{{ asset_v }}/css/planning.css">
 {% endblock %}
 {% block subtitle %}<p class="page-sub">Pull the full Google Ads and Meta account state, compare it to the 30-day plan, turn a plain-English brief into API-shaped changes, read the diff, then publish by hand. The model only reads the state document and writes a proposal; publishing is deterministic code.</p>{% endblock %}
 {% block actions %}<span class="pill pill-sample" id="pl-mode-pill" title="Platform mode from config/platforms.yaml">Mode: sample</span>{% endblock %}
@@ -114,5 +114,5 @@
 </div>
 {% endblock %}
 {% block scripts %}
-<script type="module" src="/static/js/planning.js"></script>
+<script type="module" src="/s/{{ asset_v }}/js/planning.js"></script>
 {% endblock %}

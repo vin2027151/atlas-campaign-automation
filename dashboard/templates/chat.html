@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
-<link rel="stylesheet" href="/static/css/chat.css">
+<link rel="stylesheet" href="/s/{{ asset_v }}/css/chat.css">
 {% endblock %}
 
 {% block subtitle %}<p class="page-sub">Ask about the 30-day plan, the latest account state and Search Atlas offerings. Answers come from one context document. Your history stays in this browser only.</p>{% endblock %}
@@ -27,5 +27,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="module" src="/static/js/chat.js"></script>
+<script type="module" src="/s/{{ asset_v }}/js/chat.js"></script>
 {% endblock %}

@@ -330,7 +330,7 @@ const COUNT_LABELS = [["campaigns", "campaign"], ["ad_groups", "ad group"], ["ad
 function renderAnalysis() {
   const a = S.analysis, box = $("#an-result");
   if (!a) {
-    box.innerHTML = `<p class="muted mt-0">No analysis yet. Analyze pulls every campaign, budget, bid strategy, ad group, ad set, keyword, negative and ad into a saved state document, checks it against the 30-day plan, then asks Opus 5.5 for short recommendations.</p>`;
+    box.innerHTML = `<p class="muted mt-0">No analysis yet. Analyze pulls every campaign, budget, bid strategy, ad group, ad set, keyword, negative and ad into a saved state document, checks it against the 30-day plan, then asks Opus 5.5 for recommendations, each traced from the plan to the test or data behind it.</p>`;
     return;
   }
   const bullets = (list) => (list && list.length)
@@ -348,11 +348,11 @@ function renderAnalysis() {
         ${a.model ? `<span>${esc(a.model)}${a.effort ? ` · effort ${esc(a.effort)}` : ""}</span>` : ""}
         ${a.duration_s !== undefined && a.duration_s !== null ? `<span>${esc(secs(a.duration_s))}</span>` : ""}
       </div>
-      <div class="pl-cols">
+      ${(a.items && a.items.length) ? itemsHTML(a) : `<div class="pl-cols">
         <div class="pl-col"><h3>Where the plan stands</h3>${bullets(a.plan_status)}</div>
         <div class="pl-col"><h3>What the account shows</h3>${bullets(a.state_summary)}</div>
         <div class="pl-col"><h3>Recommendations</h3>${recs}</div>
-      </div>
+      </div>`}
       ${facts.length ? `<details class="pl-details">
         <summary>Deterministic plan checks (${facts.length})</summary>
         <ul class="pl-bullets small">${facts.map((f) => `<li><span class="tag">${esc(String(f.kind || "").replace(/_/g, " "))}</span> ${platformChip(f.platform)} ${f.campaign ? `<span class="strong">${esc(f.campaign)}</span>` : ""}
@@ -362,6 +362,38 @@ function renderAnalysis() {
     </div>`;
   wireSnapshot(box, a.snapshot_id);
   if (a.snapshot_id && !S.snapshots[a.snapshot_id]) ensureSnapshot(a.snapshot_id);
+}
+
+const ITEM_ROWS = [["plan", "Plan"], ["running", "Running"], ["testing", "Testing"], ["evidence", "Evidence"], ["recommendation", "Recommendation"]];
+
+function itemsHTML(a) {
+  const reads = {};
+  (a.test_reads || []).forEach((r) => { reads[r.test_id] = r; });
+  const rows = a.items.map((it, i) => {
+    const pri = String(it.priority || "low").toLowerCase();
+    const plat = it.platform === "both" ? platformChip("google") + platformChip("meta") : platformChip(it.platform);
+    const camp = it.campaign_id ? `<a href="/campaigns#${encodeURIComponent(it.campaign_id)}" class="mono small">${esc(it.campaign_id)}</a>` : "";
+    const r = it.test_id ? reads[it.test_id] : null;
+    const test = it.test_id ? `<span class="tag" title="${esc(r ? r.verdict_text : "")}">Test ${esc(it.test_id)}${r ? " · " + esc(String(r.verdict || "").replace(/_/g, " ")) : ""}</span>` : "";
+    const lines = ITEM_ROWS.filter(([k]) => it[k]).map(([k, label]) =>
+      `<div class="pl-item-row${k === "recommendation" ? " is-rec" : ""}"><div class="pl-item-label">${label}</div><div class="pl-item-text">${esc(it[k])}</div></div>`).join("");
+    const research = it.research ? `<details class="pl-item-more"><summary>Further research</summary><p>${esc(it.research)}</p></details>` : "";
+    return `<li class="pl-item">
+      <div class="pl-item-head"><span class="pl-item-n">${i + 1}</span><span class="pl-item-title">${esc(it.title || "Recommendation")}</span>
+        <span class="pl-item-tags"><span class="badge pri-${esc(pri)}">${esc(pri)}</span>${plat}${test}${camp}</span></div>
+      <div class="pl-item-body">${lines}</div>${research}
+    </li>`;
+  }).join("");
+  const notes = (a.notes || []).length
+    ? `<div class="pl-notes"><div class="label">Other notes</div><ul class="pl-bullets">${a.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></div>` : "";
+  const stats = (a.test_reads || []).length ? `<details class="pl-details">
+      <summary>Test statistics, computed by code (${a.test_reads.length})</summary>
+      <div class="table-wrap"><table class="table small"><thead><tr><th>Test</th><th>Rule</th><th class="num">Observed</th><th class="num">95% interval</th><th>Sample</th><th>Minimums</th><th>Verdict</th></tr></thead><tbody>
+      ${a.test_reads.map((t) => `<tr><td><span class="strong">${esc(t.test_id)}</span> ${esc(t.name || "")}</td><td>${esc(t.win_rule || "")}</td>
+        <td class="num">${esc(fmtVal(t.observed))}</td><td class="num">${t.ci95 ? esc(fmtVal(t.ci95[0])) + " to " + esc(fmtVal(t.ci95[1])) : fmt.none}</td>
+        <td>${esc(t.sample || "")}</td><td>${t.minimums_met ? "met" : "not met"}</td><td>${esc(String(t.verdict || "").replace(/_/g, " "))}</td></tr>`).join("")}
+      </tbody></table></div></details>` : "";
+  return `<ol class="pl-items">${rows}</ol>${notes}${stats}`;
 }
 
 function fmtVal(v) {

@@ -135,6 +135,13 @@ def _latest_analysis():
     if not a:
         return "No Analyze run yet."
     parts = ["From Analyze %s (%s, snapshot %s):" % (a.get("id"), a.get("created_at"), a.get("snapshot_id"))]
+    for it in a.get("items") or []:
+        parts.append("- [%s] %s. Plan: %s Running: %s Testing: %s Evidence: %s Recommendation: %s%s" % (
+            it.get("priority"), it.get("title"), it.get("plan"), it.get("running"), it.get("testing"), it.get("evidence"),
+            it.get("recommendation"), (" Further research: " + it["research"]) if it.get("research") else ""))
+    if a.get("items"):
+        parts.extend("- Note: " + n for n in a.get("notes") or [])
+        return "\n".join(parts)
     for key, title in (("plan_status", "Where the plan stands"), ("state_summary", "What the account shows")):
         parts.append("%s:" % title)
         parts.extend("- " + b for b in a.get(key) or [])

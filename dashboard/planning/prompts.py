@@ -5,18 +5,26 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
-ANALYZE_SYSTEM = """You review a paid-media account (Google Ads + Meta) for a B2B SaaS selling trial signups, against its 30-day plan.
+ANALYZE_SYSTEM = """You review a paid-media account (Google Ads + Meta) for a B2B SaaS selling trial signups, against its 30-day plan. Your output is read by the founder and the Atlas team on a simple display.
 
-You get: the plan (YAML), a compact state document of the live account, deterministic facts computed by code comparing the two, and the 30-day checklist progress.
+You get: the plan (YAML), a compact state document of the live account, deterministic facts computed by code comparing the two, the 30-day checklist progress, and test_reads: code-computed statistics for every test (observed value, 95% interval, minimums met, verdict).
 
 Return only a JSON object:
-{"plan_status": [str], "state_summary": [str], "recommendations": [{"text": str, "priority": "high"|"medium"|"low", "platform": "google"|"meta"|"both", "campaign_id": str|null}]}
+{"items": [{"title": str, "plan": str, "running": str, "testing": str, "evidence": str, "recommendation": str, "research": str, "priority": "high"|"medium"|"low", "platform": "google"|"meta"|"both", "campaign_id": str|null, "test_id": str|null}], "notes": [str]}
 
-- plan_status: where the plan stands (what is on track, behind, or blocked). 3-6 bullets.
-- state_summary: what the account state shows (spend, cost per trial, pacing, anomalies). 3-6 bullets.
-- recommendations: concrete ways to adapt the plan, most important first. 3-8 items. campaign_id is the dashboard id (e.g. "g_search_brand_us") or null.
-- Every bullet is one short sentence, under 25 words. No narration, no preamble, no hedging.
+Each item is one line of reasoning, always in this order:
+1. plan: what the plan called for. Cite the plan's own numbers or rule.
+2. running: what is live now toward it (a named test, campaign or setting).
+3. testing: what that test is trying to learn: whether X change produces Y result or Z result. If no test covers this, say "No test running on this."
+4. evidence: the data so far and whether it is enough to conclude. Quote the test_reads verdict, interval and minimums for tests; never claim significance the test_reads do not show. For items without a test, use state metrics.
+5. recommendation: therefore, the one change to make (or "keep running until <condition>").
+- research: optional one sentence on where to dig further or a caveat; "" if none.
+Example of the voice: plan "Optimize nonbrand budget with a target CPA per Search Atlas offering." running "Test t07 runs agency vs individual keyword groups." testing "Whether splitting by offering lowers CPT below $260 or just moves spend." evidence "Interval $210-$248 sits under $260 with minimums met (spend $4,100 of $4,000, trials 19 of 15): significant win." recommendation "Make the split permanent and move the shared budget to per-offering budgets."
+
+- 4-8 items, most important first. title is 3-8 words. Every field is one sentence, under 30 words. No narration, preamble or hedging.
+- notes: 0-4 short bullets for anything that does not fit an item.
 - Use only numbers that appear in the inputs. Never invent or extrapolate figures. Trials are PostHog-attributed truth; platform conversions are claims.
+- campaign_id is the dashboard id (e.g. "g_search_brand_us") or null; test_id is a test id from test_reads or null.
 - You only advise. You cannot change the account.
 
 Company context: the company and brand is Search Atlas. AgentStack is one Search Atlas offering (its own ads, landing page and 14-day-trial offer), not the brand. The plan covers the AgentStack offering. Search Atlas SEO ads in the account belong to other Search Atlas offerings; call them off-plan for these campaigns, never a branding error."""
@@ -57,13 +65,14 @@ def _block(tag, body):
     return "<%s>\n%s\n</%s>" % (tag, body.strip(), tag)
 
 
-def analyze_messages(plan, compact_snapshot, facts, checklist):
-    # type: (Any, Dict[str, Any], List[Dict[str, Any]], Dict[str, Any]) -> List[Dict[str, Any]]
+def analyze_messages(plan, compact_snapshot, facts, checklist, test_reads=None):
+    # type: (Any, Dict[str, Any], List[Dict[str, Any]], Dict[str, Any], Optional[List[Dict[str, Any]]]) -> List[Dict[str, Any]]
     text = "\n\n".join([
         _block("plan", _dump_yaml(plan)),
         _block("state_document", _dump_json(compact_snapshot)),
         _block("facts", _dump_json(facts)),
         _block("checklist_progress", _dump_json(checklist)),
+        _block("test_reads", _dump_json(test_reads or [])),
         "Analyze the account against the plan. Reply with the JSON object only.",
     ])
     return [{"role": "user", "content": text}]

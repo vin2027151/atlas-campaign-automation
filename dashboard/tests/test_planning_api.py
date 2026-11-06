@@ -127,9 +127,12 @@ class PlanningApiTest(unittest.TestCase):
         a = client.get(API + "/analyses/latest").json()["analysis"]
         self.assertEqual(a["id"], aid)
         self.assertEqual(client.get("%s/analyses/%s" % (API, aid)).json()["analysis"]["id"], aid)
-        for key in ("plan_status", "state_summary", "recommendations", "facts"):
+        for key in ("items", "notes", "test_reads", "recommendations", "facts"):
             self.assertIsInstance(a[key], list, key)
-        self.assertTrue(a["plan_status"] and a["state_summary"] and a["recommendations"])
+        self.assertTrue(a["items"] and a["recommendations"])
+        for it in a["items"]:
+            for f in ("title", "plan", "running", "testing", "evidence", "recommendation"):
+                self.assertIn(f, it)
         for rec in a["recommendations"]:
             self.assertIn(rec["priority"], ("high", "medium", "low"))
             self.assertIn(rec["platform"], ("google", "meta", "both"))

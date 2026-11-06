@@ -20,6 +20,8 @@ import store
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 log = logging.getLogger("atlas")
+# Cache-busting stamp for /static links; changes on every restart (every deploy).
+ASSET_V = str(int(__import__("time").time()))
 
 PAGES = [
     # route name, path, nav label, title, one-line description
@@ -43,6 +45,19 @@ API_PAGES = ["spend", "campaigns", "reporting", "management", "planning", "media
 
 app = FastAPI(title="Atlas Ops", version="1.0", docs_url="/api/docs", redoc_url=None)
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+# Same files under a per-deploy path: Cloudflare ignores query strings, so a new path is the only reliable cache key.
+app.mount("/s/%s" % ASSET_V, StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static_v")
+
+
+@app.middleware("http")
+async def _no_edge_cache_for_code(request, call_next):
+    # Scripts and styles change on every deploy; stop Cloudflare's edge from serving stale copies.
+    # Browsers still revalidate cheaply with the ETag (304). Media and images keep normal caching.
+    response = await call_next(request)
+    path = request.url.path
+    if path.startswith(("/static/js/", "/static/css/")) or not path.startswith(("/static/", "/s/")):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 
@@ -101,7 +116,7 @@ def _context(request, page, **extra):
     # type: (Request, str, Any) -> Dict[str, Any]
     title = [p[3] for p in PAGES if p[0] == page][0]
     ctx = {"request": request, "page": page, "title": title, "nav": _nav(),
-           "today": store.today(), "meta": store.get_state()["meta"], "store": store}
+           "today": store.today(), "meta": store.get_state()["meta"], "store": store, "asset_v": ASSET_V}
     ctx.update(extra)
     return ctx
 

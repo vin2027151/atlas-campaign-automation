@@ -309,6 +309,25 @@ def _norm_recs(x):
     return out[:12]
 
 
+ITEM_FIELDS = ("title", "plan", "running", "testing", "evidence", "recommendation", "research")
+
+
+def _norm_items(x):
+    # type: (Any) -> List[Dict[str, Any]]
+    out = []
+    for r in x if isinstance(x, list) else []:
+        if not isinstance(r, dict) or not str(r.get("recommendation", "")).strip():
+            continue
+        it = {k: str(r.get(k) or "").strip() for k in ITEM_FIELDS}
+        pr = str(r.get("priority", "medium")).lower()
+        pl = str(r.get("platform", "both")).lower()
+        it.update(priority=pr if pr in ("high", "medium", "low") else "medium",
+                  platform=pl if pl in ("google", "meta", "both") else "both",
+                  campaign_id=r.get("campaign_id") or None, test_id=r.get("test_id") or None)
+        out.append(it)
+    return out[:10]
+
+
 # ------------------------------------------------------------------ analyze
 
 def _run_analyze(job):
@@ -322,14 +341,19 @@ def _run_analyze(job):
     facts = plan_compare.compare(plan, snap)
     _update(job, stage=STAGE_ASK)
     fixtures = importlib.import_module("planning.fixtures")
-    msgs = prompts.analyze_messages(plan, snapshot.compact(snap), facts, checklist_progress())
-    obj, res = llm.ask_json(prompts.ANALYZE_SYSTEM, msgs, stub=lambda: fixtures.analysis_text(facts),
+    test_reads = importlib.import_module("planning.test_stats").read_all()
+    msgs = prompts.analyze_messages(plan, snapshot.compact(snap), facts, checklist_progress(), test_reads)
+    obj, res = llm.ask_json(prompts.ANALYZE_SYSTEM, msgs, stub=lambda: fixtures.analysis_text(facts, test_reads),
                             before_call=_before_call)
+    items = _norm_items(obj.get("items"))
     a = records.add_analysis({
         "snapshot_id": snap["id"], "created_at": records.now_iso(), "model": res.get("model", llm.MODEL),
         "effort": llm.EFFORT, "duration_s": round(time.time() - t0, 2),
-        "plan_status": _norm_list(obj.get("plan_status")), "state_summary": _norm_list(obj.get("state_summary")),
-        "recommendations": _norm_recs(obj.get("recommendations")), "facts": facts, "usage": res.get("usage") or {}})
+        "items": items, "notes": _norm_list(obj.get("notes"), limit=6), "test_reads": test_reads,
+        # kept for older readers (Quick Chat, exports): one line per item
+        "recommendations": [{"text": it["recommendation"], "priority": it["priority"], "platform": it["platform"],
+                             "campaign_id": it["campaign_id"]} for it in items],
+        "facts": facts, "usage": res.get("usage") or {}})
     return {"analysis_id": a["id"]}
 
 

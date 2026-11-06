@@ -20,17 +20,33 @@ def _load(name):
         return json.load(fh)
 
 
-def analysis_text(facts):
-    # type: (List[Dict[str, Any]]) -> str
+def analysis_text(facts, test_reads=None):
+    # type: (List[Dict[str, Any]], Optional[List[Dict[str, Any]]]) -> str
+    """Stub analysis in the plan -> running -> testing -> evidence -> recommendation shape."""
     base = _load("analysis.json")
-    out = dict(base)
-    extra = []
-    for f in (facts or [])[:3]:
-        note = f.get("note") or f.get("kind")
-        if note:
-            extra.append(str(note)[:140])
-    out["plan_status"] = list(base["plan_status"]) + extra
-    return json.dumps(out)
+    items = []
+    for r in (test_reads or []):
+        if r.get("status") != "running":
+            continue
+        ci = r.get("ci95") or [None, None]
+        items.append({
+            "title": "Stub: " + str(r.get("name"))[:40],
+            "plan": "Stub (ATLAS_LLM_MODE=stub): the plan's test slot for this campaign.",
+            "running": "Test %s runs on %s." % (r.get("test_id"), r.get("campaign_id")),
+            "testing": str(r.get("hypothesis") or ""),
+            "evidence": "%s; observed %s, 95%% interval %s to %s. %s" % (r.get("sample"), r.get("observed"), ci[0], ci[1], r.get("verdict_text")),
+            "recommendation": "Keep running until the benchmark minimums are met." if not r.get("minimums_met") else "Act on the verdict above.",
+            "research": "", "priority": "high", "platform": r.get("platform") or "both",
+            "campaign_id": r.get("campaign_id"), "test_id": r.get("test_id")})
+    for f in (facts or [])[:2]:
+        items.append({
+            "title": "Stub: " + str(f.get("kind")), "plan": "Stub: plan rule behind this fact.",
+            "running": str(f.get("campaign") or "Account"), "testing": "No test running on this.",
+            "evidence": str(f.get("note") or "")[:200], "recommendation": "Review this gap in Campaign Planning.",
+            "research": "", "priority": "medium", "platform": f.get("platform") or "both",
+            "campaign_id": f.get("campaign_id"), "test_id": None})
+    items.extend(base.get("items", []))
+    return json.dumps({"items": items, "notes": base.get("notes", [])})
 
 
 # ---------------------------------------------------------------- changeset

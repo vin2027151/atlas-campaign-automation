@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
-<link rel="stylesheet" href="/static/css/media.css">
+<link rel="stylesheet" href="/s/{{ asset_v }}/css/media.css">
 {% endblock %}
 
 {% block subtitle %}<p class="page-sub">Every creative the ad accounts can use, numbered by kind (IMG, VID, H5). Requests wait for a file, uploads wait for review, and only approved media can be tagged in a Campaign Planning brief.</p>{% endblock %}
@@ -53,5 +53,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="module" src="/static/js/media.js"></script>
+<script type="module" src="/s/{{ asset_v }}/js/media.js"></script>
 {% endblock %}
