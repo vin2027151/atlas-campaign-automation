@@ -1,12 +1,15 @@
-// Media page: Requests / Ready for review / Approved board for numbered image, video and HTML5 assets.
+// Media page: four threads (Creative requests / Ready for review / Approved / Active) for numbered image, video and HTML5 assets.
 import { api, fmt, toast, platformChip, esc, $, $$, withBusy, isoDate, parseDate } from "/static/js/common.js";
 
 const API = "/api/media";
-const COLUMNS = [
-  { status: "requested", label: "Requests", empty: "No open requests. Use + New request to brief one." },
+const THREADS = [
+  { status: "requested", label: "Creative requests", empty: "No open requests. Use + New request to brief one." },
   { status: "in_review", label: "Ready for review", empty: "Nothing waiting for review." },
   { status: "approved", label: "Approved", empty: "Nothing approved yet." },
+  { status: "active", label: "Active / in use", empty: "Nothing marked active yet. Use Mark active on an approved asset once it runs." },
 ];
+const USABLE = ["approved", "active"]; // both can be tagged in Plan & Adapt briefs
+const THREAD_KEY = "atlas.media.thread";
 const KIND_LABEL = { image: "Image", video: "Video", html5: "HTML5" };
 const ACCEPT = {
   image: "image/png,image/jpeg,image/webp,image/gif,.png,.jpg,.jpeg,.webp,.gif",
@@ -20,6 +23,12 @@ const FORMAT_LABEL = {
 
 let data = null;
 let kindFilter = "";
+let thread = (() => {
+  try {
+    const t = localStorage.getItem(THREAD_KEY);
+    return THREADS.some((x) => x.status === t) ? t : "requested";
+  } catch (e) { return "requested"; }
+})();
 let freshId = null;
 let targetId = (location.hash || "").replace(/^#/, "") || null;
 const ui = { sendBack: {}, editing: {}, uploading: {}, expanded: {} };
@@ -71,16 +80,29 @@ function render() {
     el.textContent = k ? all.filter((a) => a.kind === k).length : all.length;
   });
   const by = (s) => all.filter((a) => a.status === s).length;
-  $("#md-summary").innerHTML = `<b>${by("requested")}</b> requested · <b>${by("in_review")}</b> waiting for review · <b>${by("approved")}</b> approved`;
+  $("#md-summary").innerHTML = `<b>${by("requested")}</b> requested · <b>${by("in_review")}</b> waiting for review · <b>${by("approved")}</b> approved · <b>${by("active")}</b> active`;
 
-  $("#board").innerHTML = COLUMNS.map((col) => {
-    const items = shown.filter((a) => a.status === col.status);
-    return `<section class="md-col" data-status="${col.status}" aria-labelledby="col-${col.status}">
-      <div class="md-col-head"><h2 class="md-col-title" id="col-${col.status}">${esc(col.label)}</h2>
-        <span class="md-col-count" aria-label="${items.length} items">${items.length}</span></div>
-      <div class="md-col-body">${items.length ? items.map((a) => (a.status === "approved" && !ui.expanded[a.id] && !ui.editing[a.id] ? compactHtml(a) : cardHtml(a))).join("") : `<div class="md-col-empty">${esc(q || kindFilter ? "No matches here." : col.empty)}</div>`}</div>
-    </section>`;
-  }).join("");
+  // A deep link (#IMG-0003) opens the thread that holds the asset.
+  if (targetId) {
+    const t = all.find((a) => a.id === targetId);
+    if (t && t.status !== thread && THREADS.some((x) => x.status === t.status)) thread = t.status;
+  }
+  // Thread counts follow the kind filter and search, so each matches what its thread shows.
+  $$("#md-threads [data-thread]").forEach((el) => {
+    el.querySelector(".md-thread-count").textContent = shown.filter((a) => a.status === el.dataset.thread).length;
+    const on = el.dataset.thread === thread;
+    el.classList.toggle("active", on);
+    el.setAttribute("aria-selected", on ? "true" : "false");
+    el.tabIndex = on ? 0 : -1;
+  });
+
+  const col = THREADS.find((t) => t.status === thread) || THREADS[0];
+  const items = shown.filter((a) => a.status === col.status);
+  $("#board").setAttribute("aria-labelledby", "thread-" + col.status);
+  $("#board").dataset.status = col.status;
+  $("#board").innerHTML = items.length
+    ? items.map((a) => (USABLE.includes(a.status) && !ui.expanded[a.id] && !ui.editing[a.id] ? compactHtml(a) : cardHtml(a))).join("")
+    : `<div class="md-col-empty">${esc(q || kindFilter ? "No matches in this thread." : col.empty)}</div>`;
   fitFrames();
   if (targetId) {
     const card = document.getElementById("asset-" + targetId);
@@ -102,7 +124,21 @@ function thumbOf(a) {
   return a.thumb_url || (a.kind === "image" ? a.file_url : null);
 }
 
-// Approved column: one-line cards so 16+ stay scannable; Expand shows the full card.
+function setThread(status, focus) {
+  thread = status;
+  try { localStorage.setItem(THREAD_KEY, status); } catch (e) { /* remembered for this visit only */ }
+  if (data) render();
+  if (focus) document.querySelector(`#md-threads [data-thread="${status}"]`)?.focus();
+}
+
+// Approved <-> Active / in use.
+function stateButton(a) {
+  if (a.status === "approved") return `<button class="btn btn-sm" type="button" data-activate title="Move to Active / in use">Mark active</button>`;
+  if (a.status === "active") return `<button class="btn btn-sm" type="button" data-deactivate title="Move back to Approved">Take out of use</button>`;
+  return "";
+}
+
+// Approved and Active threads: one-line cards so 16+ stay scannable; Expand shows the full card.
 function compactHtml(a) {
   const id = esc(a.id);
   const thumb = thumbOf(a);
@@ -116,12 +152,14 @@ function compactHtml(a) {
       <div class="mcard-top">
         <button class="idchip" type="button" data-copy="${id}" aria-label="Copy ID ${id}" title="Copy ID">${id}</button>
         <span class="tag kind-tag">${n ? "Carousel" : esc(KIND_LABEL[a.kind])}</span>
+        ${a.status === "active" ? `<span class="badge info">Active</span>` : ""}
         ${Object.keys(a.platform_refs || {}).length ? `<span class="badge good">Published</span>` : ""}
       </div>
       <h3 class="mcard-title clamp-2" id="title-${id}">${esc(a.title)}</h3>
       <div class="mcard-spec">${esc(specLine(a))}${a.tags && a.tags.length ? ` · ${a.tags.length} campaign${a.tags.length === 1 ? "" : "s"}` : ""}</div>
       <div class="mcompact-actions">
-        <a class="btn btn-sm btn-primary" href="/planning?media=${encodeURIComponent(a.id)}">Use in Campaign Planning</a>
+        <a class="btn btn-sm btn-primary" href="/planning?media=${encodeURIComponent(a.id)}">Use in Plan &amp; Adapt</a>
+        ${stateButton(a)}
         <button class="btn btn-sm" type="button" data-edit>Edit</button>
         <button class="btn btn-sm btn-ghost" type="button" data-expand aria-expanded="false">Details</button>
       </div>
@@ -241,7 +279,8 @@ function actionsHtml(a) {
     </div>`;
   }
   return `<div class="mcard-actions">
-    <a class="btn btn-sm btn-primary" href="/planning?media=${encodeURIComponent(a.id)}">Use in Campaign Planning</a>
+    <a class="btn btn-sm btn-primary" href="/planning?media=${encodeURIComponent(a.id)}">Use in Plan &amp; Adapt</a>
+    ${stateButton(a)}
     <button class="btn btn-sm" type="button" data-edit>Edit</button>
     <span class="spacer"></span>
     ${a.file_url ? `<a class="btn btn-sm btn-ghost" href="${esc(a.package_url || a.file_url)}" download aria-label="Download ${id}">Download</a>` : ""}
@@ -259,6 +298,7 @@ function cardHtml(a) {
       <div class="mcard-top">
         <button class="idchip" type="button" data-copy="${id}" aria-label="Copy ID ${id}" title="Copy ID">${id}</button>
         <span class="tag kind-tag">${esc(KIND_LABEL[a.kind])}</span>
+        ${a.status === "active" ? `<span class="badge info">Active</span>` : ""}
         ${refs.length ? `<span class="badge good" title="Uploaded to ${esc(refs.join(", "))}">Published</span>` : ""}
         <span class="spacer"></span>
         ${a.due && a.status === "in_review" ? `<span class="mcard-due${overdue ? " overdue" : ""}">${overdue ? "Overdue · " : "Due "}${esc(fmt.date(a.due))}</span>` : ""}
@@ -398,6 +438,17 @@ function wireBoard() {
       } catch (err) { /* toasted */ }
       return;
     }
+    const stateBtn = e.target.closest("[data-activate], [data-deactivate]");
+    if (stateBtn) {
+      const on = stateBtn.hasAttribute("data-activate");
+      try {
+        await withBusy(stateBtn, () => api(`${API}/${encodeURIComponent(id)}/${on ? "activate" : "deactivate"}`, { body: {} }),
+          on ? `${id} moved to Active / in use` : `${id} moved back to Approved`);
+        delete ui.expanded[id];
+        await refreshAfter(id);
+      } catch (err) { /* toasted */ }
+      return;
+    }
     if (e.target.closest("[data-sendback]")) {
       ui.sendBack[id] = "";
       render();
@@ -500,6 +551,21 @@ function wireBoard() {
 }
 
 // ---------------------------------------------------------------- filter
+function wireThreads() {
+  const bar = $("#md-threads");
+  bar.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-thread]");
+    if (b) setThread(b.dataset.thread, false);
+  });
+  bar.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    e.preventDefault();
+    const i = THREADS.findIndex((t) => t.status === thread);
+    const next = THREADS[(i + (e.key === "ArrowRight" ? 1 : THREADS.length - 1)) % THREADS.length];
+    setThread(next.status, true);
+  });
+}
+
 function wireTabs() {
   $("#kind-tabs").addEventListener("click", (e) => {
     const tab = e.target.closest(".tab[data-kind]");
@@ -568,6 +634,8 @@ function wireNewForm() {
       card.hidden = true;
       toggle.setAttribute("aria-expanded", "false");
       if (kindFilter && kindFilter !== res.asset.kind) $(`#kind-tabs .tab[data-kind=""]`).click();
+      thread = "requested"; // show the new request where it lives
+      try { localStorage.setItem(THREAD_KEY, thread); } catch (e2) { /* ignore */ }
       await refreshAfter(res.asset.id);
       const el = document.getElementById("asset-" + res.asset.id);
       if (el) { el.scrollIntoView({ block: "center" }); el.querySelector("[data-upload]")?.focus({ preventScroll: true }); }
@@ -580,6 +648,7 @@ window.addEventListener("hashchange", () => {
   if (data) render();
 });
 
+wireThreads();
 wireTabs();
 wireBoard();
 wireNewForm();

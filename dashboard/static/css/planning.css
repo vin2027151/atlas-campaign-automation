@@ -1,8 +1,8 @@
-/* Campaign planning page. Uses app.css tokens only. */
+/* Plan & Adapt page. Uses app.css tokens only. */
 
 .pl-layout { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: var(--s4); align-items: start; }
 .pl-main { display: flex; flex-direction: column; gap: var(--s4); min-width: 0; }
-.pl-side { display: flex; flex-direction: column; gap: var(--s4); min-width: 0; position: sticky; top: var(--s4); }
+.pl-side { display: flex; flex-direction: column; gap: var(--s4); min-width: 0; }
 
 /* numbered step heads */
 .pl-step-title { display: inline-flex; align-items: center; gap: var(--s2); }
@@ -54,11 +54,10 @@
 
 /* code / yaml viewers */
 .pl-code {
-  max-height: 440px; margin: 0; overflow: auto; padding: var(--s3);
+  margin: 0; overflow-x: auto; overflow-y: hidden; padding: var(--s3);
   border: 1px solid var(--line); border-radius: var(--r); background: var(--surface-2);
   color: var(--ink); font: 12px/1.55 var(--mono); white-space: pre; tab-size: 2;
 }
-.pl-code.sm { max-height: 240px; }
 .pl-code > code { display: inline-block; min-width: 100%; font: inherit; }
 .pl-code .ln { display: block; min-height: 1.55em; }
 .pl-code .ln-add { display: block; color: var(--good); background: var(--good-soft); }
@@ -128,7 +127,7 @@
 .pl-chip button { appearance: none; border: 0; background: none; color: inherit; cursor: pointer; font-size: 14px; line-height: 1; padding: 0 4px; border-radius: 50%; }
 .pl-chip button:hover { background: var(--accent-line); }
 .pl-media-tools .input { width: 260px; max-width: 100%; }
-.pl-media { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--s2); max-height: 300px; overflow: auto; padding: 2px; }
+.pl-media { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--s2); padding: 2px; }
 .pl-asset {
   appearance: none; display: flex; flex-direction: column; gap: 4px; padding: 6px; text-align: left;
   border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); color: var(--ink); cursor: pointer; font: inherit;
@@ -141,7 +140,6 @@
 .pl-asset .t { font-size: var(--fs-sm); line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
 /* side */
-.pl-history { max-height: 460px; overflow: auto; }
 .pl-history > li { padding: 0; }
 .pl-hist-btn {
   appearance: none; display: flex; flex-direction: column; gap: 3px; width: 100%; padding: var(--s2) var(--s4);
@@ -172,7 +170,7 @@
   .pl-action-row .btn-primary { min-height: 38px; flex: 1 1 auto; }
   .pl-media { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pl-media-tools .input { width: 100%; }
-  .pl-code { font-size: 11px; max-height: 360px; }
+  .pl-code { font-size: 11px; }
   .pl-hist-btn { padding: var(--s2) var(--s3); }
   .pl-kv { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .pl-kv dd { margin-bottom: 4px; }
@@ -202,3 +200,13 @@
   .pl-item-more p { margin-left: 0; }
   .pl-item-tags { margin-left: 0; }
 }
+
+/* ---- step 3: the exact API requests, in run order (no inner vertical scroll) ---- */
+.pl-reqs { list-style: none; margin: var(--s2) 0 0; padding: 0; display: grid; gap: var(--s3); }
+.pl-req { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: var(--s2) var(--s3) var(--s3); display: grid; gap: var(--s2); min-width: 0; }
+.pl-req.is-error { border-color: var(--bad-line); background: var(--bad-soft); }
+.pl-req-head { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; min-width: 0; }
+.pl-req-n { display: inline-grid; place-items: center; min-width: 22px; height: 22px; border-radius: 11px; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: var(--fs-xs); }
+.pl-req-line { font-family: var(--mono); font-size: var(--fs-xs); overflow-wrap: anywhere; word-break: break-all; min-width: 0; flex: 1 1 220px; color: var(--ink-2); }
+.pl-req-line b { color: var(--ink); }
+.pl-req .pl-code { white-space: pre; }

@@ -315,6 +315,16 @@ def _today(today, checklist, band):
     }
 
 
+def _schedule():
+    # type: () -> List[Dict[str, Any]]
+    """Every test decorated the way the Calendar page used to show it (benchmark text, verdict, progress)."""
+    from api import calendar as cal
+    tests = [cal._decorate_test(x) for x in store.get_state().get("tests", [])]
+    order = {"running": 0, "queued": 1, "won": 2, "lost": 3, "inconclusive": 4}
+    tests.sort(key=lambda x: (order.get(x["status"], 9), x.get("started") or ""))
+    return tests
+
+
 def build():
     # type: () -> Dict[str, Any]
     state = store.get_state()
@@ -326,8 +336,9 @@ def build():
         "today": _today(today, checklist, band),
         "checklist": checklist,
         "needs_action": _needs_action(),
-        "in_play": _in_play(band),
+        "in_play": _in_play(band),        # not shown on Management any more; the Home page still reads it
         "tests": _tests(today),
+        "schedule": _schedule(),          # testing schedule, moved here from the Calendar page
         "tracking": _tracking(today),
         "lessons": _lessons(),
         "activity": store.recent_activity(20),

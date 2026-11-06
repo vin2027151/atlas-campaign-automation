@@ -1,7 +1,8 @@
-"""Campaign Planning API (/api/planning).
+"""Plan & Adapt API (/api/planning).
 
 Analyze (snapshot -> plan comparison -> Opus 5.5 bullets), draft and revise changesets from a
-brief (Opus 5.5 writes YAML; code validates and diffs it), and publish by hand. Publish calls
+brief (Opus 5.5 writes JSON operations; code validates them, renders each as the exact HTTP
+request and diffs them), and publish by hand. Publish calls
 only planning.executor.publish with the stored version; the LLM is never on that path.
 """
 
@@ -181,7 +182,25 @@ def list_changesets():
 def get_changeset(cs_id):
     # type: (str) -> Dict[str, Any]
     jobs.recover()
-    return {"ok": True, "changeset": records.get_changeset(cs_id)}
+    return {"ok": True, "changeset": _with_requests(records.get_changeset(cs_id))}
+
+
+def _with_requests(cs):
+    # type: (Dict[str, Any]) -> Dict[str, Any]
+    """Versions stored before requests were rendered get them rendered now (not saved)."""
+    for v in cs.get("versions") or []:
+        if "requests" in v and "changeset_json" in v:
+            continue
+        v["changeset_json"] = jobs.version_json(v)
+        v.pop("yaml", None)
+        doc, errs = _mod("changeset").parse(v["changeset_json"])
+        snap = None
+        try:
+            snap = _mod("snapshot").get(v.get("snapshot_id"))
+        except store.NotFound:
+            pass
+        v["requests"] = _mod("executor").preview_requests(doc, snap) if doc and not errs else []
+    return cs
 
 
 @router.post("/changesets/{cs_id}/revise")
@@ -217,11 +236,12 @@ def publish(cs_id, body: PublishBody):
     if v is None or any(x.get("level") == "error" for x in v.get("validation") or []):
         raise store.BadInput("version %s has validation errors" % body.version)
     changeset, executor = _mod("changeset"), _mod("executor")
-    doc, errs = changeset.parse(v["yaml"])
+    doc, errs = changeset.parse(jobs.version_json(v))
     if errs or doc is None:
-        raise store.BadInput("stored YAML no longer parses: %s" % "; ".join(errs or ["empty"]))
+        raise store.BadInput("stored changeset no longer parses: %s" % "; ".join(errs or ["empty"]))
     rows = ((v.get("diff") or {}).get("rows")) or []
-    result = executor.publish(doc, rows, v["snapshot_id"])
+    # the exact requests the reviewer saw; publish refuses if a fresh render differs
+    result = executor.publish(doc, rows, v["snapshot_id"], expected_requests=v.get("requests") or None)
     attempt = {"version": v["n"], "at": records.now_iso(), "ok": bool(result.get("ok")),
                "verified": result.get("verified"), "drift": len(result.get("drift") or []),
                "post_snapshot_id": result.get("post_snapshot_id")}

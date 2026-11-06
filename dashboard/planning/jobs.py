@@ -7,6 +7,7 @@ planning.executor and never runs here.
 """
 
 import importlib
+import json
 import statistics
 import threading
 import time
@@ -267,7 +268,7 @@ def approved_media():
     # type: () -> List[Dict[str, Any]]
     try:
         media = importlib.import_module("media")
-        assets = media.list_assets(status="approved")
+        assets = media.list_assets(status=list(getattr(media, "USABLE_STATUSES", ("approved",))))
     except Exception:
         return []
     keep = ("id", "kind", "title", "aspect", "format")
@@ -359,15 +360,39 @@ def _run_analyze(job):
 
 # --------------------------------------------------------- draft / revise
 
-def _validate(yaml_text, snap):
+def _reply_doc(obj):
+    # type: (Dict[str, Any]) -> Any
+    """The changeset in a model reply: {"changeset", "operations", ...} (JSON), or the
+    pre-JSON {"yaml": "..."} shape."""
+    if not isinstance(obj, dict):
+        return None
+    if "operations" in obj or "changeset" in obj:
+        return {"changeset": obj.get("changeset"), "operations": obj.get("operations")}
+    for key in ("changeset_json", "yaml"):
+        if isinstance(obj.get(key), str) and obj[key].strip():
+            return obj[key]
+    return None
+
+
+def _validate(raw, snap):
     # type: (Any, Dict[str, Any]) -> Tuple[Optional[Dict[str, Any]], List[Dict[str, Any]]]
     changeset = _mod("changeset")
-    if not isinstance(yaml_text, str) or not yaml_text.strip():
-        return None, [{"op": None, "level": "error", "message": "reply had no changeset YAML"}]
-    doc, errs = changeset.parse(yaml_text)
+    if raw is None or (isinstance(raw, str) and not raw.strip()):
+        return None, [{"op": None, "level": "error", "message": "reply had no changeset (changeset + operations)"}]
+    doc, errs = changeset.parse(raw)
     if errs or doc is None:
-        return None, [{"op": None, "level": "error", "message": e} for e in (errs or ["could not parse YAML"])]
+        return None, [{"op": None, "level": "error", "message": e} for e in (errs or ["could not parse the changeset"])]
     return doc, list(changeset.validate(doc, snap) or [])
+
+
+def version_json(v):
+    # type: (Dict[str, Any]) -> str
+    """A stored version's changeset JSON (versions stored before the JSON switch carry "yaml")."""
+    if v.get("changeset_json"):
+        return v["changeset_json"]
+    changeset = _mod("changeset")
+    doc, _errs = changeset.parse(v.get("yaml") or "")
+    return changeset.to_json(doc) if doc else (v.get("yaml") or "")
 
 
 def _errors(validation):
@@ -394,7 +419,7 @@ def _run_changeset(job, cs_id, revision_note=None):
     landing = ((plan or {}).get("account") or {}).get("landing_url") or "https://www.agentstack.example/trial"
 
     if revision_note:
-        msgs = prompts.revise_messages(cs["directive"], revision_note, (prior or {}).get("yaml", ""), compact,
+        msgs = prompts.revise_messages(cs["directive"], revision_note, version_json(prior) if prior else "", compact,
                                        changeset.SCHEMA_DOC, media_assets, plan, tagged,
                                        prior_validation=(prior or {}).get("validation"))
     else:
@@ -409,7 +434,7 @@ def _run_changeset(job, cs_id, revision_note=None):
     llm_seconds = float(res.get("seconds") or 0)
 
     _update(job, stage=STAGE_VALIDATE)
-    doc, validation = _validate(obj.get("yaml"), snap)
+    doc, validation = _validate(_reply_doc(obj), snap)
     repaired = False
     errs = _errors(validation)
     if errs:  # one repair round, then store whatever comes back
@@ -418,25 +443,34 @@ def _run_changeset(job, cs_id, revision_note=None):
         try:
             obj2, res2 = llm.ask_json(prompts.CHANGESET_SYSTEM, rmsgs, stub=stub, before_call=_before_call)
             llm_seconds += float(res2.get("seconds") or 0)
-            if isinstance(obj2.get("yaml"), str) and obj2["yaml"].strip():
+            if _reply_doc(obj2) is not None:
                 obj, res, repaired = obj2, res2, True
                 _update(job, stage=STAGE_VALIDATE)
-                doc, validation = _validate(obj.get("yaml"), snap)
+                doc, validation = _validate(_reply_doc(obj), snap)
         except (llm.LLMError, CapReached) as exc:
             validation.append({"op": None, "level": "warn", "message": "repair round failed: %s" % exc})
 
     _update(job, stage=STAGE_DIFF)
     diff = None
+    requests = []  # type: List[Dict[str, Any]]
     if doc is not None:
         try:
             d = changeset.dry_run(doc, snap)
             diff = {k: v for k, v in d.items() if k != "after"}
         except Exception as exc:
             validation.append({"op": None, "level": "error", "message": "dry run failed: %s" % exc})
+        # the exact HTTP requests publish will send (deterministic; no LLM)
+        requests = _mod("executor").preview_requests(doc, snap)
+        for r in requests:
+            if r.get("error"):
+                validation.append({"op": r.get("op"), "level": "error", "message": "request: %s" % r["error"]})
+    raw = _reply_doc(obj)
+    cs_json = changeset.to_json(doc) if doc is not None else (raw if isinstance(raw, str) else json.dumps(raw, indent=2))
 
     ops = len((doc or {}).get("operations") or []) if isinstance(doc, dict) else 0
     n = revision + 1
-    version = {"n": n, "created_at": records.now_iso(), "snapshot_id": snap["id"], "yaml": obj.get("yaml") or "",
+    version = {"n": n, "created_at": records.now_iso(), "snapshot_id": snap["id"], "changeset_json": cs_json,
+               "requests": requests,
                "summary": _norm_list(obj.get("summary")), "assumptions": _norm_list(obj.get("assumptions")),
                "questions": _norm_list(obj.get("questions")), "validation": validation, "diff": diff,
                "revision_note": revision_note, "model": res.get("model", llm.MODEL), "effort": llm.EFFORT,

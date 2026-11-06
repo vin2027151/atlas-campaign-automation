@@ -69,7 +69,7 @@
 .mcard-inline .textarea { min-height: 64px; }
 .mcard-inline .input { width: 100%; }
 .mcard-inline .row { justify-content: flex-end; }
-.mcard-tagpick { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 2px var(--s2); max-height: 156px; overflow: auto; padding: 4px; border: 1px solid var(--line); border-radius: var(--r); }
+.mcard-tagpick { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 2px var(--s2); padding: 4px; border: 1px solid var(--line); border-radius: var(--r); }
 .mcard-tagpick .check { font-size: var(--fs-sm); min-width: 0; }
 .mcard-tagpick .check span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -163,9 +163,32 @@
 /* ad copy */
 .mcard-dl { margin-top: 4px; font-size: var(--fs-sm); }
 .mcard-dl dd { overflow-wrap: anywhere; }
-.mcard-primary { max-height: 180px; overflow: auto; padding: 6px var(--s2); border-radius: var(--r); background: var(--surface-2); }
+.mcard-primary { padding: 6px var(--s2); border-radius: var(--r); background: var(--surface-2); }
 
 @media (max-width: 640px) {
   .md-tools, .md-search { width: 100%; }
   .mcompact-actions .btn { min-height: 34px; }
+}
+
+/* thread switcher (page-level, not the sidebar nav): one thread on screen at a time */
+.md-threads { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface-2); }
+.md-thread-btn {
+  appearance: none; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 6px var(--s3);
+  border: 1px solid transparent; border-radius: var(--r); background: none; color: var(--ink-2); cursor: pointer;
+  font: 500 var(--fs)/1.2 var(--font); text-align: center;
+}
+.md-thread-btn:hover { color: var(--ink); background: var(--surface-3); }
+.md-thread-btn.active { color: var(--ink); font-weight: 600; background: var(--surface); border-color: var(--accent-line); box-shadow: inset 0 -2px 0 var(--accent); }
+.md-thread-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.md-thread-count { min-width: 22px; padding: 0 6px; border-radius: var(--r-pill); color: var(--ink-2); background: var(--surface-3); font-size: var(--fs-sm); font-weight: 600; font-variant-numeric: tabular-nums; }
+.md-thread-btn.active .md-thread-count { color: var(--accent); background: var(--accent-soft); }
+/* the board shows the selected thread as a card grid that grows with its items */
+.md-board { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.md-board > .md-col-empty { grid-column: 1 / -1; border: 1px dashed var(--line); border-radius: var(--r-lg); }
+@media (max-width: 900px) {
+  .md-threads { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .md-board { grid-template-columns: minmax(0, 1fr); }
+  .md-thread-btn { font-size: var(--fs-sm); padding: 6px var(--s2); }
 }

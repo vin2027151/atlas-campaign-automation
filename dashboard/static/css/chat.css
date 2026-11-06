@@ -1,7 +1,7 @@
 .qc-card { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
-.qc-meta { font-size: 12px; }
-.qc-log { min-height: 320px; max-height: calc(100vh - 360px); overflow-y: auto; overscroll-behavior: contain;
-  display: flex; flex-direction: column; gap: 12px; padding: 4px 2px; }
+.qc-config { margin: 0; }
+/* The log grows with the conversation: no max-height, no inner scroll, the page scrolls. */
+.qc-log { min-height: 240px; display: flex; flex-direction: column; gap: 12px; padding: 4px 2px; }
 .qc-msg { max-width: min(760px, 92%); border-radius: 14px; padding: 10px 14px; line-height: 1.5; }
 .qc-user { align-self: flex-end; background: color-mix(in srgb, var(--sa-purple) 22%, transparent); border: 1px solid color-mix(in srgb, var(--sa-purple) 45%, transparent); }
 .qc-assistant { align-self: flex-start; background: var(--surface-2, rgba(255,255,255,0.04)); border: 1px solid var(--border, rgba(255,255,255,0.08)); }
@@ -12,9 +12,11 @@
 .qc-text code { font-size: 12px; padding: 1px 4px; border-radius: 4px; background: rgba(127,127,127,.18); }
 .qc-h { font-weight: 600; }
 .qc-form { display: flex; flex-direction: column; gap: 8px; }
-.qc-input { width: 100%; resize: vertical; min-height: 56px; }
-.qc-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.qc-count { font-size: 12px; }
+/* roomier message box: more internal padding than the default .input */
+.qc-input { width: 100%; height: auto; resize: vertical; min-height: 84px; padding: 12px 14px; line-height: 1.5; }
+.qc-actions { display: flex; justify-content: flex-start; align-items: center; gap: 12px; }
+.qc-count { font-size: 12px; margin-left: auto; }
+.qc-below { display: flex; align-items: center; justify-content: flex-start; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
 .qc-note { font-size: 12px; margin: 0; }
 .qc-empty { margin: auto 0; text-align: center; padding: 24px 8px; }
 .qc-starters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 10px; }
@@ -22,5 +24,5 @@
 .qc-dots i:nth-child(2) { animation-delay: .2s; } .qc-dots i:nth-child(3) { animation-delay: .4s; }
 @keyframes qcdot { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-@media (max-width: 640px) { .qc-log { max-height: none; min-height: 260px; } .qc-msg { max-width: 100%; } }
+@media (max-width: 640px) { .qc-log { min-height: 200px; } .qc-msg { max-width: 100%; } .qc-card { padding: 12px; } }
 @media (prefers-reduced-motion: reduce) { .qc-dots i { animation: none; opacity: .7; } }

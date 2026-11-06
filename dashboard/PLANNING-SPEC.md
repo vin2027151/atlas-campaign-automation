@@ -1,4 +1,11 @@
-# Campaign Planning + Media — build contract (Task 2)
+# Plan & Adapt + Media — build contract (Task 2)
+
+> **Update 2026-11-06:** changesets are now JSON (`{"changeset":…, "operations":[…]}`); legacy YAML versions are still read.
+> `planning/api_requests.py` renders every operation as the exact HTTP request (Google Ads REST v26 `…:mutate`,
+> Meta Graph v27.0), with redacted headers and a curl copy. The Plan & Adapt UI shows those requests in place of YAML,
+> and publish refuses unless re-rendering against fresh state gives byte-identical requests. Direct Campaigns-page
+> controls (pause/enable, budget, bid) use the same renderer and guardrails via `planning/direct.py` and
+> `POST /api/campaigns/actions`. Where this spec still says "YAML" for changesets, read JSON.
 
 Read SPEC.md and AGENT-CONTRACT.md first: same stack, same Python 3.9 rules, same UI
 conventions, same visual style (read static/css/app.css and templates/campaigns.html +
@@ -11,7 +18,7 @@ triggers by hand after reading the diff. `planning/executor.py`, `planning/adapt
 `planning/changeset.py` must NEVER import `planning.llm`, `planning.llm_worker`,
 `planning.prompts` or `anthropic` (a test asserts this via sys.modules).
 
-## Flow on the Campaign Planning page (/planning)
+## Flow on the Plan & Adapt page (/planning)
 1. **Analyze** button: pull the full current account state (Google + Meta: every campaign,
    setting, bid strategy/target, optimization goal, budget, ad group/ad set, targeting,
    keyword, negative keyword, ad title/headline, status, recent metrics) into a saved
@@ -187,7 +194,7 @@ Allowlist (validate rejects anything else):
 - meta POST /{adset_id}: status, daily_budget (cents), bid_amount (cents), targeting (age_min, age_max, geo_locations), frequency_control_specs
 - meta POST /{ad_id}: status
 - meta POST /act_{id}/adimages {media_id}; /act_{id}/advideos {media_id}; /act_{id}/adcreatives; /act_{id}/ads (new ads must start PAUSED)
-`media_id` must exist in the Media library with status `approved` (else error). `$ref:<ref>.<field>` must point to an earlier op.
+`media_id` must exist in the Media library with status `approved` or `active` (else error). `$ref:<ref>.<field>` must point to an earlier op.
 Guardrails (errors): resource not in snapshot; budget change > +50% or < -50% on one entity in one changeset
 (warn above ±20%); any daily budget below $10; total daily budget across both platforms rising more than 10% (warn).
 
@@ -283,16 +290,22 @@ summary = {id, title, status, current_version, created_at, ops, errors, warnings
 version number sent, only with `confirm: true`. 400 otherwise.
 
 ## Media — media/ + api/media.py (prefix /api/media)
-Asset: `{id, kind: "image"|"video"|"html5", status: "requested"|"in_review"|"approved", title, description,
+Asset: `{id, kind: "image"|"video"|"html5", status: "requested"|"in_review"|"approved"|"active", title, description,
 brief, format (mime), file_url|null, thumb_url|null, width, height, duration_s|null, size_bytes|null,
 aspect ("1:1"|"4:5"|"9:16"|"16:9"|"1.91:1"|"300x250"...), platforms: ["meta","google"], placements: [str],
 source, source_url, requested_by, due|null, created_at, updated_at, history: [{ts, action, note}],
 tags: [campaign_id], platform_refs: {"meta": {"image_hash"|"video_id"}, "google": {"asset_resource"}}}`.
 IDs `IMG-0001`, `VID-0001`, `H5-0001` (per-kind counter). Library module API used by planning:
-`list_assets(status=None, kind=None)`, `get_asset(id)` (store.NotFound), `mark_published(id, platform, ref_dict)`.
-Endpoints: `GET /` (?status=&kind=) -> {ok, assets, counts}; `GET /{id}`; `POST /requests` {title, description, kind, brief,
+`list_assets(status=None, kind=None)` (status: one, comma-separated or a list), `get_asset(id)` (store.NotFound), `mark_published(id, platform, ref_dict)`.
+Lifecycle: requested -> (upload) in_review -> (approve) approved -> (activate) active -> (deactivate) approved;
+reject sends in_review back to requested. `approved` and `active` are the usable statuses (`USABLE_STATUSES`):
+both can be tagged in Plan & Adapt briefs, referenced by `media_id` and published.
+Endpoints: `GET /` (?status=&kind=, status may be `approved,active`) -> {ok, assets, counts}; `GET /{id}`; `POST /requests` {title, description, kind, brief,
 due, platforms, placements} -> requested asset; `POST /{id}/upload` multipart `file` (image/png|jpeg|webp|gif, video/mp4|quicktime,
 text/html or application/zip; max 50 MB) -> in_review; `POST /{id}/approve`; `POST /{id}/reject` {note} -> requested with note;
+`POST /{id}/activate` {note?} approved -> active; `POST /{id}/deactivate` {note?} active -> approved;
 `POST /{id}` {title, description, brief, tags} edit. Every mutation `store.log_activity`.
-Page /media: three columns Requests / Ready for review / Approved, cards with media preview, ID chip (click copies),
-title, description, format/size/aspect, tags; "New request" form; approve / send back with note; upload on request cards.
+Page /media: a page-level thread switcher (Creative requests / Ready for review / Approved / Active / in use),
+each thread showing only its assets; cards with media preview, ID chip (click copies),
+title, description, format/size/aspect, tags; "New request" form; approve / send back with note; upload on request cards;
+mark active / take out of use on approved and active cards.

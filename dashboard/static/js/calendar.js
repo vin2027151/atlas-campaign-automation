@@ -1,9 +1,11 @@
-// Calendar page: month calendar, next-14-days list, tests panel. Items open an edit
-// modal (fields + status). The needs-action queue lives on Management.
+// Calendar page: month calendar (prev / next month) with content items and test start / end
+// markers, plus the next-14-days list. Items open an edit modal (fields + status). The
+// needs-action queue and the testing schedule live on Management.
 import { api, fmt, toast, badge, platformChip, esc, $, $$, modal, withBusy, parseDate, isoDate } from "/static/js/common.js";
 
 const API = "/api/calendar";
 let data = null;
+let view = null; // { y, m } of the month on screen; starts at the sample-data month
 
 const STATUS_SHORT = {
   running: "Running",
@@ -22,9 +24,10 @@ async function load() {
     $("#month").innerHTML = `<div class="empty" style="grid-column:1/-1">Could not load the calendar.</div>`;
     return;
   }
+  if (!view) { const t = parseDate(data.today); view = { y: t.getFullYear(), m: t.getMonth() }; }
   renderSummary();
   renderCalendar();
-  renderTests();
+  renderUpcoming();
   fillFormOptions();
 }
 
@@ -83,16 +86,35 @@ function openEdit(id) {
 }
 
 // --------------------------------------------------------------- calendar
+function shiftMonth(delta) {
+  const d = new Date(view.y, view.m + delta, 1);
+  view = { y: d.getFullYear(), m: d.getMonth() };
+  renderCalendar();
+}
+
+function testMarker(t, kind) {
+  const label = kind === "start" ? "Test starts" : "Test ends";
+  return `<a class="ev test" href="/management#mg-schedule-card" title="${esc(`${label}: ${t.name} · ${t.status}`)}">${kind === "start" ? "&#9656;" : "&#9632;"} ${esc(t.name)}</a>`;
+}
+
 function renderCalendar() {
   const today = parseDate(data.today);
-  const y = today.getFullYear(), m = today.getMonth();
+  const y = view.y, m = view.m;
   const first = new Date(y, m, 1);
   const last = new Date(y, m + 1, 0);
-  $("#month-title").textContent = first.toLocaleString("en-US", { month: "long", year: "numeric" });
-  $("#legend").innerHTML = data.statuses.map((s) => `<span><span class="ev ${s}"></span>${esc(STATUS_SHORT[s])}</span>`).join("");
+  const label = first.toLocaleString("en-US", { month: "long", year: "numeric" });
+  $("#month-title").textContent = label;
+  $("#month-today").hidden = y === today.getFullYear() && m === today.getMonth();
+  $("#legend").innerHTML = data.statuses.map((s) => `<span><span class="ev ${s}"></span>${esc(STATUS_SHORT[s])}</span>`).join("")
+    + `<span><span class="ev test"></span>Test start / end</span>`;
 
   const byDate = {};
   data.content.forEach((c) => { (byDate[c.due] = byDate[c.due] || []).push(c); });
+  const testsBy = {};
+  (data.tests || []).forEach((t) => {
+    if (t.started) (testsBy[t.started] = testsBy[t.started] || []).push(testMarker(t, "start"));
+    if (t.ends) (testsBy[t.ends] = testsBy[t.ends] || []).push(testMarker(t, "end"));
+  });
 
   const start = new Date(y, m, 1 - first.getDay());
   const end = new Date(y, m, last.getDate() + (6 - last.getDay()));
@@ -104,12 +126,17 @@ function renderCalendar() {
     if (d.getMonth() !== m) cls.push("out");
     if (iso === data.today) cls.push("today");
     const evs = items.map((c) => `<button type="button" class="ev ${c.status}${c.overdue ? " overdue" : ""}" data-open="${esc(c.id)}" title="${esc(`${c.name} · ${c.status_label}${c.overdue ? " · OVERDUE" : ""} · ${c.owner}`)}">${esc(c.name)}</button>`).join("");
-    cells.push(`<div class="${cls.join(" ")}" role="gridcell" aria-label="${esc(fmt.date(iso, { dow: true }))}: ${items.length} item(s)"><span class="day-num">${d.getDate()}</span>${evs}</div>`);
+    const tests = testsBy[iso] || [];
+    cells.push(`<div class="${cls.join(" ")}" role="gridcell" aria-label="${esc(fmt.date(iso, { dow: true }))}: ${items.length} item(s)${tests.length ? `, ${tests.length} test date(s)` : ""}"><span class="day-num">${d.getDate()}</span>${evs}${tests.join("")}</div>`);
   }
   $("#month").innerHTML = cells.join("");
+}
 
+// The next-14-days list always counts from today, whatever month is on screen.
+function renderUpcoming() {
+  const today = parseDate(data.today);
   const up = data.upcoming_14d;
-  const endIso = isoDate(new Date(y, m, today.getDate() + 13));
+  const endIso = isoDate(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 13));
   $("#upcoming-range").textContent = `${fmt.date(data.today)} – ${fmt.date(endIso)}`;
   const overdue = data.overdue.map((c) => rowHtml(c, true)).join("");
   $("#upcoming").innerHTML = (overdue + up.map((c) => rowHtml(c, false)).join("")) || `<li class="empty">Nothing due in the next 14 days.</li>`;
@@ -120,71 +147,6 @@ function rowHtml(c, overdue) {
     : `<span class="when${c.due === data.today ? " today" : ""}">${c.due === data.today ? "Today" : esc(fmt.date(c.due, { dow: true }))}</span>`;
   const sub = [c.owner, c.format, c.segment, c.campaign_name].filter(Boolean).map(esc).join(" · ");
   return `<li>${when}<button type="button" class="what up-open" data-open="${esc(c.id)}" aria-label="${esc(`Edit ${c.name}`)}"><span class="truncate strong">${platformChip(c.platform)} ${esc(c.name)}</span><span class="truncate muted small">${sub}</span></button>${badge(c.status)}</li>`;
-}
-
-// ------------------------------------------------------------------ tests
-function metricFmt(t, v) {
-  if (v === null || v === undefined) return fmt.none;
-  return t.metric_unit === "money" ? fmt.cpt(v) : fmt.pct(v, 2);
-}
-
-function meterTone(pct) { return pct >= 100 ? "good" : pct >= 50 ? "" : "watch"; }
-
-function runningTest(t) {
-  const b = t.benchmark || {}, cur = t.current || {};
-  const target = t.target === null || t.target === undefined ? "" :
-    ` <span class="muted small">target ${t.direction === "below" ? "<" : ">"} ${esc(metricFmt(t, t.target))}</span>`;
-  const valTone = t.passing === null ? "" : t.passing ? "tone-good" : "tone-bad";
-  return `<article class="tcard">
-    <div class="tcard-head"><div class="tcard-name">${esc(t.name)}</div>${badge(t.status)}</div>
-    <div class="tcard-sub">${platformChip(t.platform)}<span>${esc(t.campaign_name || t.campaign_id)}</span><span>·</span><span class="nowrap">${esc(fmt.date(t.started))} → ${esc(fmt.date(t.ends))}</span></div>
-    <div class="tcard-hyp">${esc(t.hypothesis)}</div>
-    <div class="bench">${esc(t.benchmark_text)}</div>
-    <div class="tstats">
-      <div><div class="tstat-label">Spend</div><div class="tstat-value">${fmt.money(cur.spend)}</div></div>
-      <div><div class="tstat-label">Trials</div><div class="tstat-value">${fmt.int(cur.trials)}</div></div>
-      <div><div class="tstat-label">${esc(t.metric_label)}</div><div class="tstat-value ${valTone}">${esc(metricFmt(t, cur.value))}</div>${target}</div>
-    </div>
-    <div class="tprog"><span>Spend</span><div class="meter ${meterTone(t.spend_pct)}" role="progressbar" aria-valuenow="${t.spend_pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Spend toward minimum"><span style="width:${t.spend_pct}%"></span></div><span class="num">${fmt.money(cur.spend)} / ${fmt.money(b.min_spend)}</span></div>
-    <div class="tprog"><span>Trials</span><div class="meter ${meterTone(t.trials_pct)}" role="progressbar" aria-valuenow="${t.trials_pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Trials toward minimum"><span style="width:${t.trials_pct}%"></span></div><span class="num">${fmt.int(cur.trials)} / ${fmt.int(b.min_trials)}</span></div>
-    <div class="verdict ${t.verdict}">${esc(t.verdict_line)}</div>
-    ${t.notes ? `<div class="muted small">${esc(t.notes)}</div>` : ""}
-  </article>`;
-}
-
-function queuedTest(t) {
-  return `<article class="tcard">
-    <div class="tcard-head"><div class="tcard-name">${esc(t.name)}</div>${badge(t.status)}</div>
-    <div class="tcard-sub">${platformChip(t.platform)}<span>${esc(t.campaign_name || t.campaign_id)}</span><span>·</span><span class="nowrap">${esc(fmt.date(t.started))} → ${esc(fmt.date(t.ends))}</span></div>
-    <div class="tcard-hyp">${esc(t.hypothesis)}</div>
-    <div class="bench">${esc(t.benchmark_text)}</div>
-    <div class="verdict"><b>Starts when:</b> ${esc(t.notes || "scheduled start " + fmt.date(t.started))} Planned start ${esc(fmt.date(t.started, { dow: true }))}.</div>
-  </article>`;
-}
-
-function doneTest(t) {
-  const cur = t.current || {};
-  return `<details class="tdone">
-    <summary>${badge(t.status)}<span class="tdone-name">${esc(t.name)}</span>
-      <span class="tdone-result">${esc(t.metric_label)} ${esc(metricFmt(t, cur.value))} · ${fmt.money(cur.spend)} · ${fmt.int(cur.trials)} trials</span></summary>
-    <div class="tdone-body">
-      <div class="tcard-sub">${platformChip(t.platform)}<span>${esc(t.campaign_name || t.campaign_id)}</span><span>·</span><span>${esc(fmt.date(t.started))} → ${esc(fmt.date(t.ends))}</span></div>
-      <div class="tcard-hyp">${esc(t.hypothesis)}</div>
-      <div class="bench">${esc(t.benchmark_text)}</div>
-      <div class="verdict ${t.status === "won" ? "on_track" : t.status === "lost" ? "failing" : "not_enough_data"}"><b>Result:</b> ${esc(t.notes || t.status)}</div>
-    </div>
-  </details>`;
-}
-
-function renderTests() {
-  const running = data.tests.filter((t) => t.status === "running");
-  const queued = data.tests.filter((t) => t.status === "queued");
-  const done = data.tests.filter((t) => ["won", "lost", "inconclusive"].includes(t.status));
-  const parts = [];
-  parts.push(`<div><h3 class="section-label">Running (${running.length})</h3>${running.length ? `<div class="tests-grid">${running.map(runningTest).join("")}</div>` : `<div class="empty">No tests running.</div>`}</div>`);
-  if (queued.length) parts.push(`<div><h3 class="section-label">Queued (${queued.length})</h3><div class="tests-grid">${queued.map(queuedTest).join("")}</div></div>`);
-  if (done.length) parts.push(`<div><h3 class="section-label">Finished (${done.length})</h3>${done.map(doneTest).join("")}</div>`);
-  $("#tests").innerHTML = parts.join("");
 }
 
 // ------------------------------------------------------------------- form
@@ -237,6 +199,14 @@ function openFromHash() {
   if (id && data && data.content.some((c) => c.id === id)) openEdit(id);
 }
 window.addEventListener("hashchange", openFromHash);
+
+$("#month-prev").addEventListener("click", () => { if (view) shiftMonth(-1); });
+$("#month-next").addEventListener("click", () => { if (view) shiftMonth(1); });
+$("#month-today").addEventListener("click", () => {
+  const t = parseDate(data.today);
+  view = { y: t.getFullYear(), m: t.getMonth() };
+  renderCalendar();
+});
 
 wireForm();
 load().then(openFromHash);

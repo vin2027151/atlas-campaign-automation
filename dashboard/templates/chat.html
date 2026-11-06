@@ -6,24 +6,26 @@
 {% block subtitle %}<p class="page-sub">Ask about the 30-day plan, the latest account state and Search Atlas offerings. Answers come from one context document. Your history stays in this browser only.</p>{% endblock %}
 {% block actions %}
 <a class="btn btn-ghost btn-sm" href="/api/chat/context" target="_blank" rel="noopener">View context document</a>
-<button class="btn btn-sm" id="qc-clear" type="button">Clear chat</button>
 {% endblock %}
 
 {% block content %}
 <section class="card qc-card" aria-label="Quick chat">
-  <div class="qc-meta muted" id="qc-meta">Loading context…</div>
+  <div class="callout watch qc-config" id="qc-config" hidden>The model is not configured on this server, so Quick Chat cannot answer yet.</div>
   <div class="qc-log" id="qc-log" role="log" aria-live="polite" aria-relevant="additions"></div>
   <form class="qc-form" id="qc-form" autocomplete="off">
     <label class="sr-only" for="qc-input">Your question</label>
-    <textarea class="input qc-input" id="qc-input" rows="2" maxlength="4000"
+    <textarea class="input qc-input" id="qc-input" rows="3" maxlength="4000"
       placeholder="e.g. Which campaigns are over the $350 cost-per-trial ceiling this week?"></textarea>
     <div class="qc-actions">
-      <span class="muted qc-count" id="qc-count">0 / 4,000</span>
       <button class="btn btn-primary" id="qc-send" type="submit">Send</button>
+      <span class="muted qc-count" id="qc-count">0 / 4,000</span>
     </div>
   </form>
-  <p class="muted qc-note">Saved in this browser only. The last 20 messages go with each question. Clear chat erases it here; nothing is kept on the server.</p>
 </section>
+<div class="qc-below">
+  <button class="btn btn-sm" id="qc-clear" type="button">Clear chat</button>
+  <p class="muted qc-note">Saved in this browser only. The last 20 messages go with each question. Clear chat erases it here; nothing is kept on the server.</p>
+</div>
 {% endblock %}
 
 {% block scripts %}

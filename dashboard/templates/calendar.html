@@ -14,7 +14,7 @@
   .new-form .form-actions { grid-column: 1 / -1; display: flex; gap: var(--s2); justify-content: flex-end; }
 
   /* month grid */
-  .month-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); }
+  .month-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); flex-wrap: wrap; }
   .month { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
   .month .dow { padding: 6px var(--s2); font-size: var(--fs-sm); color: var(--muted); font-weight: 600; background: var(--surface-2); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
   .day { min-height: 104px; padding: 4px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 3px; min-width: 0; }
@@ -38,6 +38,17 @@
   .cal-summary a { color: var(--accent); }
   .legend { display: flex; gap: var(--s3); flex-wrap: wrap; font-size: var(--fs-sm); color: var(--ink-2); }
   .legend .ev { display: inline-block; width: 14px; height: 10px; padding: 0; vertical-align: -1px; margin-right: 4px; }
+  /* tests on the calendar: start and end markers (details in Management's testing schedule) */
+  .ev.test { border-left-color: var(--sa-mint, var(--good)); background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); text-decoration: none; }
+  a.ev.test:hover { color: var(--ink); text-decoration: none; filter: none; box-shadow: inset 0 0 0 1px var(--line-strong); }
+  a.ev:focus-visible { outline: none; box-shadow: var(--focus); }
+
+  /* top toolbar: New content item on the left */
+  .cal-toolbar { display: flex; align-items: center; justify-content: flex-start; gap: var(--s2); flex-wrap: wrap; }
+  /* month navigation, top right */
+  .month-nav { display: inline-flex; align-items: center; gap: var(--s2); }
+  .month-nav .month-label { min-width: 132px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .month-nav .btn-icon { min-width: 32px; }
 
   .upcoming { list-style: none; margin: 0; padding: 0; }
   .upcoming li { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: var(--s3); align-items: center; padding: var(--s2) var(--s4); border-bottom: 1px solid var(--line); }
@@ -47,53 +58,36 @@
   .upcoming .what { min-width: 0; }
   .upcoming .what .truncate { display: block; }
 
-  /* tests */
-  .tests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: var(--s3); }
-  .tcard { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); padding: var(--s3) var(--s4); display: flex; flex-direction: column; gap: var(--s2); min-width: 0; }
-  .tcard-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s2); }
-  .tcard-name { font-weight: 600; line-height: 1.3; }
-  .tcard-sub { font-size: var(--fs-sm); color: var(--muted); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-  .tcard-hyp { color: var(--ink-2); font-size: var(--fs-sm); }
-  .bench { font-size: var(--fs-sm); font-weight: 600; padding: 6px var(--s2); border-radius: var(--r); background: var(--surface-2); border: 1px solid var(--line); }
-  .tstats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s2); }
-  .tstat-label { font-size: var(--fs-xs); color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
-  .tstat-value { font-size: var(--fs-lg); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .tprog { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: var(--s2); align-items: center; font-size: var(--fs-sm); color: var(--ink-2); }
-  .tprog .num { color: var(--muted); }
-  .verdict { font-size: var(--fs-sm); padding: 6px var(--s2); border-radius: var(--r); border: 1px solid var(--line); background: var(--surface-2); }
-  .verdict.on_track { border-color: var(--good-line); background: var(--good-soft); color: var(--good); }
-  .verdict.failing { border-color: var(--bad-line); background: var(--bad-soft); color: var(--bad); }
-  .verdict.not_enough_data { border-color: var(--watch-line); background: var(--watch-soft); color: var(--watch); }
-  .tdone { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
-  .tdone + .tdone { margin-top: var(--s2); }
-  .tdone > summary { cursor: pointer; padding: var(--s2) var(--s3); display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; list-style: none; }
-  .tdone > summary::-webkit-details-marker { display: none; }
-  .tdone > summary .tdone-name { font-weight: 600; flex: 1; min-width: 180px; }
-  .tdone > summary .tdone-result { color: var(--ink-2); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
-  .tdone-body { padding: 0 var(--s3) var(--s3); display: flex; flex-direction: column; gap: var(--s2); }
-  .section-label { font-size: var(--fs-sm); font-weight: 600; color: var(--ink-2); margin: 0 0 var(--s2); }
-
   @media (max-width: 1100px) {
     .new-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 720px) {
     .new-form { grid-template-columns: minmax(0, 1fr); }
     .new-form .field.wide { grid-column: auto; }
-    .tests-grid { grid-template-columns: minmax(0, 1fr); }
     .day { min-height: 64px; padding: 2px; }
     .month .dow { padding: 4px 2px; text-align: center; font-size: var(--fs-xs); }
     .ev { font-size: 10px; padding: 1px 2px; border-left-width: 2px; }
     .upcoming li { grid-template-columns: 70px minmax(0, 1fr); padding: var(--s2) var(--s3); }
     .upcoming li .badge { grid-column: 2; justify-self: start; }
-    .tstats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 </style>
 {% endblock %}
 
-{% block subtitle %}<p class="page-sub">Media and content calendar: what is due when, by status. Click an item to edit it or move its status. Approvals and Vin&rsquo;s feedback queue live in Management. Live tests and their win benchmarks sit underneath.</p>{% endblock %}
-{% block actions %}<button class="btn btn-primary" id="new-toggle" type="button" aria-expanded="false" aria-controls="new-card">+ New content item</button>{% endblock %}
+{% block subtitle %}<p class="page-sub">Content and test dates by day: what is due when, by status, and when each test starts and ends. Click an item to edit it or move its status. Approvals, Vin&rsquo;s feedback queue and the testing schedule live in Management.</p>{% endblock %}
+{% block actions %}
+<div class="month-nav" role="group" aria-label="Month">
+  <button class="btn btn-sm btn-icon" id="month-prev" type="button" aria-label="Previous month" title="Previous month">&larr;</button>
+  <span class="month-label" id="month-title" aria-live="polite">Month</span>
+  <button class="btn btn-sm btn-icon" id="month-next" type="button" aria-label="Next month" title="Next month">&rarr;</button>
+</div>
+{% endblock %}
 
 {% block content %}
+<div class="cal-toolbar">
+  <button class="btn btn-primary" id="new-toggle" type="button" aria-expanded="false" aria-controls="new-card">+ New content item</button>
+  <button class="btn btn-sm btn-ghost" id="month-today" type="button" hidden>Back to this month</button>
+</div>
+
 <section class="card" id="new-card" hidden>
   <div class="card-head"><h2 class="card-title">New content item</h2><button class="btn btn-ghost btn-sm" type="button" data-close-new>Cancel</button></div>
   <div class="card-body">
@@ -128,7 +122,7 @@
 
 <section class="card" id="month-card">
   <div class="card-head month-head">
-    <div><h2 class="card-title" id="month-title">Month</h2><div class="cal-summary" id="cal-summary"></div></div>
+    <div class="cal-summary" id="cal-summary"></div>
     <div class="legend" id="legend"></div>
   </div>
   <div class="month" id="month" role="grid"><div class="skeleton" style="height:120px;grid-column:1/-1"></div></div>
@@ -139,10 +133,6 @@
   <ul class="upcoming" id="upcoming"></ul>
 </section>
 
-<section class="card" id="tests-card">
-  <div class="card-head"><h2 class="card-title">Test schedule context</h2><a class="card-sub" href="/management#mg-tests">Full scoreboard and win/loss ledger in Management →</a></div>
-  <div class="card-body stack" id="tests"><div class="skeleton" style="height:160px"></div></div>
-</section>
 {% endblock %}
 
 {% block scripts %}

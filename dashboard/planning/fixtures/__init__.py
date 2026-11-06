@@ -9,8 +9,6 @@ import json
 import os
 from typing import Any, Dict, List, Optional
 
-import yaml
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -42,7 +40,7 @@ def analysis_text(facts, test_reads=None):
         items.append({
             "title": "Stub: " + str(f.get("kind")), "plan": "Stub: plan rule behind this fact.",
             "running": str(f.get("campaign") or "Account"), "testing": "No test running on this.",
-            "evidence": str(f.get("note") or "")[:200], "recommendation": "Review this gap in Campaign Planning.",
+            "evidence": str(f.get("note") or "")[:200], "recommendation": "Review this gap in Plan & Adapt.",
             "research": "", "priority": "medium", "platform": f.get("platform") or "both",
             "campaign_id": f.get("campaign_id"), "test_id": None})
     items.extend(base.get("items", []))
@@ -115,7 +113,7 @@ def _target_adset(snapshot):
 def changeset(snapshot, media_assets, tagged_media=None, revision=0, revision_note=None, page_id="123456789012345",
               landing_url="https://www.agentstack.example/trial"):
     # type: (Dict[str, Any], List[Dict[str, Any]], Optional[List[str]], int, Optional[str], str, str) -> str
-    """Return the stub model reply (JSON text with a yaml field) built from the snapshot."""
+    """Return the stub model reply (JSON: changeset, operations, summary, ...) built from the snapshot."""
     cut = min(0.10 + 0.05 * revision, 0.20)
     ops = []  # type: List[Dict[str, Any]]
     summary = []  # type: List[str]
@@ -188,6 +186,6 @@ def changeset(snapshot, media_assets, tagged_media=None, revision=0, revision_no
     if revision_note:
         assumptions.append("Revision %d applied: brand cut now %d%%." % (revision, int(cut * 100)))
     questions = [] if asset else ["No approved image in the Media library; skipped the new ad."]
-    reply = {"yaml": yaml.safe_dump(doc, sort_keys=False, allow_unicode=True, width=120),
+    reply = {"changeset": doc["changeset"], "operations": doc["operations"],
              "summary": summary, "assumptions": assumptions, "questions": questions}
     return json.dumps(reply)

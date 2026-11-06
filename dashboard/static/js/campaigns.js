@@ -1,12 +1,15 @@
 // Campaigns page: one campaign table with its controls on each row.
 // GET /api/campaigns/?window=... drives the pacing summary, the table (with ad
 // sets and ads for the expandable rows) and the negative-keyword review.
-// Mutations reuse the /api/campaigns/* POST endpoints, then reload.
-import { api, fmt, toast, confirmButton, platformChip, badge, cptTone, esc, $, $$ } from "/static/js/common.js";
+// Direct controls (pause/enable, daily budget, bid) POST /api/campaigns/actions:
+// the server turns each into the exact Google Ads / Meta API request, applies it
+// to the account (sample state in data/state.json, so every browser sees it) and
+// returns that request, shown in the undo toast. Negatives use their own route.
+import { api, fmt, toast, platformChip, badge, cptTone, esc, $, $$ } from "/static/js/common.js";
 
 const WINDOW_KEY = "campaigns.window";
 const WINDOWS = ["3d", "7d", "14d", "30d", "mtd"];
-const COLS = 9;
+const COLS = 10;
 
 const S = {
   window: "7d",
@@ -18,6 +21,8 @@ const S = {
   match: {},              // search term key -> chosen match type
   more: { terms: false, negs: false }, // <details> open state survives re-render
   target: null,           // deep-linked campaign id to highlight once
+  edit: null,             // open inline editor {kind, id, field}
+  pending: new Set(),     // "kind:id" with a request in flight
 };
 
 try {
@@ -96,7 +101,7 @@ function renderPace() {
       </div>
       <div class="card-foot">
         <span>MTD ${fmt.money(p.month_to_date_spend)} of ${fmt.moneyShort(p.monthly_budget)}</span>
-        <span title="Projected month end at the 7-day spend rate">Projected <span class="${paceTone(p.month_pace_pct)} strong">${fmt.pct(p.month_pace_pct)}</span> (${fmt.moneyShort(p.projected_month_end)})</span>
+        <span title="MTD ${fmt.money(p.month_to_date_spend)} + ${p.days_remaining} days × ${fmt.money(p.pacing_daily_budget)}/day enabled now">Projected month-end at current daily budgets <span class="${paceTone(p.month_pace_pct)} strong">${fmt.pct(p.month_pace_pct)}</span> (${fmt.moneyShort(p.projected_month_end)})</span>
       </div>
     </div>`;
   };
@@ -144,8 +149,58 @@ function sumRows(rows) {
 function statusBtn(kind, id, status, name) {
   const paused = status === "PAUSED";
   const label = paused ? "Enable" : "Pause";
-  return `<button class="btn btn-sm${paused ? "" : " btn-danger"}" type="button" data-status-btn data-kind="${kind}" data-id="${esc(id)}"
-    data-next="${paused ? "ACTIVE" : "PAUSED"}" data-name="${esc(name)}" data-confirm-label="Confirm ${label.toLowerCase()}?">${label}</button>`;
+  const busy = S.pending.has(`${kind}:${id}`);
+  return `<button class="btn btn-sm${paused ? " btn-primary" : ""}" type="button" data-status-btn data-kind="${kind}" data-id="${esc(id)}"
+    data-next="${paused ? "ACTIVE" : "PAUSED"}" data-name="${esc(name)}" ${busy ? "disabled" : ""}
+    aria-label="${label} ${esc(name)}">${label}</button>`;
+}
+
+// ------------------------------------------------------- budget / bid cells
+const BID_SHORT = { "Target CPA": "tCPA", "Target CPA (max. conversions)": "tCPA", "Max CPC": "Max CPC", "Cost cap": "Cost cap", "Bid cap": "Bid cap" };
+
+function stepFor(v) {
+  const n = Math.abs(Number(v) || 0);
+  if (n >= 20) return Math.max(1, Math.round(n * 0.05));
+  return 0.5;
+}
+
+function editorHtml(kind, id, field, ctl, name) {
+  const v = ctl.value === null || ctl.value === undefined ? "" : ctl.value;
+  const what = field === "budget" ? "daily budget" : (ctl.label || "bid");
+  return `<span class="ctl-editor" data-editor data-kind="${kind}" data-id="${esc(id)}" data-field="${field}" data-name="${esc(name)}" data-current="${esc(v)}">
+    <button class="btn btn-sm ctl-step" type="button" data-step="-1" aria-label="Lower ${esc(what)}">&minus;</button>
+    <input class="input ctl-input" type="number" inputmode="decimal" min="0.01" step="0.01" value="${esc(v)}" aria-label="${esc(what)} for ${esc(name)}">
+    <button class="btn btn-sm ctl-step" type="button" data-step="1" aria-label="Raise ${esc(what)}">+</button>
+    <button class="btn btn-sm btn-primary" type="button" data-save>Save</button>
+    <button class="btn btn-sm btn-ghost" type="button" data-cancel aria-label="Cancel">&times;</button>
+  </span>`;
+}
+
+function isEditing(kind, id, field) {
+  return !!S.edit && S.edit.kind === kind && S.edit.id === id && S.edit.field === field;
+}
+
+function budgetCell(kind, item, name) {
+  const ctl = (item.controls || {}).budget;
+  if (!ctl) {
+    if (kind === "campaign") return fmt.money(item.daily_budget);
+    return item.daily_budget ? fmt.money(item.daily_budget) : '<span class="muted" title="Uses the campaign budget">campaign</span>';
+  }
+  if (isEditing(kind, item.id, "budget")) return editorHtml(kind, item.id, "budget", ctl, name);
+  const note = ctl.level === "ad_sets" ? " (sets the ad set budgets)" : "";
+  return `<button class="ctl-btn" type="button" data-edit="budget" data-kind="${kind}" data-id="${esc(item.id)}" ${ctl.editable ? "" : "disabled"}
+    title="${esc(ctl.note || "Click to raise or lower the daily budget")}" aria-label="Edit daily budget for ${esc(name)}${note}, now ${fmt.money(ctl.value)}">${fmt.money(ctl.value)}</button>`;
+}
+
+function bidCell(kind, item, name) {
+  const ctl = (item.controls || {}).bid;
+  if (!ctl) return `<span class="muted">${fmt.none}</span>`;
+  if (!ctl.editable) return `<span class="muted small ctl-fixed" title="${esc(ctl.note || "")}">${esc(ctl.label || fmt.none)}</span>`;
+  if (isEditing(kind, item.id, "bid")) return editorHtml(kind, item.id, "bid", ctl, name);
+  const short = BID_SHORT[ctl.label] || ctl.label;
+  const val = ctl.value === null || ctl.value === undefined ? (ctl.level === "ad_sets" ? "mixed" : "not set") : fmt.money(ctl.value);
+  return `<button class="ctl-btn" type="button" data-edit="bid" data-kind="${kind}" data-id="${esc(item.id)}"
+    title="${esc(ctl.label)}${ctl.note ? ": " + esc(ctl.note) : ""}. Click to raise or lower it." aria-label="Edit ${esc(ctl.label)} for ${esc(name)}, now ${esc(val)}"><span class="ctl-label">${esc(short)}</span> ${esc(val)}</button>`;
 }
 
 function caveat(trials, days) {
@@ -168,7 +223,8 @@ function campaignRow(c, tgt, newStart) {
     <td class="name"><span class="strong">${esc(c.name)}</span>${c.legacy ? '<span class="tag legacy-tag">legacy</span>' : ""}
       <div class="small muted cmp-meta">${esc(c.country)} · ${esc(c.type)} · ${esc(c.bid_strategy || "")}${live}</div></td>
     <td>${badge(c.status)}</td>
-    <td class="num"><button class="budget-btn" type="button" data-budget="${esc(c.id)}" title="Click to edit daily budget" aria-label="Edit daily budget for ${esc(c.name)}, now ${fmt.money(c.daily_budget)}">${fmt.money(c.daily_budget)}</button></td>
+    <td class="num">${budgetCell("campaign", c, c.name)}</td>
+    <td class="num">${bidCell("campaign", c, c.name)}</td>
     <td class="num">${fmt.money(c.spend)}${paceSub(c)}</td>
     <td class="num">${fmt.int(c.trials)}</td>
     <td class="num monitor ${cptTone(c.cpt_3d, tgt)}" title="${fmt.money(c.spend_3d)} / ${c.trials_3d} trials, last 3 days">${fmt.cpt(c.cpt_3d)}${caveat(c.trials_3d, 3)}</td>
@@ -198,6 +254,7 @@ function renderTable() {
     html += `<tr class="group-row${g.legacy ? " legacy" : ""}">
       <td colspan="3">${g.legacy ? "&#9888; " : ""}${esc(g.label)} · ${plural(rows.length, "campaign")}</td>
       <td class="num" title="Active campaigns only">${fmt.money(t.daily_budget)}</td>
+      <td></td>
       <td class="num">${fmt.money(t.spend)}</td>
       <td class="num">${fmt.int(t.trials)}</td>
       <td class="num ${cptTone(t.cpt_3d, tgt)}">${fmt.cpt(t.cpt_3d)}</td>
@@ -206,8 +263,17 @@ function renderTable() {
     html += rows.map((c) => campaignRow(c, tgt, newStart)).join("");
   });
   const body = $("#cmp-body");
+  // keep a half-typed value in an open editor across re-renders (background reloads)
+  const liveInput = body.querySelector("[data-editor] .ctl-input");
+  const keep = liveInput ? { value: liveInput.value, focused: document.activeElement === liveInput } : null;
   body.innerHTML = html || `<tr><td colspan="${COLS}" class="table-empty">No campaigns.</td></tr>`;
-  $$("[data-status-btn]", body).forEach((b) => confirmButton(b, onStatus));
+  const nextInput = body.querySelector("[data-editor] .ctl-input");
+  if (keep && nextInput) {
+    nextInput.value = keep.value;
+    nextInput.dataset.focused = "1";
+    if (keep.focused) nextInput.focus();
+  }
+  focusEditor();
   $("#cmp-foot").textContent = `${d.notes.monitor} Spend sub-line: average spend per live day and its share of today's daily budget (amber below 80% or above 115%). Cost per trial = spend ÷ PostHog trials, target ${fmt.money(tgt[0])}–${fmt.money(tgt[1])}. Daily spend and rolling cost-per-trial charts are on Reporting.`;
 }
 
@@ -238,19 +304,30 @@ function panelHtml(c) {
   const tip = `Apportioned: campaign ${d.window.label.toLowerCase()} totals split by ${basis}. Sample data has no ad-set-level daily rows.`;
   const rows = c.adsets.map((a) => {
     const open = S.openAdsets.has(a.id);
-    const ads = !open ? "" : (a.ads.map((ad) => `<tr class="ad-row indent-1${ad.status === "PAUSED" ? " is-paused" : ""}">
-        <td>${esc(ad.name)}</td>
+    const ads = !open ? "" : (a.ads.map((ad) => {
+      const m = ad.metrics || {};
+      const atip = `${ad.metrics_basis || "sample split"}: ${fmt.int(m.impressions)} impressions, CTR ${fmt.pct(m.ctr, 2)}, ${fmt.int(m.platform_conversions)} platform conv.`;
+      return `<tr class="ad-row indent-1${ad.status === "PAUSED" ? " is-paused" : ""}">
+        <td class="hook"><span class="strong">${esc(ad.name)}</span> <span class="tag">${esc(ad.format)}</span>
+          <div class="small muted">${esc(ad.hook)} · CTA ${esc(ad.cta)} · launched ${fmt.date(ad.launched)}</div></td>
         <td>${badge(ad.status)}</td>
-        <td><span class="tag">${esc(ad.format)}</span></td>
-        <td class="hook" colspan="3">${esc(ad.hook)} <span class="muted">· CTA ${esc(ad.cta)} · launched ${fmt.date(ad.launched)}</span></td>
+        <td class="num"><span class="muted">${fmt.none}</span></td>
+        <td class="num"><span class="muted">${fmt.none}</span></td>
+        <td class="num"><span class="apportioned" title="${esc(atip)}">${fmt.money(m.spend)}</span></td>
+        <td class="num"><span class="apportioned" title="${esc(atip)}">${fmt.int(m.clicks)}</span></td>
+        <td class="num"><span class="apportioned" title="${esc(atip)}">${m.trials == null ? fmt.none : Number(m.trials).toFixed(1)}</span></td>
+        <td class="num ${cptTone(m.cost_per_trial, tgt)}"><span class="apportioned" title="${esc(atip)}">${fmt.cpt(m.cost_per_trial)}</span></td>
         <td class="actions">${statusBtn("ad", ad.id, ad.status, ad.name)}</td>
-      </tr>`).join("") || `<tr class="ad-row indent-1"><td colspan="7" class="muted">No ads.</td></tr>`);
+      </tr>`;
+    }).join("") || `<tr class="ad-row indent-1"><td colspan="9" class="muted">No ads.</td></tr>`);
     return `<tr class="${a.status === "PAUSED" ? "is-paused" : ""}">
       <td><span class="strong">${esc(a.name)}</span>
         <div class="small muted truncate" title="${esc(a.targeting || "")}">${esc(a.targeting || "")}</div></td>
       <td>${badge(a.status)}</td>
-      <td class="num">${a.daily_budget ? fmt.money(a.daily_budget) : '<span class="muted" title="Uses the campaign budget">campaign</span>'}</td>
+      <td class="num">${budgetCell("adset", a, a.name)}</td>
+      <td class="num">${bidCell("adset", a, a.name)}</td>
       <td class="num"><span class="apportioned" title="${esc(tip)}">${fmt.money(a.spend)}</span></td>
+      <td class="num"><span class="apportioned" title="${esc(tip)}">${fmt.int(a.clicks)}</span></td>
       <td class="num"><span class="apportioned" title="${esc(tip)}">${a.trials == null ? fmt.none : Number(a.trials).toFixed(1)}</span></td>
       <td class="num ${cptTone(a.cost_per_trial, tgt)}"><span class="apportioned" title="${esc(tip)}">${fmt.cpt(a.cost_per_trial)}</span></td>
       <td class="actions"><span class="row-actions">
@@ -261,12 +338,13 @@ function panelHtml(c) {
   const wk = d.window.key === "mtd" ? "MTD" : d.window.key;
   return `<div class="panel">${stats}
     <div class="table-wrap"><table class="table compact sub-table">
-      <thead><tr><th>${esc(unit.charAt(0).toUpperCase() + unit.slice(1))}s &amp; targeting</th><th>Status</th><th class="num">Budget / day</th>
+      <thead><tr><th>${esc(unit.charAt(0).toUpperCase() + unit.slice(1))}s &amp; ads</th><th>Status</th><th class="num">Budget / day</th><th class="num">Bid</th>
         <th class="num"><span class="apportioned" title="${esc(tip)}">Spend ${wk}*</span></th>
+        <th class="num"><span class="apportioned" title="${esc(tip)}">Clicks*</span></th>
         <th class="num"><span class="apportioned" title="${esc(tip)}">Trials*</span></th>
         <th class="num"><span class="apportioned" title="${esc(tip)}">Cost / trial*</span></th><th class="actions"></th></tr></thead>
       <tbody>${rows}</tbody></table></div>
-    <p class="panel-note">* Apportioned from the campaign total by ${esc(basis)}; the sample data has no ad-set-level rows.</p>
+    <p class="panel-note">* Sample data has daily rows per campaign only: ${esc(unit)} numbers are the campaign total split by ${esc(basis)}, and each ad's numbers are its seeded share of its ${esc(unit)} (saved in the account state), so ads add up to their ${esc(unit)}.</p>
   </div>`;
 }
 
@@ -338,52 +416,268 @@ function renderNegatives() {
 }
 
 // ----------------------------------------------------------------- actions
-const STATUS_PATH = {
-  campaign: (id) => `/api/campaigns/${encodeURIComponent(id)}/status`,
-  adset: (id) => `/api/campaigns/adsets/${encodeURIComponent(id)}/status`,
-  ad: (id) => `/api/campaigns/ads/${encodeURIComponent(id)}/status`,
-};
+// Every direct control posts here. The server answers with the exact API
+// request(s) it ran (or, for a large change, the warnings and the requests it
+// would run, waiting for a confirm).
+function postAction(actions, confirm = false) {
+  return api("/api/campaigns/actions", { body: { actions, confirm } });
+}
+
+function findItem(kind, id) {
+  for (const c of (S.data ? S.data.campaigns : [])) {
+    if (kind === "campaign" && c.id === id) return c;
+    for (const a of c.adsets || []) {
+      if (kind === "adset" && a.id === id) return a;
+      for (const ad of a.ads || []) if (kind === "ad" && ad.id === id) return ad;
+    }
+  }
+  return null;
+}
+
+function itemName(kind, id) {
+  const it = findItem(kind, id);
+  return (it && it.name) || id;
+}
+
+// Apply the server's answer locally (status, budget, bid) so the table shows it
+// before the background reload lands, and refresh the pacing cards.
+function applyLocal(res) {
+  const r = res.result || res;
+  (r.changes || []).forEach((ch) => {
+    const it = findItem(ch.kind, ch.id);
+    if (!it) return;
+    const v = ch.now !== undefined ? ch.now : ch.after;
+    if (ch.field === "status") it.status = v;
+    else if (it.controls && it.controls[ch.field]) it.controls[ch.field].value = v;
+    if (ch.field === "budget" && "daily_budget" in it) it.daily_budget = v;
+  });
+  // pacing reacts at once; the window-based spend numbers wait for the reload
+  const sm = res.summary;
+  if (sm) {
+    const keys = ["month_pace_pct", "projected_month_end", "pacing_daily_budget", "active_daily_budget",
+      "pct_of_target", "active", "paused", "days_remaining"];
+    ["account", "google", "meta"].forEach((k) => {
+      const src = k === "account" ? sm.account : sm.platforms[k];
+      const dst = k === "account" ? S.data.summary.account : S.data.summary.platforms[k];
+      if (src && dst) keys.forEach((x) => { if (x in src) dst[x] = src[x]; });
+    });
+  }
+}
+
+function setLocalStatus(kind, id, status) {
+  const it = findItem(kind, id);
+  if (it) it.status = status;
+}
 
 async function onStatus(btn) {
   const { kind, id, next, name } = btn.dataset;
-  await api(STATUS_PATH[kind](id), { body: { status: next } });
-  await afterMutation(`${name} ${next === "PAUSED" ? "paused" : "enabled"}`);
+  const prev = next === "PAUSED" ? "ACTIVE" : "PAUSED";
+  const key = `${kind}:${id}`;
+  if (S.pending.has(key)) return;
+  S.pending.add(key);
+  setLocalStatus(kind, id, next);     // show it now; the server confirms below
+  render();
+  try {
+    const res = await postAction([{ kind, id, action: "status", value: next, expected: prev }]);
+    S.pending.delete(key);
+    applyLocal(res);
+    render();
+    actionToast(`${name} ${next === "PAUSED" ? "paused" : "enabled"}`, res.result);
+    refresh();
+  } catch (e) {
+    S.pending.delete(key);
+    setLocalStatus(kind, id, prev);
+    render();
+    toast(e.status === 409 ? `${name} changed in another window. Reloaded the latest state.` : `Could not ${next === "PAUSED" ? "pause" : "enable"} ${name}: ${e.message}`, "error");
+    if (e.status === 409) refresh();
+  }
 }
 
-function startBudgetEdit(btn) {
-  const id = btn.dataset.budget;
-  const c = S.data.campaigns.find((x) => x.id === id);
-  if (!c) return;
-  const cell = btn.parentElement;
-  cell.innerHTML = `<input class="input budget-input" type="number" min="0.01" step="1" value="${c.daily_budget}" aria-label="Daily budget for ${esc(c.name)}">`;
-  const input = cell.querySelector("input");
+async function refresh() {
+  try { await load(); } catch (e) { toast(`Saved, but the page did not refresh: ${e.message}`, "warn"); }
+}
+
+// ------------------------------------------------------------ inline editor
+function openEditor(kind, id, field) {
+  S.edit = { kind, id, field };
+  render();
+}
+
+function closeEditor() {
+  if (!S.edit) return;
+  S.edit = null;
+  render();
+}
+
+function focusEditor() {
+  const input = document.querySelector("[data-editor] .ctl-input");
+  if (input && document.activeElement !== input && !input.dataset.focused) {
+    input.dataset.focused = "1";
+    input.focus();
+    input.select();
+  }
+}
+
+function roundStep(v, step) {
+  const n = Math.round(v / step) * step;
+  return Math.round(n * 100) / 100;
+}
+
+function stepEditor(ed, dir) {
+  const input = ed.querySelector(".ctl-input");
+  const base = Number(ed.dataset.current) || Number(input.value) || 0;
+  const step = stepFor(base);
+  const cur = Number(input.value) || 0;
+  input.value = String(Math.max(step, roundStep(cur + dir * step, step)));
   input.focus();
-  input.select();
-  let done = false;
-  const cancel = () => { if (done) return; done = true; renderTable(); };
-  input.addEventListener("click", (e) => e.stopPropagation());
-  input.addEventListener("keydown", async (e) => {
-    if (e.key === "Escape") { e.preventDefault(); cancel(); return; }
-    if (e.key !== "Enter") return;
-    e.preventDefault();
-    const v = Number(input.value);
-    if (!input.value.trim() || !isFinite(v) || v <= 0) {
-      toast("Daily budget must be a number greater than 0", "error");
-      input.focus();
+}
+
+async function saveEditor(ed, confirm = false) {
+  const { kind, id, field, name, current } = ed.dataset;
+  const input = ed.querySelector(".ctl-input");
+  const v = Number(input.value);
+  if (!input.value.trim() || !isFinite(v) || v <= 0) {
+    toast(`${field === "budget" ? "Daily budget" : "Bid"} must be a number greater than 0`, "error");
+    input.focus();
+    return;
+  }
+  const before = current === "" ? null : Number(current);
+  if (before !== null && Math.abs(v - before) < 0.005) { closeEditor(); return; }
+  ed.querySelectorAll("button, input").forEach((x) => { x.disabled = true; });
+  try {
+    const res = await postAction([{ kind, id, action: field, value: v, expected: before }], confirm);
+    const r = res.result || {};
+    if (r.needs_confirm) {
+      ed.querySelectorAll("button, input").forEach((x) => { x.disabled = false; });
+      confirmLarge(ed, r);
       return;
     }
-    if (v === Number(c.daily_budget)) { cancel(); return; }
-    done = true;
-    input.disabled = true;
+    S.edit = null;
+    applyLocal(res);
+    render();
+    const label = field === "budget" ? "daily budget" : (((findItem(kind, id) || {}).controls || {}).bid || {}).label || "bid";
+    actionToast(`${name}: ${label} ${before === null ? "" : fmt.money(before) + " → "}${fmt.money(v)}`, r);
+    refresh();
+  } catch (e) {
+    ed.querySelectorAll("button, input").forEach((x) => { x.disabled = false; });
+    toast(e.status === 409 ? `${name} changed in another window; reloaded. Try again.` : e.message, "error");
+    if (e.status === 409) { S.edit = null; refresh(); }
+  }
+}
+
+// A large change (guardrail warning) needs a second, explicit click.
+function confirmLarge(ed, r) {
+  S.lastConfirm = r;
+  let box = ed.querySelector(".ctl-confirm");
+  if (!box) {
+    box = document.createElement("div");
+    box.className = "ctl-confirm";
+    ed.appendChild(box);
+  }
+  box.innerHTML = `<div class="tone-watch small">${(r.warnings || []).map(esc).join("<br>")}</div>
+    <details class="ctl-req"><summary>${r.requests.length === 1 ? "API request" : `${r.requests.length} API requests`} it will send</summary>${requestsHtml(r.requests)}</details>
+    <div class="row-actions"><button class="btn btn-sm btn-danger" type="button" data-confirm-save>Confirm change</button>
+    <button class="btn btn-sm btn-ghost" type="button" data-cancel>Cancel</button></div>`;
+  box.querySelector("[data-confirm-save]").focus();
+}
+
+// ------------------------------------------------------- request rendering
+function requestsHtml(reqs) {
+  return (reqs || []).map((q, i) => `<div class="req-block">
+      <div class="req-head"><span class="req-n">${q.step || i + 1}</span><span class="mono">${esc(q.method)} ${esc(q.url)}</span>
+        <button class="btn btn-sm" type="button" data-copy-curl="${i}">Copy curl</button></div>
+      <pre class="req-code"><code>${esc(requestText(q))}</code></pre>
+    </div>`).join("");
+}
+
+function requestText(q) {
+  const h = Object.entries(q.headers || {}).map(([k, v]) => `${k}: ${v}`).join("\n");
+  let body;
+  if (q.content_type === "application/x-www-form-urlencoded") {
+    body = Object.entries(q.body || {}).map(([k, v]) => `${k}=${typeof v === "string" ? v : JSON.stringify(v)}`).join("\n");
+  } else {
+    body = JSON.stringify(q.body, null, 2);
+  }
+  return `${q.method} ${q.url}\n${h}\n\n${body}`;
+}
+
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* fall back */ }
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  let ok = false;
+  try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+  ta.remove();
+  return ok;
+}
+
+function wireCopy(root, reqs) {
+  root.addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-copy-curl]");
+    if (!b) return;
+    e.stopPropagation();
+    const q = reqs[Number(b.dataset.copyCurl)];
+    if (q && await copyText(q.curl)) { b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy curl"; }, 1500); }
+    else toast("Copy failed", "error");
+  });
+}
+
+// ------------------------------------------------------------- undo toast
+function toastStack() {
+  let stack = document.getElementById("cmp-toasts");
+  if (!stack) {
+    stack = document.createElement("div");
+    stack.id = "cmp-toasts";
+    stack.className = "cmp-toasts";
+    stack.setAttribute("aria-live", "polite");
+    document.body.appendChild(stack);
+  }
+  return stack;
+}
+
+function actionToast(msg, r, { undoable = true } = {}) {
+  r = r || {};
+  const reqs = r.requests || [];
+  const undo = (r.undo || {}).actions || [];
+  const el = document.createElement("div");
+  el.className = "cmp-toast";
+  el.setAttribute("role", "status");
+  const sample = r.mode && r.mode !== "live" ? ` <span class="muted small">(${esc(r.mode)} account)</span>` : "";
+  el.innerHTML = `<div class="cmp-toast-head"><span class="cmp-toast-msg">${esc(msg)}${sample}</span>
+      ${undoable && undo.length ? '<button class="btn btn-sm" type="button" data-undo>Undo</button>' : ""}
+      <button class="cmp-toast-x" type="button" aria-label="Dismiss">&times;</button></div>
+    ${reqs.length ? `<details class="ctl-req"><summary>${reqs.length === 1 ? "API request sent" : `${reqs.length} API requests sent`}</summary>${requestsHtml(reqs)}</details>` : ""}`;
+  toastStack().appendChild(el);
+  wireCopy(el, reqs);
+  let timer = null;
+  const close = () => { clearTimeout(timer); el.classList.add("leaving"); setTimeout(() => el.remove(), 220); };
+  const arm = () => { clearTimeout(timer); timer = setTimeout(close, 12000); };
+  el.addEventListener("mouseenter", () => clearTimeout(timer));
+  el.addEventListener("mouseleave", () => { if (!el.querySelector("details[open]")) arm(); });
+  el.addEventListener("toggle", () => { if (el.querySelector("details[open]")) clearTimeout(timer); else arm(); }, true);
+  el.querySelector(".cmp-toast-x").addEventListener("click", close);
+  const ub = el.querySelector("[data-undo]");
+  if (ub) ub.addEventListener("click", async () => {
+    ub.disabled = true;
+    ub.textContent = "Undoing…";
     try {
-      await api(`/api/campaigns/${encodeURIComponent(id)}/budget`, { body: { daily_budget: v } });
-      await afterMutation(`${c.name}: daily budget ${fmt.money(c.daily_budget)} → ${fmt.money(v)}`);
-    } catch (err) {
-      toast(err.message, "error");
-      renderTable();
+      // the undo carries the exact before values; confirm is implied (the user made the change)
+      const res = await postAction(undo, true);
+      applyLocal(res);
+      render();
+      close();
+      actionToast(`Undone: ${msg}`, res.result, { undoable: false });
+      refresh();
+    } catch (e) {
+      ub.disabled = false;
+      ub.textContent = "Undo";
+      toast(`Undo failed: ${e.message}`, "error");
+      if (e.status === 409) refresh();
     }
   });
-  input.addEventListener("blur", () => setTimeout(cancel, 120));
+  arm();
+  return el;
 }
 
 async function addNegative(cid, text, match, source, btn) {
@@ -445,8 +739,20 @@ function wire() {
   const body = $("#cmp-body");
   body.addEventListener("click", (e) => {
     const t = e.target;
-    const budget = t.closest("[data-budget]");
-    if (budget) { startBudgetEdit(budget); return; }
+    const st = t.closest("[data-status-btn]");
+    if (st) { e.stopPropagation(); onStatus(st); return; }
+    const ed = t.closest("[data-editor]");
+    if (ed) {
+      e.stopPropagation();
+      const stepB = t.closest("[data-step]");
+      if (stepB) { stepEditor(ed, Number(stepB.dataset.step)); return; }
+      if (t.closest("[data-confirm-save]")) { saveEditor(ed, true); return; }
+      if (t.closest("[data-save]")) { saveEditor(ed); return; }
+      if (t.closest("[data-cancel]")) { closeEditor(); return; }
+      return;
+    }
+    const editB = t.closest("[data-edit]");
+    if (editB) { e.stopPropagation(); openEditor(editB.dataset.kind, editB.dataset.id, editB.dataset.edit); return; }
     const exp = t.closest("[data-expand]");
     if (exp) { toggleCampaign(exp.dataset.expand); return; }
     const aexp = t.closest("[data-adset-expand]");
@@ -462,6 +768,16 @@ function wire() {
     const row = t.closest("tr.camp-row");
     if (row) toggleCampaign(row.dataset.cid);
   });
+
+  body.addEventListener("keydown", (e) => {
+    const ed = e.target.closest("[data-editor]");
+    if (!ed) return;
+    if (e.key === "Escape") { e.preventDefault(); closeEditor(); }
+    else if (e.key === "Enter" && e.target.matches(".ctl-input")) { e.preventDefault(); saveEditor(ed); }
+    else if (e.key === "ArrowUp" && e.target.matches(".ctl-input")) { e.preventDefault(); stepEditor(ed, 1); }
+    else if (e.key === "ArrowDown" && e.target.matches(".ctl-input")) { e.preventDefault(); stepEditor(ed, -1); }
+  });
+  body.addEventListener("click", (e) => { wireCopyClick(e); });
 
   const neg = $("#neg-body");
   neg.addEventListener("click", async (e) => {
@@ -485,6 +801,16 @@ function wire() {
     const ok = await addNegative(form.elements.campaign.value, text, form.elements.match.value, "manual", form.querySelector("button"));
     if (ok) { const f = $("#neg-form"); if (f) f.elements.text.value = ""; }
   });
+}
+
+async function wireCopyClick(e) {
+  const b = e.target.closest("[data-copy-curl]");
+  if (!b) return;
+  const ed = b.closest("[data-editor]");
+  if (!ed) return;
+  e.stopPropagation();
+  const it = S.lastConfirm && S.lastConfirm.requests ? S.lastConfirm.requests[Number(b.dataset.copyCurl)] : null;
+  if (it && await copyText(it.curl)) { b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy curl"; }, 1500); }
 }
 
 // The brand preloader locks page scroll while it plays; wait for it to finish.

@@ -24,8 +24,8 @@ SECRET_KEYS = ("developer_token", "client_id", "client_secret", "refresh_token",
 
 DEFAULT_CONFIG = {
     "mode": "sample",
-    "google_ads": {"api_version": "v22", "customer_id": "4445556666", "login_customer_id": "1112223333"},
-    "meta": {"api_version": "v24.0", "ad_account_id": "act_7778889999", "page_id": "123456789012345"},
+    "google_ads": {"api_version": "v26", "send_developer_token": False, "customer_id": "4445556666", "login_customer_id": "1112223333"},
+    "meta": {"api_version": "v27.0", "ad_account_id": "act_7778889999", "page_id": "123456789012345"},
 }  # type: Dict[str, Any]
 
 

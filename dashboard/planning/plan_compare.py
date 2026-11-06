@@ -184,28 +184,30 @@ def compare(plan, snapshot):
                 facts.append(_fact("checklist_overdue", "both", None, day["date"], "open",
                                    "Day %s: %s [%s]" % (day["day"], it["text"], it["id"])))
 
-    # pacing: straight-line projection of MTD spend vs plan totals
+    # pacing: MTD spend + days remaining x current daily budgets of what is enabled (reacts at once)
     totals = snapshot.get("totals") or {}
     plats = plan.get("platforms") or {}
+    remaining = max(0, dim - elapsed)
     for platform in ("google", "meta"):
         target = (plats.get(platform) or {}).get("declared_total")
         mtd = (totals.get(platform) or {}).get("spend_mtd")
         if not target or mtd is None or not elapsed:
             continue
-        proj = round(float(mtd) / elapsed * dim, 2)
         daily_sum = (totals.get(platform) or {}).get("daily_budget") or 0
+        proj = round(float(mtd) + float(daily_sum) * remaining, 2)
         if abs(proj / float(target) - 1) > PACING_TOLERANCE:
             facts.append(_fact("pacing", platform, None, float(target), proj,
-                               "MTD %s over %d days projects %s vs plan %s (%+.0f%%); active daily budgets x %d = %s" % (
-                                   _money(mtd), elapsed, _money(proj), _money(target), (proj / float(target) - 1) * 100,
-                                   dim, _money(daily_sum * dim))))
+                               "projected month-end at current daily budgets: MTD %s + %d days x %s/day = %s vs plan %s (%+.0f%%)" % (
+                                   _money(mtd), remaining, _money(daily_sum), _money(proj), _money(target),
+                                   (proj / float(target) - 1) * 100)))
     total = acct.get("total_budget")
     mtd_all = (totals.get("all") or {}).get("spend_mtd")
     if total and mtd_all is not None and elapsed:
-        proj = round(float(mtd_all) / elapsed * dim, 2)
+        daily_all = (totals.get("all") or {}).get("daily_budget") or 0
+        proj = round(float(mtd_all) + float(daily_all) * remaining, 2)
         if abs(proj / float(total) - 1) > PACING_TOLERANCE:
             facts.append(_fact("pacing", "both", None, float(total), proj,
-                               "account projects %s vs %s plan (%+.0f%%), reserve %s" % (
+                               "account projects %s at current daily budgets vs %s plan (%+.0f%%), reserve %s" % (
                                    _money(proj), _money(total), (proj / float(total) - 1) * 100,
                                    _money(acct.get("reserve")))))
     return facts

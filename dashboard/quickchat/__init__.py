@@ -1,4 +1,4 @@
-"""Quick Chat: one context document + a stateless chat call (Sonnet 5.5, effort low).
+"""Quick Chat: one context document + a stateless chat call (Haiku 5.5, effort low).
 
 The server keeps no chat history. Each browser stores its own history in localStorage
 and sends at most the last 20 messages with every question. The API key never leaves
@@ -21,12 +21,12 @@ WEBSITE_PATH = os.path.join(BASE_DIR, "data", "context", "searchatlas-website.md
 PLAN_PATH = os.path.join(BASE_DIR, "data", "plan", "plan.yaml")
 MEDIA_PATH = os.path.join(BASE_DIR, "data", "media.json")
 
-MODEL = "claude-sonnet-5-5"
+MODEL = "claude-haiku-5-5"
 EFFORT = "low"
 MAX_HISTORY = 20          # messages (user + assistant) sent with each question
 MAX_USER_CHARS = 4000
 MAX_ASSISTANT_CHARS = 12000
-MAX_TOKENS = 4000
+MAX_TOKENS = 8000          # Haiku 5.5 thinks by default and thinking counts toward max_tokens
 PER_IP_PER_HOUR = 40
 GLOBAL_PER_DAY = 600
 
@@ -39,7 +39,7 @@ Answer questions from the context document below: the company and its offerings 
 - Say which source a number comes from when it matters (plan, account state as of the snapshot time, website).
 - The ad-account data is sample data for a demo build, not a live account. Mention that only if asked or if it matters.
 - Company context: the company and brand is Search Atlas. AgentStack is one Search Atlas offering (its own ads, landing page and 14-day-trial offer) and is what the 30-day plan sells.
-- You cannot change anything in the accounts. For changes, point to the Campaign Planning tab (brief, diff, manual publish)."""
+- You cannot change anything in the accounts. For changes, point to the Plan & Adapt tab (brief, diff, manual publish)."""
 
 _lock = threading.Lock()
 _cache = {"key": None, "doc": None, "meta": None}
@@ -97,9 +97,9 @@ def _pacing_lines():
     out = []
     for label, plat in (("All", None), ("Google", "google"), ("Meta", "meta")):
         p = store.pacing(plat)
-        out.append("- %s: MTD spend %s of %s monthly budget, pace %s%%, projected month end %s, 7-day daily rate %s, day %s of %s." % (
+        out.append("- %s: MTD spend %s of %s monthly budget, pace %s%%, projected month end at current daily budgets %s (enabled daily budgets %s/day), day %s of %s." % (
             label, _money(p.get("month_to_date_spend")), _money(p.get("monthly_budget")), p.get("pace_pct"),
-            _money(p.get("projected_month_end")), _money(p.get("daily_rate_7d")), p.get("days_elapsed"), p.get("days_in_month")))
+            _money(p.get("projected_month_end")), _money(p.get("active_daily_budget")), p.get("days_elapsed"), p.get("days_in_month")))
     mtd = store.month_to_date()
     w7 = store.window_totals(None, 7)
     out.append("- Trials MTD %s at %s per trial; last 7 days %s trials at %s per trial (PostHog-attributed)." % (
@@ -214,7 +214,7 @@ def build_context(force=False):
             "- [%s] %s%s" % (f.get("kind"), (f.get("campaign") + ": ") if f.get("campaign") else "", f.get("note") or "") for f in facts),
         "## 4. 30-day checklist\n\n" + _checklist(),
         "## 5. Latest analysis\n\n" + _latest_analysis(),
-        "## 6. Media library (IDs usable in Campaign Planning briefs)\n\n" + _media(),
+        "## 6. Media library (IDs usable in Plan & Adapt briefs)\n\n" + _media(),
         "## 7. Recent changes (activity log)\n\n" + _activity(),
         "## 8. The 30-day plan (plan.yaml)\n\n```yaml\n" + plan_text.strip() + "\n```",
         "## 9. Full account state (state document %s, compact)\n\n```yaml\n%s```" % (snap.get("id"), compact),

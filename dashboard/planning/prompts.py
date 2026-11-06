@@ -31,7 +31,7 @@ Company context: the company and brand is Search Atlas. AgentStack is one Search
 
 CHANGESET_SYSTEM = """You turn a media buyer's brief into a changeset for a Google Ads + Meta account. Company context: the company and brand is Search Atlas. AgentStack is one Search Atlas offering (its own ads, landing page and 14-day-trial offer), not the brand. The plan covers the AgentStack offering. Search Atlas SEO ads in the account belong to other Search Atlas offerings; call them off-plan for these campaigns, never a branding error.
 
-The changeset is YAML whose operations are shaped exactly like Google Ads API and Meta Marketing API requests, following the schema document you are given. Code validates it, computes a diff against the current state, and shows the diff to a human.
+The changeset is JSON. Each operation is one Google Ads API or Meta Marketing API call, following the schema document you are given. Code validates it, renders every operation as the exact HTTP request it will send, computes a diff against the current state, and shows the requests and the diff to a human.
 
 You have no authority to publish and no access to the accounts. A human reads the diff and publishes by hand, or not at all. Write the proposal; do not claim anything was changed.
 
@@ -43,9 +43,9 @@ Rules:
 - Do exactly what the brief asks; no extra changes. If the brief is ambiguous, make the safest reasonable choice, list it under assumptions, and ask under questions.
 - rationale, summary, assumptions and questions are short bullets, each under 25 words. Use only numbers present in the inputs.
 
-Return only a JSON object:
-{"yaml": "<the full changeset YAML as one string>", "summary": [str], "assumptions": [str], "questions": [str]}
-summary: what the changeset does, one bullet per operation group. assumptions and questions may be empty lists."""
+Return only one JSON object, no prose and no code fences:
+{"changeset": {"title": str, "based_on_snapshot": str, "rationale": [str]}, "operations": [op, ...], "summary": [str], "assumptions": [str], "questions": [str]}
+operations: exactly as in the schema document. summary: what the changeset does, one bullet per operation group. assumptions and questions may be empty lists."""
 
 
 def _dump_yaml(obj):
@@ -96,16 +96,16 @@ def draft_messages(directive, compact_snapshot, schema_doc, media_assets, plan, 
     return [{"role": "user", "content": "\n\n".join(parts)}]
 
 
-def revise_messages(directive, revision_note, prior_yaml, compact_snapshot, schema_doc, media_assets, plan,
+def revise_messages(directive, revision_note, prior_json, compact_snapshot, schema_doc, media_assets, plan,
                     tagged_media, prior_validation=None):
     # type: (str, str, str, Dict[str, Any], str, List[Dict[str, Any]], Any, List[str], Optional[List[Dict[str, Any]]]) -> List[Dict[str, Any]]
     parts = _changeset_context(compact_snapshot, schema_doc, media_assets, plan, tagged_media)
-    parts += [_block("original_brief", directive), _block("prior_changeset_yaml", prior_yaml)]
+    parts += [_block("original_brief", directive), _block("prior_changeset_json", prior_json)]
     if prior_validation:
         parts.append(_block("prior_validation", _dump_json(prior_validation)))
     parts += [_block("revision_notes", revision_note),
               "Revise the prior changeset per the revision notes, against the current state document "
-              "(update based_on_snapshot). Return the complete new YAML, not a patch. Reply with the JSON object only."]
+              "(update based_on_snapshot). Return the complete new changeset, not a patch. Reply with the JSON object only."]
     return [{"role": "user", "content": "\n\n".join(parts)}]
 
 

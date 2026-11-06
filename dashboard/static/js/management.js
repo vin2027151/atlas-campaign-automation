@@ -1,7 +1,8 @@
-// Management page: checklist, needs action, in play, then the scoreboard and logs.
+// Management page: needs action, test scoreboard, testing schedule, checklist, tracking, activity, lessons.
+// (In play moved out: the same campaigns and controls live on Campaigns.)
 // One GET (/api/management/) renders every section; checklist toggles and new
 // lessons update the UI immediately, then reconcile with the server response.
-import { api, fmt, toast, esc, badge, cptTone, platformChip, confirmButton, withBusy, $, $$ } from "/static/js/common.js";
+import { api, fmt, toast, esc, badge, platformChip, withBusy, $ } from "/static/js/common.js";
 
 const S = { data: null, selectedDay: null, tag: null, newLesson: null };
 const TONE_BADGE = { good: "good", watch: "watch", bad: "bad", idle: "idle" };
@@ -21,10 +22,10 @@ async function load({ quiet = false } = {}) {
 }
 
 function renderAll() {
-  renderChecklist();
   renderNeedsAction();
-  renderInPlay();
   renderTests();
+  renderSchedule();
+  renderChecklist();
   renderTracking();
   renderLessons();
   renderActivity();
@@ -158,68 +159,6 @@ $("#mg-actions").addEventListener("click", async (ev) => {
   } catch (e) { /* withBusy toasted the error */ }
 });
 
-// ------------------------------------------------------------- 3. in play
-// "+10% / day": current daily budget x 1.10, rounded to cents.
-const scaledBudget = (v) => Math.round(Number(v || 0) * 110) / 100;
-
-function readPill(read, why) {
-  return `<span class="read ${esc(read)}" title="${esc(why + " Rule: " + S.data.in_play.rule.reads[read])}">${esc(read)}</span>`;
-}
-
-function renderInPlay() {
-  const ip = S.data.in_play;
-  const band = S.data.band;
-  const minTrials = Number(ip.rule.min_trials) || 3;
-  $("#mg-read-counts").innerHTML = ["scaling", "holding", "watching", "failing"].map((r) =>
-    `<span class="read ${r}" title="${esc(ip.rule.reads[r])}"><span class="n">${ip.counts[r]}</span> ${r}</span>`).join("");
-  const rows = [];
-  ip.groups.forEach((g) => {
-    const t = g.totals;
-    rows.push(`<tr class="mg-group-row"><td>${platformChip(g.platform)} ${esc(g.label)} <span class="muted">&middot; ${g.campaigns.length} active</span></td>
-      <td class="num" data-l="Budget / day">${fmt.money(t.daily_budget)}</td><td class="num" data-l="Spend (7d)">${fmt.money(t.spend_7d)}</td>
-      <td class="num ${cptTone(t.cpt_7d, band)}" data-l="Cost / trial (7d)">${fmt.cpt(t.cpt_7d)}</td><td class="num" data-l="Trials (7d)">${fmt.int(t.trials_7d)}</td><td></td><td></td><td></td></tr>`);
-    if (!g.campaigns.length) rows.push(`<tr><td colspan="8" class="muted">No active campaigns.</td></tr>`);
-    g.campaigns.forEach((c) => {
-      const tags = [c.legacy ? `<span class="tag" title="Legacy campaign running at reduced budget alongside the new build">legacy</span>` : "",
-        c.country && c.country !== "US" ? `<span class="tag">${esc(c.country)}</span>` : ""].join("");
-      const n = Number(c.trials_7d) || 0;
-      const thin = n < minTrials ? `<div class="caveat">${n === 0 ? "0 trials: CPT undefined" : `n=${n}: thin read`}</div>` : "";
-      const scaleTo = scaledBudget(c.daily_budget);
-      rows.push(`<tr>
-        <td class="mg-camp">${platformChip(c.platform)} ${campLink(c.id, c.name)}${tags} <span class="muted small">${esc(c.type || "")}</span></td>
-        <td class="num" data-l="Budget / day">${fmt.money(c.daily_budget)}</td>
-        <td class="num" data-l="Spend (7d)">${fmt.money(c.spend_7d)}</td>
-        <td data-l="Cost / trial (7d)" class="num strong mg-cpt ${cptTone(c.cpt_7d, band)}" title="${esc(`${fmt.money(c.spend_7d)} over ${n} PostHog trial${n === 1 ? "" : "s"}`)}">${fmt.cpt(c.cpt_7d)}${thin}</td>
-        <td class="num" data-l="Trials (7d)">${fmt.int(c.trials_7d)}</td>
-        <td data-l="Read">${readPill(c.read, c.why)}</td>
-        <td class="mg-why">${esc(c.why)}</td>
-        <td class="actions"><span class="mg-row-actions">
-          ${c.read === "scaling" ? `<button class="btn btn-sm" type="button" data-mg-scale="${esc(c.id)}" aria-label="${esc(`+10% / day for ${c.name}`)}" title="${esc(`Raise daily budget from ${fmt.money(c.daily_budget)} to ${fmt.money(scaleTo)}`)}">+10% / day</button>` : ""}
-          <button class="btn btn-sm btn-danger" type="button" data-mg-pause="${esc(c.id)}" data-name="${esc(c.name)}" data-confirm-label="Confirm pause?" aria-label="${esc(`Pause ${c.name}`)}">Pause</button>
-        </span></td></tr>`);
-    });
-  });
-  $("#mg-inplay-body").innerHTML = rows.join("");
-  $$("#mg-inplay-body [data-mg-pause]").forEach((button) => confirmButton(button, async (el) => {
-    await api(`/api/campaigns/${encodeURIComponent(el.dataset.mgPause)}/status`, { body: { status: "PAUSED" } });
-    toast(`${el.dataset.name} paused`);
-    await load({ quiet: true });
-  }));
-
-  const paused = ip.paused;
-  const det = $("#mg-paused");
-  det.querySelector("summary").textContent = `Paused campaigns (${paused.length})`;
-  $("#mg-paused-body").innerHTML = paused.length
-    ? `<div class="table-wrap" style="border:0;border-radius:0"><table class="table compact"><thead><tr><th>Campaign</th><th class="num">Daily budget</th><th class="num">7d spend</th><th class="num">7d CPT</th><th class="num">Trials 7d</th></tr></thead><tbody>${
-      paused.map((c) => `<tr class="is-paused"><td class="mg-camp">${platformChip(c.platform)} ${campLink(c.id, c.name)} ${badge("paused")}</td>
-        <td class="num">${fmt.money(c.daily_budget)}</td><td class="num">${fmt.money(c.spend_7d)}</td>
-        <td class="num">${fmt.cpt(c.cpt_7d)}</td><td class="num">${fmt.int(c.trials_7d)}</td></tr>`).join("")}</tbody></table></div>`
-    : `<p class="muted" style="padding:0 var(--s4) var(--s3)">No paused campaigns. Everything is live.</p>`;
-
-  $("#mg-rule").innerHTML = ["scaling", "holding", "watching", "failing"].map((r) =>
-    `<dt><span class="read ${r}">${r}</span></dt><dd>${esc(ip.rule.reads[r])}</dd>`).join("");
-}
-
 // --------------------------------------------------------------- 4. tests
 function metricVal(metric, v) {
   if (v === null || v === undefined) return fmt.none;
@@ -270,6 +209,73 @@ function renderTests() {
       <td class="nowrap">${esc(fmt.date(t.ends))}</td>
       <td class="wrap">${esc(t.taught)}</td></tr>`).join("")
     : `<tr><td colspan="9" class="table-empty">No finished tests yet.</td></tr>`;
+}
+
+// ------------------------------------------------- 4b. testing schedule
+// Moved from the Calendar page: running tests with their win benchmarks, queued and finished tests.
+function schedMetric(t, v) {
+  if (v === null || v === undefined) return fmt.none;
+  return t.metric_unit === "money" ? fmt.cpt(v) : fmt.pct(v, 2);
+}
+const meterTone = (pct) => (pct >= 100 ? "good" : pct >= 50 ? "" : "watch");
+
+function schedRunning(t) {
+  const b = t.benchmark || {}, cur = t.current || {};
+  const target = t.target === null || t.target === undefined ? "" :
+    ` <span class="muted small">target ${t.direction === "below" ? "&lt;" : "&gt;"} ${esc(schedMetric(t, t.target))}</span>`;
+  const valTone = t.passing === null ? "" : t.passing ? "tone-good" : "tone-bad";
+  return `<article class="tcard">
+    <div class="tcard-head"><div class="tcard-name">${esc(t.name)}</div>${badge(t.status)}</div>
+    <div class="tcard-sub">${platformChip(t.platform)}<span>${esc(t.campaign_name || t.campaign_id)}</span><span>·</span><span class="nowrap">${esc(fmt.date(t.started))} → ${esc(fmt.date(t.ends))}</span></div>
+    <div class="tcard-hyp">${esc(t.hypothesis)}</div>
+    <div class="bench">${esc(t.benchmark_text)}</div>
+    <div class="tstats">
+      <div><div class="tstat-label">Spend</div><div class="tstat-value">${fmt.money(cur.spend)}</div></div>
+      <div><div class="tstat-label">Trials</div><div class="tstat-value">${fmt.int(cur.trials)}</div></div>
+      <div><div class="tstat-label">${esc(t.metric_label)}</div><div class="tstat-value ${valTone}">${esc(schedMetric(t, cur.value))}</div>${target}</div>
+    </div>
+    <div class="tprog"><span>Spend</span><div class="meter ${meterTone(t.spend_pct)}" role="progressbar" aria-valuenow="${t.spend_pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Spend toward minimum"><span style="width:${t.spend_pct}%"></span></div><span class="num">${fmt.money(cur.spend)} / ${fmt.money(b.min_spend)}</span></div>
+    <div class="tprog"><span>Trials</span><div class="meter ${meterTone(t.trials_pct)}" role="progressbar" aria-valuenow="${t.trials_pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Trials toward minimum"><span style="width:${t.trials_pct}%"></span></div><span class="num">${fmt.int(cur.trials)} / ${fmt.int(b.min_trials)}</span></div>
+    <div class="verdict ${esc(t.verdict)}">${esc(t.verdict_line)}</div>
+    ${t.notes ? `<div class="muted small">${esc(t.notes)}</div>` : ""}
+  </article>`;
+}
+
+function schedQueued(t) {
+  return `<article class="tcard">
+    <div class="tcard-head"><div class="tcard-name">${esc(t.name)}</div>${badge(t.status)}</div>
+    <div class="tcard-sub">${platformChip(t.platform)}<span>${esc(t.campaign_name || t.campaign_id)}</span><span>·</span><span class="nowrap">${esc(fmt.date(t.started))} → ${esc(fmt.date(t.ends))}</span></div>
+    <div class="tcard-hyp">${esc(t.hypothesis)}</div>
+    <div class="bench">${esc(t.benchmark_text)}</div>
+    <div class="verdict"><b>Starts when:</b> ${esc(t.notes || "scheduled start " + fmt.date(t.started))} Planned start ${esc(fmt.date(t.started, { dow: true }))}.</div>
+  </article>`;
+}
+
+function schedDone(t) {
+  const cur = t.current || {};
+  return `<details class="tdone">
+    <summary>${badge(t.status)}<span class="tdone-name">${esc(t.name)}</span>
+      <span class="tdone-result">${esc(t.metric_label)} ${esc(schedMetric(t, cur.value))} · ${fmt.money(cur.spend)} · ${fmt.int(cur.trials)} trials</span></summary>
+    <div class="tdone-body">
+      <div class="tcard-sub">${platformChip(t.platform)}<span>${esc(t.campaign_name || t.campaign_id)}</span><span>·</span><span>${esc(fmt.date(t.started))} → ${esc(fmt.date(t.ends))}</span></div>
+      <div class="tcard-hyp">${esc(t.hypothesis)}</div>
+      <div class="bench">${esc(t.benchmark_text)}</div>
+      <div class="verdict ${t.status === "won" ? "on_track" : t.status === "lost" ? "failing" : "not_enough_data"}"><b>Result:</b> ${esc(t.notes || t.status)}</div>
+    </div>
+  </details>`;
+}
+
+function renderSchedule() {
+  const tests = S.data.schedule || [];
+  const running = tests.filter((t) => t.status === "running");
+  const queued = tests.filter((t) => t.status === "queued");
+  const done = tests.filter((t) => ["won", "lost", "inconclusive"].includes(t.status));
+  $("#mg-schedule-sub").textContent = `${running.length} running · ${queued.length} queued · ${done.length} finished`;
+  const parts = [];
+  parts.push(`<div><h3 class="section-label">Running (${running.length})</h3>${running.length ? `<div class="tests-grid">${running.map(schedRunning).join("")}</div>` : `<div class="empty">No tests running.</div>`}</div>`);
+  if (queued.length) parts.push(`<div><h3 class="section-label">Queued (${queued.length})</h3><div class="tests-grid">${queued.map(schedQueued).join("")}</div></div>`);
+  if (done.length) parts.push(`<div><h3 class="section-label">Finished (${done.length})</h3>${done.map(schedDone).join("")}</div>`);
+  $("#mg-schedule").innerHTML = parts.join("");
 }
 
 // ------------------------------------------------------------ 5. tracking
@@ -363,25 +369,6 @@ $("#mg-lesson-text").addEventListener("keydown", (ev) => {
 });
 $("#mg-refresh").addEventListener("click", async () => { await load({ quiet: true }); toast("Refreshed", "info"); });
 
-$("#mg-inplay").addEventListener("click", async (ev) => {
-  const button = ev.target.closest("[data-mg-scale]");
-  if (!button || button.disabled) return;
-  const id = button.dataset.mgScale;
-  const campaign = S.data.in_play.groups.flatMap((g) => g.campaigns).find((c) => String(c.id) === id);
-  if (!campaign || campaign.read !== "scaling") return;
-  const next = scaledBudget(campaign.daily_budget);
-  if (!(next > 0)) return;
-  button.disabled = true; button.classList.add("is-busy");
-  try {
-    await api(`/api/campaigns/${encodeURIComponent(id)}/budget`, { body: { daily_budget: next } });
-    toast(`${campaign.name}: daily budget ${fmt.money(campaign.daily_budget)} → ${fmt.money(next)}`);
-    await load({ quiet: true });
-  } catch (e) {
-    toast("Could not scale budget: " + e.message, "error");
-    button.disabled = false; button.classList.remove("is-busy");
-  }
-});
-
 // Listbox keyboard: arrows move the selection, Home/End jump to the ends.
 $("#mg-rail").addEventListener("keydown", (ev) => {
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(ev.key) || !S.data) return;
@@ -398,4 +385,13 @@ $("#mg-rail").addEventListener("keydown", (ev) => {
   if (sel) sel.focus({ preventScroll: true });
 });
 
-load();
+// /management#mg-schedule-card (linked from the Calendar's test markers) opens the testing schedule.
+function openScheduleFromHash() {
+  if (location.hash !== "#mg-schedule-card") return;
+  $("#mg-schedule-fold").open = true;
+  $("#mg-schedule-card").scrollIntoView({ block: "start" });
+}
+window.addEventListener("hashchange", openScheduleFromHash);
+
+load().then(openScheduleFromHash);
+

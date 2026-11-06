@@ -483,16 +483,19 @@ hr { border: 0; border-top: 1px solid var(--line); margin: var(--s4) 0; }
 .tone-idle { color: var(--idle); }
 
 /* ------------------------------------------------------------------- table */
+/* Tables grow to their full height; only wide tables scroll, and only sideways.
+   No vertical scroll region, so the mouse wheel over a table always scrolls the page. */
 .table-wrap {
   max-width: 100%;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--surface);
-  overscroll-behavior: contain;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
 }
-.table-wrap.scroll { max-height: 560px; }
 .table { width: 100%; border-spacing: 0; border-collapse: separate; font-size: var(--fs); }
 .table th, .table td {
   padding: 7px var(--s3);

@@ -4,8 +4,12 @@ Builds the real mutate requests:
 
     POST https://googleads.googleapis.com/{api_version}/customers/{customer_id}/{resource}:mutate
     headers: Authorization: Bearer <OAuth access token from the refresh token>,
-             developer-token, login-customer-id (MCC), Content-Type: application/json
-    body:    {"operations": [{"update": {...}, "updateMask": "a,b"} | {"create": {...}} | {"remove": rn}]}
+             login-customer-id (MCC), Content-Type: application/json
+             (+ developer-token only if google_ads.send_developer_token is true: Google sunset
+             developer tokens on 2026-09-09; they are optional and ignored, see
+             developers.google.com/google-ads/api/docs/api-policy/developer-token)
+    body:    {"operations": [{"update": {...}, "updateMask": "a,b"} | {"create": {...}} | {"remove": rn}],
+              "partialFailure": false, "validateOnly": false}
 
 and refuses to send unless config mode == live AND env ATLAS_ALLOW_LIVE == "1" (and the
 credentials are not the committed EXAMPLE values). The preview is built either way.
@@ -17,11 +21,13 @@ import json
 import os
 from typing import Any, Dict, List
 
-from planning.adapters import LiveRefused, live_allowed, mask
+from planning.adapters import LiveRefused, live_allowed
 from planning.adapters.base import (Adapter, AdapterError, camelize, flatten_paths, media_asset,
                                     nest_paths, resolve_refs)
 
 ENDPOINT = "https://googleads.googleapis.com"
+DEFAULT_VERSION = "v26"   # confirmed 2026-11-06 on developers.google.com/google-ads/api/docs/sunset-dates
+REDACTED = "\u2039redacted\u203a"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
 
 SERVICE_RESOURCE = {
@@ -32,7 +38,10 @@ SERVICE_RESOURCE = {
     "AdGroupCriterionService": ("mutateAdGroupCriteria", "adGroupCriteria"),
     "CampaignCriterionService": ("mutateCampaignCriteria", "campaignCriteria"),
     "AssetService": ("mutateAssets", "assets"),
+    "AssetGroupService": ("mutateAssetGroups", "assetGroups"),
+    "AssetGroupAssetService": ("mutateAssetGroupAssets", "assetGroupAssets"),
 }
+RESOURCE_SERVICE = dict((res, svc) for svc, (_m, res) in SERVICE_RESOURCE.items())
 
 
 def normalize_fields(op):
@@ -137,15 +146,15 @@ def build_google_request(op, ctx, cfg, secrets_visible=False, inline_bytes=False
         body_op = {"remove": resolved.get("resource_name")}
     else:
         raise AdapterError("operation must be update, create or remove")
-    url = "%s/%s/customers/%s/%s:mutate" % (ENDPOINT, g.get("api_version", "v22"),
+    url = "%s/%s/customers/%s/%s:mutate" % (ENDPOINT, g.get("api_version") or DEFAULT_VERSION,
                                            g.get("customer_id"), resource)
     token = (ctx or {}).get("_access_token") or "<oauth access token from refresh_token>"
-    headers = {
-        "Authorization": "Bearer %s" % (token if secrets_visible else mask(token)),
-        "developer-token": g.get("developer_token") if secrets_visible else mask(g.get("developer_token")),
-        "login-customer-id": str(g.get("login_customer_id") or ""),
-        "Content-Type": "application/json",
-    }
+    headers = {"Content-Type": "application/json",
+               "Authorization": "Bearer %s" % (token if secrets_visible else REDACTED)}
+    if g.get("login_customer_id"):
+        headers["login-customer-id"] = str(g.get("login_customer_id"))
+    if g.get("send_developer_token"):
+        headers["developer-token"] = g.get("developer_token") if secrets_visible else REDACTED
     return {"method": "POST", "url": url, "headers": headers,
             "body": {"operations": [body_op], "partialFailure": False, "validateOnly": False}}
 
@@ -192,3 +201,11 @@ class LiveGoogleAdapter(Adapter):
         ctx["_access_token"] = self._access_token()
         req = build_google_request(op, ctx, self.cfg, secrets_visible=True, inline_bytes=True)
         return _http_json(req["method"], req["url"], req["headers"], body=req["body"])
+
+    def execute_request(self, req, ctx):
+        """Send a rendered request (planning.api_requests). It is parsed back into its op and
+        rebuilt by the same builder with real secrets (and media bytes) filled in, so the
+        wire request is the reviewed one plus credentials. ``execute`` keeps the live gate."""
+        from planning import api_requests
+        op = api_requests.to_op(api_requests.resolve(req, (ctx or {}).get("outputs") or {}))
+        return self.execute(op, dict(ctx or {}, outputs={}))

@@ -21,6 +21,9 @@ ROOT = os.path.dirname(HERE)
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
+import json  # noqa: E402
+import unittest  # noqa: E402
+
 import yaml  # noqa: E402
 
 import planning  # noqa: E402
@@ -33,6 +36,8 @@ FAKE_ASSETS = {
                  "file_url": None, "format": "image/png", "platform_refs": {}},
     "IMG-0003": {"id": "IMG-0003", "kind": "image", "status": "in_review", "title": "Draft", "file_url": None},
     "VID-0001": {"id": "VID-0001", "kind": "video", "status": "approved", "title": "Founder cut", "file_url": None},
+    "IMG-0004": {"id": "IMG-0004", "kind": "image", "status": "active", "title": "Running hero 1:1",
+                 "file_url": None, "format": "image/png", "platform_refs": {}},
 }
 
 
@@ -46,8 +51,9 @@ def _fake_media():
         return copy.deepcopy(FAKE_ASSETS[asset_id])
 
     def list_assets(status=None, kind=None):
+        wanted = None if status is None else ([status] if isinstance(status, str) else list(status))
         return [copy.deepcopy(a) for a in FAKE_ASSETS.values()
-                if (status is None or a["status"] == status) and (kind is None or a["kind"] == kind)]
+                if (wanted is None or a["status"] in wanted) and (kind is None or a["kind"] == kind)]
 
     def mark_published(asset_id, platform, ref):
         mod.published.append((asset_id, platform, dict(ref)))
@@ -90,8 +96,8 @@ def _mc(snap, cid):
     return [c for c in snap["meta"]["campaigns"] if c["id"] == cid][0]
 
 
-def _yaml(head, ops):
-    return yaml.safe_dump({"changeset": head, "operations": ops}, sort_keys=False)
+def _json(head, ops):
+    return json.dumps({"changeset": head, "operations": ops}, indent=1)
 
 
 def _sample_changeset(snap):
@@ -127,7 +133,7 @@ def _sample_changeset(snap):
     ]
     head = {"title": "Brand down, UK paused, negative, new Meta ad", "based_on_snapshot": snap["id"],
             "rationale": ["test"]}
-    return _yaml(head, ops), aset
+    return _json(head, ops), aset
 
 
 def _errors(issues):
@@ -234,16 +240,19 @@ def test_parse_and_validate_catch_bad_ops():
         acct = snap["meta"]["ad_account_id"]
         head = {"title": "t", "based_on_snapshot": snap["id"]}
 
-        doc, errs = changeset.parse("changeset: [unclosed")
-        assert doc is None and errs
+        doc, errs = changeset.parse('{"changeset": [unclosed')
+        assert doc is None and errs and "JSON" in errs[0]
+        doc, errs = changeset.parse('{"changeset": {"title": "x", "based_on_snapshot": "S"}, "operations": []}')
+        assert errs and "non-empty" in errs[0]
+        # legacy YAML (versions stored before the JSON switch) still parses
         doc, errs = changeset.parse("changeset: {title: x, based_on_snapshot: S}\noperations: []\n")
         assert errs and "non-empty" in errs[0]
-        doc, errs = changeset.parse("```yaml\n" + _yaml(head, [{"ref": "a", "platform": "google"},
+        doc, errs = changeset.parse("```json\n" + _json(head, [{"ref": "a", "platform": "google"},
                                                                {"ref": "a", "platform": "tiktok"}]) + "```")
         assert doc is not None and any("duplicate ref" in e for e in errs) and any("platform" in e for e in errs)
 
         def issues(ops):
-            d, e = changeset.parse(_yaml(head, ops))
+            d, e = changeset.parse(_json(head, ops))
             assert not e, e
             return changeset.validate(d, snap)
 
@@ -293,6 +302,9 @@ def test_parse_and_validate_catch_bad_ops():
                              "params": {"daily_budget": 100000}}]), "error", "ad set budgets")
         assert _has(issues([{"ref": "x", "platform": "meta", "method": "POST", "path": "/%s/adimages" % acct,
                              "params": {"media_id": "IMG-0003"}}]), "error", "not approved")
+        # active (in use) media is as usable as approved media
+        assert not _errors(issues([{"ref": "x", "platform": "meta", "method": "POST", "path": "/%s/adimages" % acct,
+                                    "params": {"media_id": "IMG-0004"}}]))
         assert _has(issues([{"ref": "x", "platform": "meta", "method": "POST", "path": "/%s/adimages" % acct,
                              "params": {"media_id": "IMG-9999"}}]), "error", "not in the Media library")
         assert _has(issues([{"ref": "x", "platform": "meta", "method": "POST", "path": "/%s/advideos" % acct,
@@ -394,12 +406,12 @@ def test_executor_publish_verified():
         assert [r["status"] for r in res["results"]] == ["applied"] * 6
         r1 = res["results"][0]
         assert r1["request"]["method"] == "POST"
-        assert r1["request"]["url"] == "https://googleads.googleapis.com/v22/customers/4445556666/campaignBudgets:mutate"
+        assert r1["request"]["url"] == "https://googleads.googleapis.com/v26/customers/4445556666/campaignBudgets:mutate"
         assert r1["request"]["body"]["operations"][0]["update"]["amountMicros"] == int(round(bd * 0.75, 2) * 1e6)
         assert r1["request"]["body"]["operations"][0]["updateMask"] == "amountMicros"
         assert r1["response"]["results"][0]["resourceName"].endswith("/campaignBudgets/201")
         assert "hash" in list(res["results"][3]["response"]["images"].values())[0]
-        assert res["results"][4]["request"]["url"] == "https://graph.facebook.com/v24.0/act_7778889999/adcreatives"
+        assert res["results"][4]["request"]["url"] == "https://graph.facebook.com/v27.0/act_7778889999/adcreatives"
         img_hash = list(res["results"][3]["response"]["images"].values())[0]["hash"]
         assert res["results"][4]["request"]["body"]["object_story_spec"]["link_data"]["image_hash"] == img_hash
         assert res["results"][5]["request"]["body"]["creative"]["creative_id"] == res["results"][4]["response"]["id"]
@@ -446,13 +458,18 @@ def test_live_adapters_refuse_and_build_requests():
         assert isinstance(adapters.get_adapter("meta", cfg), sample.SampleAdapter)
         ctx = {"mode": "live", "config": live, "snapshot": snap, "outputs": {}}
         req = g.build_request(doc["operations"][2], ctx)
-        assert req["url"].endswith("/v22/customers/4445556666/campaignCriteria:mutate")
+        assert req["url"].endswith("/v26/customers/4445556666/campaignCriteria:mutate")
         create = req["body"]["operations"][0]["create"]
         assert create["negative"] is True and create["keyword"] == {"text": "seo course", "matchType": "PHRASE"}
-        assert req["headers"]["developer-token"] == "EXAM…" and req["headers"]["login-customer-id"] == "1112223333"
+        assert req["headers"]["Authorization"] == "Bearer \u2039redacted\u203a"
+        assert req["headers"]["login-customer-id"] == "1112223333"
+        assert "developer-token" not in req["headers"]   # sunset 2026-09-09; off unless send_developer_token
+        dev = copy.deepcopy(live)
+        dev["google_ads"]["send_developer_token"] = True
+        assert LiveGoogleAdapter(dev).build_request(doc["operations"][2], ctx)["headers"]["developer-token"] == "\u2039redacted\u203a"
         assert "EXAMPLE" not in str(req["headers"])
         mreq = m.build_request(doc["operations"][3], ctx)
-        assert mreq["url"] == "https://graph.facebook.com/v24.0/act_7778889999/adimages"
+        assert mreq["url"] == "https://graph.facebook.com/v27.0/act_7778889999/adimages"
         assert "bytes" in mreq["body"] and "media_id" not in mreq["body"]
         aset = _mc(snap, "m_prospecting_core")["ad_sets"][0]
         treq = m.build_request({"platform": "meta", "method": "POST", "path": "/" + aset["meta_id"],
@@ -485,13 +502,14 @@ def test_no_llm_imports():
             "import planning.executor, planning.changeset, planning.snapshot, planning.plan_compare\n"
             "import planning.adapters, planning.adapters.base, planning.adapters.sample\n"
             "import planning.adapters.live_google, planning.adapters.live_meta\n"
+            "import planning.api_requests, planning.direct\n"
             "bad = [m for m in ('planning.llm', 'planning.llm_worker', 'planning.prompts', 'anthropic') if m in sys.modules]\n"
             "assert not bad, bad\n"
             "print('clean')\n")
     out = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True, text=True, timeout=60)
     assert out.returncode == 0 and "clean" in out.stdout, out.stderr
     for name in ("executor.py", "changeset.py", "adapters/__init__.py", "adapters/base.py", "adapters/sample.py",
-                 "adapters/live_google.py", "adapters/live_meta.py"):
+                 "adapters/live_google.py", "adapters/live_meta.py", "api_requests.py", "direct.py"):
         with open(os.path.join(ROOT, "planning", name), "r", encoding="utf-8") as fh:
             src = fh.read()
         for line in src.splitlines():
@@ -503,6 +521,14 @@ def test_no_llm_imports():
 TESTS = [test_snapshot_pull_shape, test_plan_compare_facts, test_parse_and_validate_catch_bad_ops,
          test_dry_run_rows, test_executor_drift_refusal, test_executor_publish_verified,
          test_live_adapters_refuse_and_build_requests, test_no_llm_imports]
+
+
+class CoreTests(unittest.TestCase):
+    """Lets `python -m unittest discover -s tests` run the function-style tests above."""
+
+
+for _t in TESTS:
+    setattr(CoreTests, _t.__name__, staticmethod(_t))
 
 
 def main():

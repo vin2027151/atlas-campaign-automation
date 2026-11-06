@@ -29,7 +29,7 @@
     <div class="kpi-value num {% if pp is none %}{% elif 95 <= pp <= 105 %}tone-good{% elif 90 <= pp <= 110 %}tone-watch{% else %}tone-bad{% endif %}">
       {% if pp is none %}&mdash;{% else %}{{ "{:.1f}%".format(pp) }}{% endif %}
     </div>
-    <div class="kpi-sub">{{ "${:,.0f}".format(kpis.projected) }} projected at the 7-day daily rate</div>
+    <div class="kpi-sub">{{ "${:,.0f}".format(kpis.projected) }} projected month-end at current daily budgets</div>
   </div>
 </section>
 
@@ -55,8 +55,8 @@
           <tr>
             <th>Platform</th>
             <th class="num">Spent MTD</th>
-            <th class="num">7d spend / day</th>
-            <th class="num">Projected</th>
+            <th class="num" title="Sum of the daily budgets of campaigns that are enabled right now">Daily budgets now</th>
+            <th class="num" title="Projected month-end at current daily budgets">Projected</th>
             <th class="num">Proj. / budget</th>
           </tr>
         </thead>
@@ -65,7 +65,7 @@
           <tr>
             <td><span class="chip chip-{{ pl }}">{{ "G" if pl == "google" else "M" }}</span> {{ "Google" if pl == "google" else "Meta" }}</td>
             <td class="num" title="Monthly budget {{ "${:,.0f}".format(p.monthly_budget) }}">{{ "${:,.0f}".format(p.month_to_date_spend) }}</td>
-            <td class="num">{{ "${:,.0f}".format(p.daily_rate_7d) }}</td>
+            <td class="num" title="Trailing 7-day average spend {{ "${:,.0f}".format(p.daily_rate_7d) }}/day, for reference">{{ "${:,.0f}".format(p.active_daily_budget) }}</td>
             <td class="num">{{ "${:,.0f}".format(p.projected_month_end) }}</td>
             <td class="num">{% if p.pace_pct is none %}&mdash;{% else %}{{ "{:.1f}%".format(p.pace_pct) }}{% endif %}</td>
           </tr>
@@ -73,7 +73,7 @@
         </tbody>
       </table>
     </div>
-    <div class="card-foot">Projection = MTD spend + trailing-7-day daily spend × days remaining. <a href="/reporting">Detailed pacing →</a></div>
+    <div class="card-foot">Projected month-end at current daily budgets = MTD spend + days remaining × the daily budgets of what is enabled now. Pausing a campaign or changing a budget moves it at once. <a href="/reporting">Detailed pacing →</a></div>
   </section>
 </div>
 

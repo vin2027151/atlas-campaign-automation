@@ -1,7 +1,12 @@
-"""Changeset YAML: parse, validate and dry-run API-shaped operations against a snapshot.
+"""Changesets: parse, validate and dry-run API-shaped operations against a snapshot.
+
+A changeset is JSON: ``{"changeset": {title, based_on_snapshot, rationale}, "operations": [op]}``.
+Each op names one Google Ads REST mutate or one Meta Graph API call; planning.api_requests
+renders it as the exact HTTP request, which is what the reviewer sees and publish runs.
 
     SCHEMA_DOC: str                                     # the format, for the prompt
-    parse(yaml_text) -> (doc | None, [error str])
+    parse(text_or_doc) -> (doc | None, [error str])     # JSON (legacy YAML still read)
+    to_json(doc) -> str                                 # canonical pretty JSON
     validate(doc, snapshot) -> [{"op": ref | None, "level": "error" | "warn", "message"}]
     dry_run(doc, snapshot) -> {"after", "rows", "text_diff", "summary"}
     find_entity(doc, entity_id) -> (entity_type, entity, parents) | None
@@ -12,6 +17,7 @@ Deterministic. Never imports planning.llm, planning.llm_worker, planning.prompts
 
 import copy
 import difflib
+import json
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -22,151 +28,107 @@ from planning.adapters.live_google import normalize_fields
 from planning.adapters.live_meta import EDGE_RE, NODE_RE, normalize_path
 from planning import snapshot as snapshot_mod
 
+_SCHEMA_EXAMPLE = {
+    "changeset": {"title": "Shift $1,000/day from Brand to NonBrand agency",
+                  "based_on_snapshot": "SNAP-20261105-142233",
+                  "rationale": ["short bullet", "short bullet"]},
+    "operations": [
+        {"ref": "op1", "platform": "google", "service": "CampaignBudgetService", "method": "mutateCampaignBudgets",
+         "operation": "update", "resource_name": "customers/4445556666/campaignBudgets/201",
+         "fields": {"amount_micros": 150000000}, "update_mask": ["amount_micros"], "reason": "plan: brand at $3K/month"},
+        {"ref": "op2", "platform": "google", "service": "CampaignService", "method": "mutateCampaigns",
+         "operation": "update", "resource_name": "customers/4445556666/campaigns/104",
+         "fields": {"status": "PAUSED"}, "update_mask": ["status"], "reason": "..."},
+        {"ref": "op3", "platform": "google", "service": "CampaignService", "method": "mutateCampaigns",
+         "operation": "update", "resource_name": "customers/4445556666/campaigns/103",
+         "fields": {"target_cpa": {"target_cpa_micros": 330000000}}, "update_mask": ["target_cpa.target_cpa_micros"],
+         "reason": "..."},
+        {"ref": "op4", "platform": "google", "service": "AdGroupService", "method": "mutateAdGroups",
+         "operation": "update", "resource_name": "customers/4445556666/adGroups/3003",
+         "fields": {"status": "PAUSED", "cpc_bid_micros": 4500000}, "update_mask": ["status", "cpc_bid_micros"],
+         "reason": "..."},
+        {"ref": "op5", "platform": "google", "service": "AdGroupAdService", "method": "mutateAdGroupAds",
+         "operation": "update", "resource_name": "customers/4445556666/adGroupAds/3003~50005",
+         "fields": {"status": "PAUSED"}, "update_mask": ["status"], "reason": "..."},
+        {"ref": "op6", "platform": "google", "service": "AdGroupAdService", "method": "mutateAdGroupAds",
+         "operation": "create", "fields": {
+             "ad_group": "customers/4445556666/adGroups/3003", "status": "PAUSED",
+             "ad": {"final_urls": ["https://www.agentstack.example/trial"],
+                    "responsive_search_ad": {"headlines": ["Headline one", "Headline two", "Headline three"],
+                                             "descriptions": ["Description one.", "Description two."]}}},
+         "reason": "..."},
+        {"ref": "op7", "platform": "google", "service": "AdGroupCriterionService", "method": "mutateAdGroupCriteria",
+         "operation": "create", "fields": {"ad_group": "customers/4445556666/adGroups/3003", "status": "ENABLED",
+                                           "keyword": {"text": "white label seo", "match_type": "PHRASE"}},
+         "reason": "..."},
+        {"ref": "op8", "platform": "google", "service": "AdGroupCriterionService", "method": "mutateAdGroupCriteria",
+         "operation": "remove", "resource_name": "customers/4445556666/adGroupCriteria/3003~70012", "reason": "..."},
+        {"ref": "op9", "platform": "google", "service": "CampaignCriterionService", "method": "mutateCampaignCriteria",
+         "operation": "create", "fields": {"campaign": "customers/4445556666/campaigns/102", "negative": True,
+                                           "keyword": {"text": "free", "match_type": "PHRASE"}}, "reason": "..."},
+        {"ref": "op10", "platform": "google", "service": "AssetService", "method": "mutateAssets",
+         "operation": "create", "fields": {"name": "Benefits grid 1:1", "image_asset": {"media_id": "IMG-0001"}},
+         "reason": "..."},
+        {"ref": "op11", "platform": "google", "service": "AssetGroupAssetService", "method": "mutateAssetGroupAssets",
+         "operation": "update", "resource_name": "customers/4445556666/assetGroupAssets/6001~50021~MARKETING_IMAGE",
+         "fields": {"status": "PAUSED"}, "update_mask": ["status"], "reason": "..."},
+        {"ref": "op12", "platform": "meta", "method": "POST", "path": "/120210000000000101",
+         "params": {"daily_budget": 45000}, "reason": "..."},
+        {"ref": "op13", "platform": "meta", "method": "POST", "path": "/120210000000000001",
+         "params": {"status": "PAUSED"}, "reason": "..."},
+        {"ref": "op14", "platform": "meta", "method": "POST", "path": "/act_7778889999/adimages",
+         "params": {"media_id": "IMG-0002"}, "reason": "..."},
+        {"ref": "op15", "platform": "meta", "method": "POST", "path": "/act_7778889999/adcreatives",
+         "params": {"name": "Benefits grid v2", "object_story_spec": {
+             "page_id": "123456789012345",
+             "link_data": {"image_hash": "$ref:op14.hash", "link": "https://www.agentstack.example/trial",
+                           "message": "Primary text", "name": "Headline", "call_to_action": {"type": "SIGN_UP"}}}},
+         "reason": "..."},
+        {"ref": "op16", "platform": "meta", "method": "POST", "path": "/act_7778889999/ads",
+         "params": {"name": "Static_Benefits_v2", "adset_id": "120210000000000101",
+                    "creative": {"creative_id": "$ref:op15.id"}, "status": "PAUSED"}, "reason": "..."},
+    ],
+}
+
 SCHEMA_DOC = """\
-Write ONE YAML document with two top-level keys, `changeset` and `operations`. Nothing else.
+A changeset is ONE JSON object with two keys, "changeset" and "operations". Every operation is
+one real API call; code renders each as the exact HTTP request (Google Ads REST
+POST https://googleads.googleapis.com/<version>/customers/<id>/<resource>:mutate, or Meta Graph API
+POST https://graph.facebook.com/<version>/<path>) and that is what a human reviews and publishes.
+Operations run in order; each has a unique "ref", a "platform" and a short "reason".
 
-changeset:
-  title: "Shift $1,000/day from Brand to NonBrand agency"   # short, imperative
-  based_on_snapshot: SNAP-20261105-142233                    # the snapshot id you were given
-  rationale: ["short bullet", "short bullet"]
+Example with one of every allowed operation:
+""" + json.dumps(_SCHEMA_EXAMPLE, indent=1) + """
 
-operations:   # applied in order; each has a unique `ref`, a `platform` and a short `reason`
-  # --- Google Ads API (REST mutate). Field names are snake_case API fields.
-  # Money is micros (dollars x 1,000,000, a multiple of 10,000). Every update lists update_mask.
-  - ref: op1    # campaign budget
-    platform: google
-    service: CampaignBudgetService
-    method: mutateCampaignBudgets
-    operation: update
-    resource_name: customers/4445556666/campaignBudgets/201
-    fields: {amount_micros: 150000000}
-    update_mask: [amount_micros]
-    reason: "plan: brand at $3K/month"
-  - ref: op2    # campaign status (ENABLED | PAUSED)
-    platform: google
-    service: CampaignService
-    method: mutateCampaigns
-    operation: update
-    resource_name: customers/4445556666/campaigns/104
-    fields: {status: PAUSED}
-    update_mask: [status]
-    reason: "..."
-  - ref: op3    # bidding target: target_cpa.target_cpa_micros (TARGET_CPA campaigns) or
-                # maximize_conversions.target_cpa_micros (MAXIMIZE_CONVERSIONS campaigns)
-    platform: google
-    service: CampaignService
-    method: mutateCampaigns
-    operation: update
-    resource_name: customers/4445556666/campaigns/103
-    fields: {target_cpa: {target_cpa_micros: 330000000}}
-    update_mask: [target_cpa.target_cpa_micros]
-    reason: "..."
-  - ref: op4    # ad group status and/or max CPC
-    platform: google
-    service: AdGroupService
-    method: mutateAdGroups
-    operation: update
-    resource_name: customers/4445556666/adGroups/3003
-    fields: {status: PAUSED, cpc_bid_micros: 4500000}
-    update_mask: [status, cpc_bid_micros]
-    reason: "..."
-  - ref: op5    # ad status
-    platform: google
-    service: AdGroupAdService
-    method: mutateAdGroupAds
-    operation: update
-    resource_name: customers/4445556666/adGroupAds/3003~50005
-    fields: {status: PAUSED}
-    update_mask: [status]
-    reason: "..."
-  - ref: op6    # new responsive search ad: 3-15 headlines <= 30 chars, 2-4 descriptions <= 90 chars
-    platform: google
-    service: AdGroupAdService
-    method: mutateAdGroupAds
-    operation: create
-    fields:
-      ad_group: customers/4445556666/adGroups/3003
-      status: PAUSED
-      ad:
-        final_urls: ["https://www.agentstack.example/trial"]
-        responsive_search_ad:
-          headlines: ["Headline one", "Headline two", "Headline three"]
-          descriptions: ["Description one.", "Description two."]
-    reason: "..."
-  - ref: op7    # keyword: create (EXACT | PHRASE | BROAD), update status, or remove
-    platform: google
-    service: AdGroupCriterionService
-    method: mutateAdGroupCriteria
-    operation: create
-    fields: {ad_group: customers/4445556666/adGroups/3003, status: ENABLED, keyword: {text: "white label seo", match_type: PHRASE}}
-    reason: "..."
-  - ref: op8    # remove a keyword (resource_name only)
-    platform: google
-    service: AdGroupCriterionService
-    method: mutateAdGroupCriteria
-    operation: remove
-    resource_name: customers/4445556666/adGroupCriteria/3003~70012
-    reason: "..."
-  - ref: op9    # campaign negative keyword: create or remove
-    platform: google
-    service: CampaignCriterionService
-    method: mutateCampaignCriteria
-    operation: create
-    fields: {campaign: customers/4445556666/campaigns/102, negative: true, keyword: {text: "free", match_type: PHRASE}}
-    reason: "..."
-  - ref: op10   # image asset (PMax / Display) from an approved Media library id
-    platform: google
-    service: AssetService
-    method: mutateAssets
-    operation: create
-    fields: {name: "Benefits grid 1:1", image_asset: {media_id: IMG-0001}}
-    reason: "..."
-  # --- Meta Graph API. Budgets and bid_amount are CENTS (integers). Only POST.
-  - ref: op11   # ad set: status, daily_budget, bid_amount (cost-cap campaigns),
-                # targeting {age_min, age_max, geo_locations}, frequency_control_specs
-    platform: meta
-    method: POST
-    path: /120210000000000101
-    params: {daily_budget: 45000}
-    reason: "..."
-  - ref: op12   # campaign: status, daily_budget (CBO campaigns only); ad: status
-    platform: meta
-    method: POST
-    path: /120210000000000001
-    params: {status: PAUSED}
-    reason: "..."
-  - ref: op13   # upload an approved image (or /advideos for a video) from the Media library
-    platform: meta
-    method: POST
-    path: /act_7778889999/adimages
-    params: {media_id: IMG-0002}
-    reason: "..."
-  - ref: op14   # creative: link_data for images, video_data {video_id, image_hash, title, message,
-                # call_to_action {type, value: {link}}} for videos
-    platform: meta
-    method: POST
-    path: /act_7778889999/adcreatives
-    params:
-      name: "Benefits grid v2"
-      object_story_spec:
-        page_id: "123456789012345"
-        link_data: {image_hash: "$ref:op13.hash", link: "https://www.agentstack.example/trial",
-                    message: "Primary text", name: "Headline", call_to_action: {type: SIGN_UP}}
-    reason: "..."
-  - ref: op15   # ad: new ads MUST start PAUSED
-    platform: meta
-    method: POST
-    path: /act_7778889999/ads
-    params: {name: "Static_Benefits_v2", adset_id: "120210000000000101", creative: {creative_id: "$ref:op14.id"}, status: PAUSED}
-    reason: "..."
+What each operation may do:
+- op1 CampaignBudgetService update amount_micros: Google money is micros (dollars x 1,000,000, a multiple of 10,000).
+  Every Google update lists update_mask, matching the fields exactly (dotted for nested fields).
+- op2 CampaignService update status: ENABLED | PAUSED.
+- op3 CampaignService update bidding target: target_cpa.target_cpa_micros (TARGET_CPA campaigns) or
+  maximize_conversions.target_cpa_micros (MAXIMIZE_CONVERSIONS campaigns).
+- op4 AdGroupService update status and/or cpc_bid_micros (max CPC).
+- op5 AdGroupAdService update status. op6 AdGroupAdService create a responsive search ad:
+  3-15 headlines <= 30 chars, 2-4 descriptions <= 90 chars, final_urls.
+- op7/op8 AdGroupCriterionService keyword create (EXACT | PHRASE | BROAD), update status, or remove (resource_name only).
+- op9 CampaignCriterionService campaign negative keyword create (negative: true) or remove.
+- op10 AssetService create image_asset from an approved Media library media_id (PMax / Display).
+- op11 AssetGroupAssetService update status (a PMax asset); AssetGroupService mutateAssetGroups update status (an asset group).
+- Meta (Graph API, POST only). Budgets and bid_amount are CENTS (integers).
+  op12 ad set: status, daily_budget, bid_amount (cost cap / bid cap campaigns),
+  targeting {age_min, age_max, geo_locations}, frequency_control_specs.
+  op13 campaign: status, daily_budget (CBO campaigns only); ad: status.
+  op14 upload an approved image (/advideos for a video) from the Media library.
+  op15 creative: link_data for images, video_data {video_id, image_hash, title, message,
+  call_to_action {type, value: {link}}} for videos. op16 ad: new ads MUST start PAUSED.
 
 Rules:
 - Only the operations above exist. Use only resource names and Meta ids present in the state document.
 - "$ref:<ref>.<field>" points to an EARLIER op: adimages -> .hash, advideos/adcreatives/ads -> .id,
   Google creates -> .resource_name.
-- media_id must be an APPROVED Media library id (images for adimages/AssetService, videos for advideos).
+- media_id must be an APPROVED (or active) Media library id (images for adimages/AssetService, videos for advideos).
 - Guardrails: one entity's budget may move at most +/-50% in one changeset (warning above +/-20%);
-  no daily budget below $10; total daily budget across both platforms rising more than 10% is flagged.
+  no daily budget below $10; total daily budget across both platforms rising more than 10% is flagged;
+  a bid or target moving more than +/-20% is flagged.
 """
 
 GOOGLE_SERVICES = {
@@ -184,6 +146,10 @@ GOOGLE_SERVICES = {
     "CampaignCriterionService": {"method": "mutateCampaignCriteria", "collection": "campaignCriteria",
                                  "etype": "negative_keyword", "ops": {"create": None, "remove": None}},
     "AssetService": {"method": "mutateAssets", "collection": "assets", "etype": "asset", "ops": {"create": None}},
+    "AssetGroupService": {"method": "mutateAssetGroups", "collection": "assetGroups", "etype": "asset_group",
+                          "ops": {"update": {"status"}}},
+    "AssetGroupAssetService": {"method": "mutateAssetGroupAssets", "collection": "assetGroupAssets",
+                               "etype": "asset_group_asset", "ops": {"update": {"status"}}},
 }
 META_NODE_PARAMS = {
     "campaign": {"status", "daily_budget"},
@@ -199,6 +165,7 @@ MONEY_FIELDS = ("daily", "daily_budget", "bid_amount", "bidding.target_cpa", "cp
 BUDGET_MIN = 10.0
 BUDGET_MAX_STEP = 0.50
 BUDGET_WARN_STEP = 0.20
+BID_WARN_STEP = 0.20
 TOTAL_WARN_RISE = 0.10
 MAX_OPS = 100
 
@@ -212,23 +179,49 @@ class _OpError(Exception):
 def _strip_fences(text):
     # type: (str) -> str
     t = str(text or "").strip()
-    m = re.search(r"```(?:ya?ml)?\s*\n(.*?)```", t, re.S)
+    m = re.search(r"```(?:json|ya?ml)?\s*\n(.*?)```", t, re.S)
     return m.group(1) if m else t
 
 
-def parse(yaml_text):
-    # type: (str) -> Tuple[Optional[Dict[str, Any]], List[str]]
-    """Parse changeset YAML. Returns (doc, errors); doc is None when it is not a usable YAML mapping."""
+def _load_text(text):
+    # type: (str) -> Tuple[Any, Optional[str]]
+    """JSON first (the format); fall back to YAML so versions stored before the switch still load."""
+    t = _strip_fences(text)
     try:
-        doc = yaml.safe_load(_strip_fences(yaml_text))
-    except yaml.YAMLError as exc:
-        return None, ["YAML does not parse: %s" % str(exc).replace("\n", " ")]
+        return json.loads(t), None
+    except ValueError as exc:
+        json_err = "JSON does not parse: %s" % exc
+    if t.lstrip().startswith(("{", "[")):
+        return None, json_err
+    try:
+        return yaml.safe_load(t), None
+    except yaml.YAMLError:
+        return None, json_err
+
+
+def to_json(doc):
+    # type: (Dict[str, Any]) -> str
+    """Canonical pretty JSON for a changeset (what is stored and shown)."""
+    return json.dumps({"changeset": (doc or {}).get("changeset"), "operations": (doc or {}).get("operations")},
+                      indent=2, ensure_ascii=False)
+
+
+def parse(text):
+    # type: (Any) -> Tuple[Optional[Dict[str, Any]], List[str]]
+    """Parse a changeset (JSON text, an already-parsed dict, or legacy YAML text).
+    Returns (doc, errors); doc is None when it is not a usable object."""
+    if isinstance(text, dict):
+        doc = copy.deepcopy(text)
+    else:
+        doc, err = _load_text(text)
+        if err:
+            return None, [err]
     if not isinstance(doc, dict):
-        return None, ["changeset must be a YAML mapping with `changeset` and `operations`"]
+        return None, ["changeset must be a JSON object with `changeset` and `operations`"]
     errors = []  # type: List[str]
     head = doc.get("changeset")
     if not isinstance(head, dict):
-        errors.append("missing `changeset` mapping (title, based_on_snapshot, rationale)")
+        errors.append("missing `changeset` object (title, based_on_snapshot, rationale)")
     else:
         if not str(head.get("title") or "").strip():
             errors.append("changeset.title is required")
@@ -247,7 +240,7 @@ def parse(yaml_text):
     for i, op in enumerate(ops):
         label = "operations[%d]" % i
         if not isinstance(op, dict):
-            errors.append("%s is not a mapping" % label)
+            errors.append("%s is not an object" % label)
             continue
         ref = op.get("ref")
         if not ref or not re.match(r"^[A-Za-z0-9_\-]+$", str(ref)):
@@ -289,6 +282,9 @@ def _index(doc):
                 put([a.get("id"), a.get("resource_name")], "ad", a, p2)
         for ag in c.get("asset_groups") or []:
             put([ag.get("id"), ag.get("resource_name")], "asset_group", ag, par)
+            p3 = {"platform": "google", "campaign": c, "asset_group": ag}
+            for a in ag.get("assets") or []:
+                put([a.get("id"), a.get("resource_name")], "asset_group_asset", a, p3)
     for a in (doc.get("google") or {}).get("assets", []):
         put([a.get("resource_name")], "asset", a, {"platform": "google"})
     meta = doc.get("meta") or {}
@@ -445,8 +441,8 @@ class _Sim(object):
         asset = media_asset(media_id)
         if not asset:
             raise _OpError("media_id %s is not in the Media library" % media_id)
-        if asset.get("status") != "approved":
-            raise _OpError("media_id %s is %s, not approved" % (media_id, asset.get("status")))
+        if asset.get("status") not in ("approved", "active"):
+            raise _OpError("media_id %s is %s, not approved or active" % (media_id, asset.get("status")))
         if kind and asset.get("kind") != kind:
             raise _OpError("media_id %s is a %s, this operation needs a %s" % (media_id, asset.get("kind"), kind))
         return asset
@@ -455,6 +451,14 @@ class _Sim(object):
         t = self.budgets.setdefault(eid, {"before": before, "platform": platform, "name": name, "ops": []})
         t["after"] = after
         t["ops"].append(ref)
+
+    def check_bid(self, ref, name, before, after):
+        try:
+            b, a = float(before), float(after)
+        except (TypeError, ValueError):
+            return
+        if b > 0 and abs(a / b - 1) > BID_WARN_STEP:
+            self.issue(ref, "warn", "%s bid moves %+.0f%% (%s -> %s)" % (name, (a / b - 1) * 100, _fmt_money(b), _fmt_money(a)))
 
     def check_refs(self, ref, obj):
         if isinstance(obj, dict):
@@ -593,6 +597,7 @@ class _Sim(object):
                     if bidding.get("strategy") != want:
                         raise _OpError("%s uses %s; %s needs %s" % (ent["name"], bidding.get("strategy"), path, want))
                     new = _micros_to_dollars(v, path)
+                    self.check_bid(ref, ent["name"], bidding.get("target_cpa"), new)
                     self.row(ref, "google", "campaign", ent["id"], ent["name"], "update", "bidding.target_cpa",
                              bidding.get("target_cpa"), new)
                     bidding["target_cpa"] = new
@@ -615,9 +620,18 @@ class _Sim(object):
                     ent["status"] = new
                 else:
                     new = _micros_to_dollars(v, path)
+                    self.check_bid(ref, ent["name"], ent.get("cpc_bid"), new)
                     self.row(ref, "google", "ad_group", ent["id"], ent["name"], "update", "cpc_bid", ent.get("cpc_bid"), new)
                     ent["cpc_bid"] = new
         elif service == "AdGroupAdService":
+            new = self._status(flat["status"], ("ENABLED", "PAUSED"))
+            self.row(ref, "google", "ad", ent["id"], ent["name"], "update", "status", ent["status"], new)
+            ent["status"] = new
+        elif service == "AssetGroupService":
+            new = self._status(flat["status"], ("ENABLED", "PAUSED"))
+            self.row(ref, "google", "asset_group", ent["id"], ent["name"], "update", "status", ent["status"], new)
+            ent["status"] = new
+        elif service == "AssetGroupAssetService":
             new = self._status(flat["status"], ("ENABLED", "PAUSED"))
             self.row(ref, "google", "ad", ent["id"], ent["name"], "update", "status", ent["status"], new)
             ent["status"] = new
@@ -796,6 +810,7 @@ class _Sim(object):
                 if par["campaign"].get("bid_strategy") not in ("COST_CAP", "LOWEST_COST_WITH_BID_CAP"):
                     raise _OpError("%s bids %s; bid_amount needs a cost cap or bid cap" % (
                         par["campaign"]["name"], par["campaign"].get("bid_strategy")))
+                self.check_bid(ref, name, ent.get("bid_amount"), new)
                 self.row(ref, "meta", etype, ent["id"], name, "update", "bid_amount", ent.get("bid_amount"), new)
                 ent["bid_amount"] = new
             elif key == "targeting":
@@ -955,7 +970,7 @@ def validate(doc, snapshot):
         return [{"op": None, "level": "error", "message": "no changeset to validate"}]
     issues = []  # type: List[Dict[str, Any]]
     # structural problems parse() would report (doc may be hand-built)
-    _d, errs = parse(yaml.safe_dump(doc, sort_keys=False))
+    _d, errs = parse(doc)
     for e in errs:
         issues.append({"op": None, "level": "error", "message": e})
     sim = _Sim(doc, snapshot).run()

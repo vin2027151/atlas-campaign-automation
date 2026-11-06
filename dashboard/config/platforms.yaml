@@ -4,7 +4,12 @@
 # supplied outside the repo (the live adapters refuse any value containing EXAMPLE).
 mode: sample          # sample | live. live also needs env ATLAS_ALLOW_LIVE=1 and real values.
 google_ads:
-  api_version: "v22"  # set to the current Google Ads API version before going live
+  # Current major version, confirmed 2026-11-06 at developers.google.com/google-ads/api/docs/sunset-dates
+  # (v26 released 2026-10-14, minor v26.1 2026-10-28, sunset Nov 2027; v22 is sunset).
+  api_version: "v26"
+  # Google sunset developer tokens on 2026-09-09: optional and ignored by the API
+  # (developers.google.com/google-ads/api/docs/api-policy/developer-token). Set true to send it anyway.
+  send_developer_token: false
   developer_token: "EXAMPLE-DEV-TOKEN-NOT-REAL"
   client_id: "000000000000-example.apps.googleusercontent.com"
   client_secret: "EXAMPLE-CLIENT-SECRET"
@@ -12,7 +17,9 @@ google_ads:
   login_customer_id: "1112223333"   # MCC
   customer_id: "4445556666"         # Search Atlas ads account (sample)
 meta:
-  api_version: "v24.0"  # set to the current Graph API version before going live
+  # Latest Graph / Marketing API version, confirmed 2026-11-06 at
+  # developers.facebook.com/docs/marketing-api/marketing-api-changelog (v27.0, introduced 2026-11-04).
+  api_version: "v27.0"
   app_id: "000000000000000"
   app_secret: "EXAMPLE-APP-SECRET"
   access_token: "EXAMPLE-SYSTEM-USER-TOKEN"

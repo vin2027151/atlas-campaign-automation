@@ -54,7 +54,7 @@ function renderKpis(d) {
       sub: deltaHtml(k.mtd_spend.delta, { goodWhen: "neutral", vs: vsMonth }) }),
     tile({ label: "Projected spend / budget", value: fmt.money(k.projected.value),
       tone: paceTone(k.projected.pace_pct), bar: k.projected.pace_pct,
-      sub: `<span class="${paceTone(k.projected.pace_pct)} strong">${fmt.pct(k.projected.pace_pct)}</span> of ${fmt.moneyShort(k.projected.budget)} budget` }),
+      sub: `<span class="${paceTone(k.projected.pace_pct)} strong">${fmt.pct(k.projected.pace_pct)}</span> of ${fmt.moneyShort(k.projected.budget)} budget<br><span class="muted">Projected month-end at current daily budgets</span>` }),
   ];
   $("#rp-kpis").innerHTML = html.join("");
 }
@@ -74,7 +74,7 @@ function renderPacing(d) {
     const vsPlan = p.month_to_date_spend - p.budget_to_date;
     return `<div class="rp-pace-row">
       <div class="rp-pace-name">${name}
-        <div><span class="rp-pace-pct ${paceTone(p.pace_pct)}">${fmt.pct(p.pace_pct)}</span> <span class="muted small">projected pace</span></div>
+        <div><span class="rp-pace-pct ${paceTone(p.pace_pct)}">${fmt.pct(p.pace_pct)}</span> <span class="muted small">projected at current daily budgets</span></div>
       </div>
       <div>
         <div class="rp-bar ${cls}" role="img" aria-label="${esc(p.label)}: ${fmt.money(p.month_to_date_spend)} spent, should be ${fmt.money(p.budget_to_date)} today, projected ${fmt.money(p.projected_month_end)} of ${fmt.money(p.monthly_budget)}">
@@ -87,9 +87,9 @@ function renderPacing(d) {
           ${stat("Monthly budget", fmt.money(p.monthly_budget))}
           ${stat("Spent MTD", fmt.money(p.month_to_date_spend))}
           ${stat("Budget to date", `${fmt.money(p.budget_to_date)} <span class="muted small">(${vsPlan >= 0 ? "+" : "-"}${fmt.money(Math.abs(vsPlan))})</span>`)}
-          ${stat("Daily rate, 7d avg", fmt.money(p.daily_rate_7d))}
+          ${stat("Daily budgets now", `<span title="Enabled campaigns' daily budgets; trailing 7-day average spend ${fmt.money(p.daily_rate_7d)}/day">${fmt.money(p.active_daily_budget)}</span>`)}
           ${stat("Daily target", fmt.money(p.daily_target))}
-          ${stat("Projected month end", fmt.money(p.projected_month_end), paceTone(p.pace_pct))}
+          ${stat(`<span title="MTD spend + ${p.days_remaining} days remaining × current daily budgets">Projected month-end at current daily budgets</span>`, fmt.money(p.projected_month_end), paceTone(p.pace_pct))}
         </div>
       </div>
     </div>`;

@@ -27,10 +27,17 @@ call the platform first and then record the result here.
 
 import calendar
 import copy
+import contextlib
+import hashlib
 import json
 import os
 import tempfile
 import threading
+
+try:  # POSIX advisory lock so two server processes never interleave a read-modify-write
+    import fcntl  # type: ignore
+except ImportError:  # pragma: no cover (Windows)
+    fcntl = None  # type: ignore
 from datetime import date, datetime, timedelta, timezone
 from typing import Any, Callable, Dict, List, Optional
 
@@ -125,15 +132,41 @@ def save_state():
         _mtime = os.path.getmtime(STATE_PATH)
 
 
+@contextlib.contextmanager
+def _file_lock():
+    """Exclusive advisory lock next to state.json (``.state-lock.json``, git-ignored).
+
+    The thread lock covers one server process; this covers several (two uvicorn
+    workers, a CLI script) so a read-modify-write is never interleaved. Writes are
+    already atomic (temp file + os.replace), so readers never see a torn file.
+    """
+    if fcntl is None:
+        yield
+        return
+    path = os.path.join(os.path.dirname(STATE_PATH) or ".", ".state-lock.json")
+    fh = open(path, "a")
+    try:
+        fcntl.flock(fh.fileno(), fcntl.LOCK_EX)
+        yield
+    finally:
+        try:
+            fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
+        finally:
+            fh.close()
+
+
 def mutate(fn):
     # type: (Callable[[Dict[str, Any]], Any]) -> Any
     """Run ``fn(state)`` under the store lock, save atomically, and return ``fn``'s result.
 
+    The thread lock and a file lock are held for the whole read-modify-write, and
+    state.json is re-read first if another process changed it, so concurrent edits
+    from several browsers never overwrite each other or corrupt the file.
     If ``fn`` raises, nothing is saved (the in-memory state is restored from a
     snapshot), so a failed mutation never leaves a half-applied change.
     """
     global _state
-    with _lock:
+    with _lock, _file_lock():
         state = get_state()
         snapshot = copy.deepcopy(state)
         try:
@@ -429,17 +462,46 @@ def platform_budget(platform=None):
         raise BadInput("unknown platform: %s" % platform)
 
 
+def active_daily_budget(platform=None):
+    # type: (Optional[str]) -> float
+    """Sum of the daily budgets that are spending right now (account or one platform).
+
+    Only ACTIVE campaigns count. A campaign whose ad sets / ad groups are all
+    paused counts 0. Meta campaigns with ad-set budgets (ABO) count their ACTIVE
+    ad sets' budgets; everything else counts the campaign's daily budget.
+    """
+    total = 0.0
+    for c in campaigns(platform):
+        if c.get("status") != "ACTIVE":
+            continue
+        sets = adsets_for(c["id"])
+        live = [a for a in sets if a.get("status") == "ACTIVE"]
+        if sets and not live:
+            continue
+        if c["platform"] == "meta" and any(a.get("daily_budget") is not None for a in sets):
+            total += sum(float(a.get("daily_budget") or 0) for a in live)
+        else:
+            total += float(c.get("daily_budget") or 0)
+    return round(total, 2)
+
+
 def pacing(platform=None):
     # type: (Optional[str]) -> Dict[str, Any]
     """Month-to-date pacing for the account or one platform, as of today.
 
+    The projection is **month-to-date spend + days remaining x the current daily
+    budgets of what is enabled now**, so pausing a campaign or changing a budget
+    moves it immediately (a trailing-7-day rate would take a week to react).
+
     Returns ``month`` ("YYYY-MM"), ``month_to_date_spend``, ``days_elapsed``
     (today counts as elapsed), ``days_in_month``, ``days_remaining``,
-    ``daily_rate_7d`` (avg spend/day over the trailing 7 days),
-    ``projected_month_end`` (MTD + daily_rate_7d x days remaining),
-    ``monthly_budget``, ``pace_pct`` (projected / budget, percentage points),
-    ``budget_to_date`` (straight-line budget through today), ``mtd_vs_plan_pct``
-    (MTD / budget_to_date) and ``daily_target`` (budget left / days left).
+    ``active_daily_budget`` (see :func:`active_daily_budget`),
+    ``projected_month_end`` (MTD + active_daily_budget x days remaining),
+    ``projection_basis`` ("current_daily_budgets"), ``monthly_budget``,
+    ``pace_pct`` (projected / budget, percentage points), ``budget_to_date``
+    (straight-line budget through today), ``mtd_vs_plan_pct`` (MTD /
+    budget_to_date), ``daily_target`` (budget left / days left) and, for
+    reference only, ``daily_rate_7d`` (avg spend/day over the trailing 7 days).
     """
     t = parse_date(today())
     month_start = iso(t.replace(day=1))
@@ -448,7 +510,8 @@ def pacing(platform=None):
     remaining = dim - elapsed
     mtd = round(sum(r["spend"] for r in daily_for(None, platform, month_start, today())), 2)
     rate = round(window_totals(None, 7, platform)["spend"] / 7.0, 2)
-    projected = round(mtd + rate * remaining, 2)
+    daily = active_daily_budget(platform)
+    projected = round(mtd + daily * remaining, 2)
     budget = platform_budget(platform)
     to_date = round(budget * elapsed / float(dim), 2)
     return {
@@ -458,14 +521,119 @@ def pacing(platform=None):
         "days_elapsed": elapsed,
         "days_in_month": dim,
         "days_remaining": remaining,
-        "daily_rate_7d": rate,
+        "active_daily_budget": daily,
         "projected_month_end": projected,
+        "projection_basis": "current_daily_budgets",
+        "projection_label": "Projected month-end at current daily budgets",
+        "daily_rate_7d": rate,
         "monthly_budget": budget,
         "pace_pct": safe_div(projected, budget, 100.0, 1),
         "budget_to_date": to_date,
         "mtd_vs_plan_pct": safe_div(mtd, to_date, 100.0, 1),
         "daily_target": safe_div(budget - mtd, remaining) if remaining else None,
     }
+
+
+# ------------------------------------------------------------ ad-level metrics
+# The sample data has daily rows per campaign only. Each ad carries a seeded
+# ``metrics_split``: its share of its ad set's spend, impressions, clicks,
+# platform conversions, trials and paid. Shares within an ad set sum to 1 per
+# metric, so ads add up to their ad set and ad sets to the campaign. Different
+# shares per metric give each ad its own CTR and cost per trial.
+
+AD_SPLIT_KEYS = ("spend", "impressions", "clicks", "platform_conversions", "trials", "paid")
+
+
+def _seeded(ad_id, salt, lo, hi):
+    # type: (str, str, float, float) -> float
+    h = hashlib.sha256(("atlas-ad-split:%s:%s" % (ad_id, salt)).encode("utf-8")).hexdigest()
+    return lo + (hi - lo) * (int(h[:8], 16) / float(0xFFFFFFFF))
+
+
+def _ad_split_weights(ad_id):
+    # type: (str) -> Dict[str, float]
+    w = {}
+    w["spend"] = _seeded(ad_id, "spend", 0.45, 1.55)
+    w["impressions"] = w["spend"] * _seeded(ad_id, "cpm", 0.85, 1.15)
+    w["clicks"] = w["impressions"] * _seeded(ad_id, "ctr", 0.70, 1.30)
+    w["trials"] = w["clicks"] * _seeded(ad_id, "cvr", 0.55, 1.45)
+    w["platform_conversions"] = w["trials"] * _seeded(ad_id, "pconv", 0.80, 1.25)
+    w["paid"] = w["trials"] * _seeded(ad_id, "paid", 0.65, 1.35)
+    return w
+
+
+def _normalize_shares(weights):
+    # type: (List[float]) -> List[float]
+    total = sum(weights)
+    if total <= 0:
+        return [0.0 for _ in weights]
+    shares = [round(x / total, 4) for x in weights]
+    shares[-1] = round(1.0 - sum(shares[:-1]), 4)
+    return shares
+
+
+def ensure_ad_splits():
+    # type: () -> int
+    """Give every ad a seeded ``metrics_split`` once (deterministic). Returns ads changed.
+
+    Ad sets where no ad has a split get shares across all their ads. An ad added
+    later (a new ad from a publish) gets zero shares: it has no history yet, and
+    its siblings' shares still sum to 1.
+    """
+    st = get_state()
+    if all("metrics_split" in a for a in st.get("ads", [])):
+        return 0
+
+    def _apply(state):
+        changed = 0
+        by_set = {}  # type: Dict[str, List[Dict[str, Any]]]
+        for a in state["ads"]:
+            by_set.setdefault(a["adset_id"], []).append(a)
+        for sid, ads in by_set.items():
+            todo = [a for a in ads if "metrics_split" not in a]
+            if not todo:
+                continue
+            if len(todo) < len(ads):  # siblings already split: newcomers start at zero
+                for a in todo:
+                    a["metrics_split"] = dict([(k, 0.0) for k in AD_SPLIT_KEYS] + [("sample_derived", True)])
+                    changed += 1
+                continue
+            ws = [_ad_split_weights(a["id"]) for a in ads]
+            per = dict((k, _normalize_shares([w[k] for w in ws])) for k in AD_SPLIT_KEYS)
+            for i, a in enumerate(ads):
+                a["metrics_split"] = dict([(k, per[k][i]) for k in AD_SPLIT_KEYS] + [("sample_derived", True)])
+                changed += 1
+        return changed
+
+    return mutate(_apply)
+
+
+def split_ad_metrics(adset_totals, ads):
+    # type: (Dict[str, Any], List[Dict[str, Any]]) -> List[Dict[str, Any]]
+    """Split an ad set's totals across its ads by ``metrics_split``; derived metrics added.
+
+    Returns one dict per ad (same order) with the raw sums and :func:`derive` metrics.
+    Spend is rounded to cents with the remainder on the largest share, so the ads'
+    spend adds up to the ad set's exactly.
+    """
+    out = []
+    for a in ads:
+        sp = a.get("metrics_split") or {}
+        t = dict((k, float(adset_totals.get(k) or 0) * float(sp.get(k) or 0)) for k in AD_SPLIT_KEYS)
+        t["spend"] = round(t["spend"], 2)
+        t["platform_conversions"] = round(t["platform_conversions"], 1)
+        t["impressions"] = int(round(t["impressions"]))
+        t["clicks"] = int(round(t["clicks"]))
+        t["trials"] = round(t["trials"], 1)
+        t["paid"] = round(t["paid"], 1)
+        out.append(derive(t))
+    if out:
+        diff = round(float(adset_totals.get("spend") or 0) - sum(t["spend"] for t in out), 2)
+        if diff:
+            i = max(range(len(ads)), key=lambda j: float((ads[j].get("metrics_split") or {}).get("spend") or 0))
+            out[i]["spend"] = round(out[i]["spend"] + diff, 2)
+            derive(out[i])
+    return out
 
 
 def month_to_date(campaign_id=None, platform=None):

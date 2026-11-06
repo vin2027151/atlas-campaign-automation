@@ -90,7 +90,10 @@ def _google(state, ov):
                 ag["assets"] = []
                 for ad in store.ads_for(a["id"]):
                     od = g["ads"][ad["id"]]
-                    ag["assets"].append({"id": ad["id"], "resource_name": rn("assetGroupAssets", oa["num"], od["num"]),
+                    # customers/{cid}/assetGroupAssets/{asset_group_id}~{asset_id}~{field_type}
+                    field_type = "YOUTUBE_VIDEO" if od.get("asset_type") == "YOUTUBE_VIDEO" else "MARKETING_IMAGE"
+                    ag["assets"].append({"id": ad["id"], "resource_name": rn("assetGroupAssets", oa["num"], od["num"], field_type),
+                                         "field_type": field_type,
                                          "type": od.get("asset_type"), "name": ad["name"],
                                          "status": _gstatus(ad["status"])})
                 camp.setdefault("asset_groups", []).append(ag)

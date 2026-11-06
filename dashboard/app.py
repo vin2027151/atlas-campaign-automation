@@ -26,20 +26,20 @@ ASSET_V = str(int(__import__("time").time()))
 PAGES = [
     # route name, path, nav label, title, one-line description
     ("home", "/", "Home", "Overview", "Headline numbers and where to go next."),
-    ("campaigns", "/campaigns", "Campaigns", "Campaigns",
-     "Every campaign's spend, budget, pacing and cost per trial, with pause, budget, ad set and negative-keyword controls."),
     ("reporting", "/reporting", "Reporting", "Reporting",
      "Cost per trial and paid conversion by campaign, daily spend and rolling 3-day cost per trial, PostHog truth vs platform claims."),
+    ("campaigns", "/campaigns", "Campaigns", "Campaigns",
+     "Every campaign's spend, budget, pacing and cost per trial, with pause, budget, ad set and negative-keyword controls."),
     ("management", "/management", "Management", "Management",
-     "Today's checklist, everything that needs action, what's in play, and the test scoreboard."),
-    ("planning", "/planning", "Campaign Planning", "Campaign planning",
+     "Everything that needs action, the test scoreboard and testing schedule, today's checklist and tracking status."),
+    ("planning", "/planning", "Plan & Adapt", "Plan & Adapt",
      "Pull account state, compare it to the 30-day plan, draft API changes from a brief, review the diff, publish by hand."),
     ("media", "/media", "Media", "Media library",
-     "Numbered image, video and HTML5 assets: requests, ready for review, approved."),
+     "Numbered image, video and HTML5 assets: creative requests, ready for review, approved, active."),
+    ("calendar", "/calendar", "Calendar", "Content and testing calendar",
+     "The launch schedule month by month: content items and tests by day."),
     ("chat", "/chat", "Quick Chat", "Quick chat",
      "Ask about the plan, the latest account state and Search Atlas offerings."),
-    ("calendar", "/calendar", "Calendar", "30-day calendar",
-     "The November launch schedule by day: checklist, content and tests."),
 ]
 API_PAGES = ["spend", "campaigns", "reporting", "management", "planning", "media", "calendar", "chat"]
 

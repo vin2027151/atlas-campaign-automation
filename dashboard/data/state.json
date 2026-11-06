@@ -413,7 +413,16 @@
    "format": "rsa",
    "hook": "All-in-one SEO platform | Start a 7-day trial",
    "cta": "Start trial",
-   "launched": "2026-08-12"
+   "launched": "2026-08-12",
+   "metrics_split": {
+    "spend": 0.4546,
+    "impressions": 0.4045,
+    "clicks": 0.3457,
+    "platform_conversions": 0.3973,
+    "trials": 0.3346,
+    "paid": 0.3844,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_brand_us__as1_ad2",
@@ -423,7 +432,16 @@
    "format": "rsa",
    "hook": "SEO software built for agencies | White-label reports",
    "cta": "Start trial",
-   "launched": "2026-08-15"
+   "launched": "2026-08-15",
+   "metrics_split": {
+    "spend": 0.5454,
+    "impressions": 0.5955,
+    "clicks": 0.6543,
+    "platform_conversions": 0.6027,
+    "trials": 0.6654,
+    "paid": 0.6156,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_brand_us__as2_ad1",
@@ -433,7 +451,16 @@
    "format": "rsa",
    "hook": "SEO software built for agencies | White-label reports",
    "cta": "Start trial",
-   "launched": "2026-08-19"
+   "launched": "2026-08-19",
+   "metrics_split": {
+    "spend": 0.4177,
+    "impressions": 0.4071,
+    "clicks": 0.3389,
+    "platform_conversions": 0.3227,
+    "trials": 0.3222,
+    "paid": 0.3973,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_brand_us__as2_ad2",
@@ -443,7 +470,16 @@
    "format": "rsa",
    "hook": "Replace 4 SEO tools with one | See pricing",
    "cta": "See pricing",
-   "launched": "2026-08-20"
+   "launched": "2026-08-20",
+   "metrics_split": {
+    "spend": 0.5823,
+    "impressions": 0.5929,
+    "clicks": 0.6611,
+    "platform_conversions": 0.6773,
+    "trials": 0.6778,
+    "paid": 0.6027,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_us__as1_ad1",
@@ -453,7 +489,16 @@
    "format": "rsa",
    "hook": "All-in-one SEO platform | Start a 7-day trial",
    "cta": "Start trial",
-   "launched": "2026-08-15"
+   "launched": "2026-08-15",
+   "metrics_split": {
+    "spend": 0.6441,
+    "impressions": 0.6165,
+    "clicks": 0.577,
+    "platform_conversions": 0.4381,
+    "trials": 0.4023,
+    "paid": 0.4007,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_us__as1_ad2",
@@ -463,7 +508,16 @@
    "format": "rsa",
    "hook": "SEO software built for agencies | White-label reports",
    "cta": "Start trial",
-   "launched": "2026-08-30"
+   "launched": "2026-08-30",
+   "metrics_split": {
+    "spend": 0.3559,
+    "impressions": 0.3835,
+    "clicks": 0.423,
+    "platform_conversions": 0.5619,
+    "trials": 0.5977,
+    "paid": 0.5993,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_us__as2_ad1",
@@ -473,7 +527,16 @@
    "format": "rsa",
    "hook": "SEO software built for agencies | White-label reports",
    "cta": "Start trial",
-   "launched": "2026-08-27"
+   "launched": "2026-08-27",
+   "metrics_split": {
+    "spend": 0.51,
+    "impressions": 0.4904,
+    "clicks": 0.5949,
+    "platform_conversions": 0.7211,
+    "trials": 0.7564,
+    "paid": 0.8042,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_us__as2_ad2",
@@ -483,7 +546,16 @@
    "format": "rsa",
    "hook": "Replace 4 SEO tools with one | See pricing",
    "cta": "See pricing",
-   "launched": "2026-08-13"
+   "launched": "2026-08-13",
+   "metrics_split": {
+    "spend": 0.49,
+    "impressions": 0.5096,
+    "clicks": 0.4051,
+    "platform_conversions": 0.2789,
+    "trials": 0.2436,
+    "paid": 0.1958,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_us__as3_ad1",
@@ -493,7 +565,16 @@
    "format": "rsa",
    "hook": "Replace 4 SEO tools with one | See pricing",
    "cta": "See pricing",
-   "launched": "2026-08-27"
+   "launched": "2026-08-27",
+   "metrics_split": {
+    "spend": 0.4506,
+    "impressions": 0.4237,
+    "clicks": 0.3257,
+    "platform_conversions": 0.2312,
+    "trials": 0.2274,
+    "paid": 0.2014,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_us__as3_ad2",
@@ -503,7 +584,16 @@
    "format": "rsa",
    "hook": "A faster semrush alternative | Try it free",
    "cta": "Start trial",
-   "launched": "2026-08-22"
+   "launched": "2026-08-22",
+   "metrics_split": {
+    "spend": 0.5494,
+    "impressions": 0.5763,
+    "clicks": 0.6743,
+    "platform_conversions": 0.7688,
+    "trials": 0.7726,
+    "paid": 0.7986,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_us__as4_ad1",
@@ -513,7 +603,16 @@
    "format": "rsa",
    "hook": "A faster semrush alternative | Try it free",
    "cta": "Start trial",
-   "launched": "2026-08-29"
+   "launched": "2026-08-29",
+   "metrics_split": {
+    "spend": 0.5608,
+    "impressions": 0.5629,
+    "clicks": 0.5738,
+    "platform_conversions": 0.5932,
+    "trials": 0.5289,
+    "paid": 0.6512,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_us__as4_ad2",
@@ -523,7 +622,16 @@
    "format": "rsa",
    "hook": "All-in-one SEO platform | Start a 7-day trial",
    "cta": "Start trial",
-   "launched": "2026-08-18"
+   "launched": "2026-08-18",
+   "metrics_split": {
+    "spend": 0.4392,
+    "impressions": 0.4371,
+    "clicks": 0.4262,
+    "platform_conversions": 0.4068,
+    "trials": 0.4711,
+    "paid": 0.3488,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_pmax_us__as1_ad1",
@@ -533,7 +641,16 @@
    "format": "video",
    "hook": "All-in-one SEO platform | Start a 7-day trial",
    "cta": "Start trial",
-   "launched": "2026-08-12"
+   "launched": "2026-08-12",
+   "metrics_split": {
+    "spend": 0.6083,
+    "impressions": 0.6098,
+    "clicks": 0.6207,
+    "platform_conversions": 0.6063,
+    "trials": 0.619,
+    "paid": 0.5456,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_pmax_us__as1_ad2",
@@ -543,7 +660,16 @@
    "format": "image",
    "hook": "SEO software built for agencies | White-label reports",
    "cta": "Start trial",
-   "launched": "2026-08-10"
+   "launched": "2026-08-10",
+   "metrics_split": {
+    "spend": 0.3917,
+    "impressions": 0.3902,
+    "clicks": 0.3793,
+    "platform_conversions": 0.3937,
+    "trials": 0.381,
+    "paid": 0.4544,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_pmax_us__as2_ad1",
@@ -553,7 +679,16 @@
    "format": "video",
    "hook": "SEO software built for agencies | White-label reports",
    "cta": "Start trial",
-   "launched": "2026-08-29"
+   "launched": "2026-08-29",
+   "metrics_split": {
+    "spend": 0.4225,
+    "impressions": 0.4119,
+    "clicks": 0.5296,
+    "platform_conversions": 0.3374,
+    "trials": 0.3469,
+    "paid": 0.4857,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_pmax_us__as2_ad2",
@@ -563,7 +698,16 @@
    "format": "image",
    "hook": "Replace 4 SEO tools with one | See pricing",
    "cta": "See pricing",
-   "launched": "2026-08-26"
+   "launched": "2026-08-26",
+   "metrics_split": {
+    "spend": 0.5775,
+    "impressions": 0.5881,
+    "clicks": 0.4704,
+    "platform_conversions": 0.6626,
+    "trials": 0.6531,
+    "paid": 0.5143,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_uk__as1_ad1",
@@ -573,7 +717,16 @@
    "format": "rsa",
    "hook": "All-in-one SEO platform | Start a 7-day trial",
    "cta": "Start trial",
-   "launched": "2026-08-21"
+   "launched": "2026-08-21",
+   "metrics_split": {
+    "spend": 0.5444,
+    "impressions": 0.5277,
+    "clicks": 0.5376,
+    "platform_conversions": 0.4999,
+    "trials": 0.4475,
+    "paid": 0.296,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_uk__as1_ad2",
@@ -583,7 +736,16 @@
    "format": "rsa",
    "hook": "SEO software built for agencies | White-label reports",
    "cta": "Start trial",
-   "launched": "2026-08-29"
+   "launched": "2026-08-29",
+   "metrics_split": {
+    "spend": 0.4556,
+    "impressions": 0.4723,
+    "clicks": 0.4624,
+    "platform_conversions": 0.5001,
+    "trials": 0.5525,
+    "paid": 0.704,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_uk__as2_ad1",
@@ -593,7 +755,16 @@
    "format": "rsa",
    "hook": "SEO software built for agencies | White-label reports",
    "cta": "Start trial",
-   "launched": "2026-08-29"
+   "launched": "2026-08-29",
+   "metrics_split": {
+    "spend": 0.7117,
+    "impressions": 0.6994,
+    "clicks": 0.686,
+    "platform_conversions": 0.6292,
+    "trials": 0.6705,
+    "paid": 0.7726,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_nonbrand_uk__as2_ad2",
@@ -603,7 +774,16 @@
    "format": "rsa",
    "hook": "Replace 4 SEO tools with one | See pricing",
    "cta": "See pricing",
-   "launched": "2026-08-22"
+   "launched": "2026-08-22",
+   "metrics_split": {
+    "spend": 0.2883,
+    "impressions": 0.3006,
+    "clicks": 0.314,
+    "platform_conversions": 0.3708,
+    "trials": 0.3295,
+    "paid": 0.2274,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_brand_uk__as1_ad1",
@@ -613,7 +793,16 @@
    "format": "rsa",
    "hook": "All-in-one SEO platform | Start a 7-day trial",
    "cta": "Start trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.5519,
+    "impressions": 0.609,
+    "clicks": 0.5044,
+    "platform_conversions": 0.5045,
+    "trials": 0.5127,
+    "paid": 0.4816,
+    "sample_derived": true
+   }
   },
   {
    "id": "g_search_brand_uk__as1_ad2",
@@ -623,7 +812,16 @@
    "format": "rsa",
    "hook": "SEO software built for agencies | White-label reports",
    "cta": "Start trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.4481,
+    "impressions": 0.391,
+    "clicks": 0.4956,
+    "platform_conversions": 0.4955,
+    "trials": 0.4873,
+    "paid": 0.5184,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_core__as1_ad1",
@@ -633,7 +831,16 @@
    "format": "video",
    "hook": "How a 9-person agency runs 140 client audits a month",
    "cta": "Start free trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.3798,
+    "impressions": 0.3818,
+    "clicks": 0.4702,
+    "platform_conversions": 0.4837,
+    "trials": 0.4166,
+    "paid": 0.4214,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_core__as1_ad2",
@@ -643,7 +850,16 @@
    "format": "video",
    "hook": "I stopped paying for four SEO tools",
    "cta": "Start free trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.3023,
+    "impressions": 0.2918,
+    "clicks": 0.2198,
+    "platform_conversions": 0.1752,
+    "trials": 0.1872,
+    "paid": 0.218,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_core__as1_ad3",
@@ -653,7 +869,16 @@
    "format": "image",
    "hook": "Rank tracking, audits, content and backlinks in one login",
    "cta": "Sign up",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.3179,
+    "impressions": 0.3264,
+    "clicks": 0.31,
+    "platform_conversions": 0.3411,
+    "trials": 0.3962,
+    "paid": 0.3606,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_core__as2_ad1",
@@ -663,7 +888,16 @@
    "format": "video",
    "hook": "90 seconds inside the dashboard",
    "cta": "Start free trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.2445,
+    "impressions": 0.2349,
+    "clicks": 0.1643,
+    "platform_conversions": 0.2192,
+    "trials": 0.2111,
+    "paid": 0.1793,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_core__as2_ad2",
@@ -673,7 +907,16 @@
    "format": "image",
    "hook": "Send clients reports with your logo, not ours",
    "cta": "Start free trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.3311,
+    "impressions": 0.3828,
+    "clicks": 0.4699,
+    "platform_conversions": 0.4849,
+    "trials": 0.4328,
+    "paid": 0.4351,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_core__as2_ad3",
@@ -683,7 +926,16 @@
    "format": "video",
    "hook": "The fifth tool I cancelled this year",
    "cta": "Start free trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.4244,
+    "impressions": 0.3823,
+    "clicks": 0.3658,
+    "platform_conversions": 0.2959,
+    "trials": 0.3561,
+    "paid": 0.3856,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_test__as1_ad1",
@@ -693,7 +945,16 @@
    "format": "video",
    "hook": "How a 9-person agency runs 140 client audits a month",
    "cta": "Start free trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.3722,
+    "impressions": 0.3975,
+    "clicks": 0.4491,
+    "platform_conversions": 0.5799,
+    "trials": 0.6028,
+    "paid": 0.6371,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_test__as1_ad2",
@@ -703,7 +964,16 @@
    "format": "video",
    "hook": "I stopped paying for four SEO tools",
    "cta": "Start free trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.2196,
+    "impressions": 0.2141,
+    "clicks": 0.2317,
+    "platform_conversions": 0.2242,
+    "trials": 0.1888,
+    "paid": 0.136,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_test__as1_ad3",
@@ -713,7 +983,16 @@
    "format": "image",
    "hook": "Rank tracking, audits, content and backlinks in one login",
    "cta": "Sign up",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.4082,
+    "impressions": 0.3884,
+    "clicks": 0.3192,
+    "platform_conversions": 0.1959,
+    "trials": 0.2084,
+    "paid": 0.2269,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_test__as2_ad1",
@@ -723,7 +1002,16 @@
    "format": "video",
    "hook": "90 seconds inside the dashboard",
    "cta": "Start free trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.2809,
+    "impressions": 0.2403,
+    "clicks": 0.2253,
+    "platform_conversions": 0.2388,
+    "trials": 0.2365,
+    "paid": 0.3003,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_test__as2_ad2",
@@ -733,7 +1021,16 @@
    "format": "image",
    "hook": "Send clients reports with your logo, not ours",
    "cta": "Start free trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.4443,
+    "impressions": 0.4809,
+    "clicks": 0.5367,
+    "platform_conversions": 0.5854,
+    "trials": 0.5823,
+    "paid": 0.4732,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_test__as2_ad3",
@@ -743,7 +1040,16 @@
    "format": "video",
    "hook": "The fifth tool I cancelled this year",
    "cta": "Start free trial",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.2748,
+    "impressions": 0.2788,
+    "clicks": 0.238,
+    "platform_conversions": 0.1758,
+    "trials": 0.1812,
+    "paid": 0.2265,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_agency_14d__as1_ad1",
@@ -753,7 +1059,16 @@
    "format": "video",
    "hook": "We replaced three tools in our first week",
    "cta": "Finish signup",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.194,
+    "impressions": 0.1769,
+    "clicks": 0.1905,
+    "platform_conversions": 0.1763,
+    "trials": 0.2101,
+    "paid": 0.1931,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_agency_14d__as1_ad2",
@@ -763,7 +1078,16 @@
    "format": "image",
    "hook": "What it costs after the trial, all of it",
    "cta": "Finish signup",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.4353,
+    "impressions": 0.4203,
+    "clicks": 0.3094,
+    "platform_conversions": 0.4621,
+    "trials": 0.4495,
+    "paid": 0.39,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_agency_14d__as1_ad3",
@@ -773,7 +1097,16 @@
    "format": "video",
    "hook": "Moving your projects over takes an afternoon",
    "cta": "Finish signup",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.3707,
+    "impressions": 0.4028,
+    "clicks": 0.5001,
+    "platform_conversions": 0.3616,
+    "trials": 0.3404,
+    "paid": 0.4169,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_individual_14d__as1_ad1",
@@ -783,7 +1116,16 @@
    "format": "video",
    "hook": "We replaced three tools in our first week",
    "cta": "Finish signup",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.3452,
+    "impressions": 0.4042,
+    "clicks": 0.431,
+    "platform_conversions": 0.5233,
+    "trials": 0.4725,
+    "paid": 0.4908,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_individual_14d__as1_ad2",
@@ -793,7 +1135,16 @@
    "format": "image",
    "hook": "What it costs after the trial, all of it",
    "cta": "Finish signup",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.3381,
+    "impressions": 0.2999,
+    "clicks": 0.3247,
+    "platform_conversions": 0.3144,
+    "trials": 0.3627,
+    "paid": 0.3777,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_individual_14d__as1_ad3",
@@ -803,7 +1154,16 @@
    "format": "video",
    "hook": "Moving your projects over takes an afternoon",
    "cta": "Finish signup",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.3167,
+    "impressions": 0.2959,
+    "clicks": 0.2443,
+    "platform_conversions": 0.1623,
+    "trials": 0.1648,
+    "paid": 0.1315,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_lapsed_15to30d__as1_ad1",
@@ -813,7 +1173,16 @@
    "format": "video",
    "hook": "We replaced three tools in our first week",
    "cta": "Finish signup",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.4581,
+    "impressions": 0.4738,
+    "clicks": 0.543,
+    "platform_conversions": 0.6735,
+    "trials": 0.6506,
+    "paid": 0.6414,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_lapsed_15to30d__as1_ad2",
@@ -823,7 +1192,16 @@
    "format": "image",
    "hook": "What it costs after the trial, all of it",
    "cta": "Finish signup",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.3227,
+    "impressions": 0.2966,
+    "clicks": 0.2521,
+    "platform_conversions": 0.1637,
+    "trials": 0.1797,
+    "paid": 0.2253,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_lapsed_15to30d__as1_ad3",
@@ -833,7 +1211,16 @@
    "format": "video",
    "hook": "Moving your projects over takes an afternoon",
    "cta": "Finish signup",
-   "launched": "2026-11-01"
+   "launched": "2026-11-01",
+   "metrics_split": {
+    "spend": 0.2192,
+    "impressions": 0.2296,
+    "clicks": 0.2049,
+    "platform_conversions": 0.1628,
+    "trials": 0.1697,
+    "paid": 0.1333,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_advantageplus__as1_ad1",
@@ -843,7 +1230,16 @@
    "format": "video",
    "hook": "How a 9-person agency runs 140 client audits a month",
    "cta": "Start free trial",
-   "launched": "2026-08-16"
+   "launched": "2026-08-16",
+   "metrics_split": {
+    "spend": 0.3711,
+    "impressions": 0.3849,
+    "clicks": 0.4411,
+    "platform_conversions": 0.4465,
+    "trials": 0.4781,
+    "paid": 0.3907,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_advantageplus__as1_ad2",
@@ -853,7 +1249,16 @@
    "format": "video",
    "hook": "I stopped paying for four SEO tools",
    "cta": "Start free trial",
-   "launched": "2026-08-22"
+   "launched": "2026-08-22",
+   "metrics_split": {
+    "spend": 0.4702,
+    "impressions": 0.471,
+    "clicks": 0.435,
+    "platform_conversions": 0.3253,
+    "trials": 0.3328,
+    "paid": 0.3824,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_advantageplus__as1_ad3",
@@ -863,7 +1268,16 @@
    "format": "image",
    "hook": "Rank tracking, audits, content and backlinks in one login",
    "cta": "Sign up",
-   "launched": "2026-08-13"
+   "launched": "2026-08-13",
+   "metrics_split": {
+    "spend": 0.1587,
+    "impressions": 0.1441,
+    "clicks": 0.1239,
+    "platform_conversions": 0.2282,
+    "trials": 0.1891,
+    "paid": 0.2269,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_broad__as1_ad1",
@@ -873,7 +1287,16 @@
    "format": "video",
    "hook": "90 seconds inside the dashboard",
    "cta": "Start free trial",
-   "launched": "2026-08-16"
+   "launched": "2026-08-16",
+   "metrics_split": {
+    "spend": 0.4898,
+    "impressions": 0.4948,
+    "clicks": 0.5409,
+    "platform_conversions": 0.4786,
+    "trials": 0.5215,
+    "paid": 0.5916,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_broad__as1_ad2",
@@ -883,7 +1306,16 @@
    "format": "image",
    "hook": "Send clients reports with your logo, not ours",
    "cta": "Start free trial",
-   "launched": "2026-08-20"
+   "launched": "2026-08-20",
+   "metrics_split": {
+    "spend": 0.1855,
+    "impressions": 0.1693,
+    "clicks": 0.1788,
+    "platform_conversions": 0.1876,
+    "trials": 0.2155,
+    "paid": 0.1657,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_prospecting_broad__as1_ad3",
@@ -893,7 +1325,16 @@
    "format": "video",
    "hook": "The fifth tool I cancelled this year",
    "cta": "Start free trial",
-   "launched": "2026-08-18"
+   "launched": "2026-08-18",
+   "metrics_split": {
+    "spend": 0.3247,
+    "impressions": 0.3359,
+    "clicks": 0.2803,
+    "platform_conversions": 0.3338,
+    "trials": 0.263,
+    "paid": 0.2427,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_30d__as1_ad1",
@@ -903,7 +1344,16 @@
    "format": "video",
    "hook": "We replaced three tools in our first week",
    "cta": "Finish signup",
-   "launched": "2026-08-15"
+   "launched": "2026-08-15",
+   "metrics_split": {
+    "spend": 0.4008,
+    "impressions": 0.3762,
+    "clicks": 0.3637,
+    "platform_conversions": 0.4943,
+    "trials": 0.4762,
+    "paid": 0.5205,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_30d__as1_ad2",
@@ -913,7 +1363,16 @@
    "format": "image",
    "hook": "What it costs after the trial, all of it",
    "cta": "Finish signup",
-   "launched": "2026-08-22"
+   "launched": "2026-08-22",
+   "metrics_split": {
+    "spend": 0.2747,
+    "impressions": 0.2564,
+    "clicks": 0.2259,
+    "platform_conversions": 0.1285,
+    "trials": 0.1489,
+    "paid": 0.1532,
+    "sample_derived": true
+   }
   },
   {
    "id": "m_retargeting_30d__as1_ad3",
@@ -923,7 +1382,16 @@
    "format": "video",
    "hook": "Moving your projects over takes an afternoon",
    "cta": "Finish signup",
-   "launched": "2026-08-29"
+   "launched": "2026-08-29",
+   "metrics_split": {
+    "spend": 0.3245,
+    "impressions": 0.3674,
+    "clicks": 0.4104,
+    "platform_conversions": 0.3772,
+    "trials": 0.3749,
+    "paid": 0.3263,
+    "sample_derived": true
+   }
   }
  ],
  "daily": [
@@ -8801,5 +9269,20 @@
    ]
   }
  ],
- "activity": []
+ "activity": [
+  {
+   "ts": "2026-11-06T18:19:19Z",
+   "actor": "vin",
+   "action": "campaign.status",
+   "target": "m_prospecting_core",
+   "detail": "Prospecting_Core: ACTIVE -> PAUSED"
+  },
+  {
+   "ts": "2026-11-06T18:20:48Z",
+   "actor": "vin",
+   "action": "campaign.status",
+   "target": "m_prospecting_core",
+   "detail": "Prospecting_Core: PAUSED -> ACTIVE"
+  }
+ ]
 }

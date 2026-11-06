@@ -440,6 +440,20 @@ class SampleAdapter(Adapter):
             return self._google(op)
         return self._meta(op)
 
+    def execute_request(self, req, ctx):
+        """Apply a rendered HTTP request (planning.api_requests) to the sample account.
+
+        The request is the source of truth: it is parsed back into the operation it
+        carries, so what runs is exactly what the reviewer saw."""
+        from planning import api_requests
+        req = api_requests.resolve(req, (ctx or {}).get("outputs") or {})
+        op = api_requests.to_op(req)
+        if op.get("platform") != self.platform:
+            raise AdapterError("request is for %s, adapter is %s" % (op.get("platform"), self.platform))
+        if self.platform == "google":
+            return self._google(op)
+        return self._meta(op)
+
     # ---------------------------------------------------------------- google
     def _google(self, op):
         ov = load_overlay()
@@ -495,6 +509,23 @@ class SampleAdapter(Adapter):
                     o["google"]["ad_groups"][aid]["cpc_bid"] = bid
                 update_overlay(_cpc)
                 store.log_activity("adgroup.cpc_bid", aid, "%s: max CPC $%.2f" % (store.adset(aid)["name"], bid))
+            return {"results": [{"resourceName": rn}]}
+
+        if service == "AssetGroupService" and kind == "update":
+            aid = _find_num(dict((k, v) for k, v in g["ad_groups"].items() if v.get("kind") == "asset_group"),
+                            ids[0] if ids else None)
+            if coll != "assetGroups" or not aid:
+                raise AdapterError("unknown asset group %s" % rn)
+            store.set_adset_status(aid, _status_store(fields.get("status")))
+            return {"results": [{"resourceName": rn}]}
+
+        if service == "AssetGroupAssetService" and kind == "update":
+            if coll != "assetGroupAssets" or len(ids) < 2:
+                raise AdapterError("unknown asset group asset %s" % rn)
+            ad_id = _find_num(dict((k, v) for k, v in g["ads"].items() if v.get("type") == "ASSET"), ids[1])
+            if not ad_id:
+                raise AdapterError("unknown asset group asset %s" % rn)
+            store.set_ad_status(ad_id, _status_store(fields.get("status")))
             return {"results": [{"resourceName": rn}]}
 
         if service == "AdGroupAdService" and kind == "update":
@@ -779,5 +810,22 @@ class SampleAdapter(Adapter):
                     return old
         old = store.mutate(_apply)
         store.log_activity("adset.budget", sid, "%s: $%s/day -> $%s/day" % (a["name"], store._n(old), store._n(daily)))
-        total = sum(float(x.get("daily_budget") or 0) for x in store.adsets_for(cid))
-        store.set_campaign_budget(cid, daily_budget=round(total, 2))
+        # Move the campaign's daily and monthly totals by the same delta (not a re-sum), so a
+        # change and its undo restore the campaign's figures exactly.
+        delta = round(daily - float(old or 0), 2)
+        import calendar
+        t = store.parse_date(store.today())
+        dim = calendar.monthrange(t.year, t.month)[1]
+
+        def _camp(state):
+            for c in state["campaigns"]:
+                if c["id"] == cid:
+                    before = c["daily_budget"]
+                    c["daily_budget"] = round(float(c["daily_budget"]) + delta, 2)
+                    c["monthly_budget"] = round(float(c["monthly_budget"]) + delta * dim, 2)
+                    if float(c["monthly_budget"]).is_integer():
+                        c["monthly_budget"] = int(c["monthly_budget"])
+                    return c, before
+        c, before = store.mutate(_camp)
+        store.log_activity("campaign.budget", cid, "%s: $%s/day -> $%s/day ($%s/mo)" % (
+            c["name"], store._n(before), store._n(c["daily_budget"]), store._n(c["monthly_budget"])))

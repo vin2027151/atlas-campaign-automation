@@ -44,28 +44,6 @@
   .mg-items .meta.old { color: var(--watch); font-weight: 600; }
   .mg-empty { color: var(--muted); padding: var(--s2) 0 var(--s3); }
 
-  /* 3. In play */
-  .mg-reads { display: flex; gap: var(--s2); flex-wrap: wrap; }
-  .read { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px; border-radius: 10px;
-    font-size: var(--fs-xs); font-weight: 600; letter-spacing: .02em; text-transform: uppercase; border: 1px solid; white-space: nowrap; cursor: help; }
-  .read::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .read.scaling { color: var(--good); background: var(--good-soft); border-color: var(--good-line); }
-  .read.holding { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
-  .read.watching { color: var(--watch); background: var(--watch-soft); border-color: var(--watch-line); }
-  .read.failing { color: var(--bad); background: var(--bad-soft); border-color: var(--bad-line); }
-  .read .n { font-variant-numeric: tabular-nums; }
-  .mg-group-row td { background: var(--surface-2) !important; font-weight: 600; color: var(--ink-2); font-size: var(--fs-sm); }
-  .mg-group-row td.num { font-weight: 600; }
-  .mg-camp a { color: var(--ink); font-weight: 500; }
-  .mg-camp a:hover { color: var(--accent); }
-  .mg-camp .tag { margin-left: 4px; }
-  .table td.mg-why { color: var(--muted); font-size: var(--fs-sm); white-space: normal; min-width: 180px; }
-  .table td.mg-camp { white-space: normal; min-width: 220px; }
-  #mg-inplay thead th { white-space: normal; vertical-align: bottom; position: static; }
-  /* In play grows with its rows: no inner scroll region, no wheel capture. */
-  #mg-inplay .table-wrap { overflow: visible; overscroll-behavior: auto; max-height: none; }
-  .main .table-wrap { overscroll-behavior: auto; }
-
   /* Needs action */
   #mg-actions .action-meta a { color: var(--ink-2); }
   .mg-rule { margin: 0; padding: var(--s3) var(--s4); display: grid; grid-template-columns: max-content 1fr; gap: 6px var(--s3); font-size: var(--fs-sm); color: var(--ink-2); }
@@ -94,6 +72,38 @@
   .mg-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
   .mg-dot.ok { background: var(--good); } .mg-dot.degraded { background: var(--watch); } .mg-dot.broken { background: var(--bad); }
 
+  /* Testing schedule (moved from Calendar): a closed-by-default dropdown */
+  details.mg-schedule > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; padding: var(--s3) var(--s4); }
+  details.mg-schedule > summary::-webkit-details-marker { display: none; }
+  details.mg-schedule > summary::before { content: "\25B8"; display: inline-block; width: 14px; color: var(--muted); }
+  details.mg-schedule[open] > summary::before { content: "\25BE"; }
+  details.mg-schedule[open] > summary { border-bottom: 1px solid var(--line); }
+  details.mg-schedule > summary:hover .card-title { color: var(--accent); }
+  .tests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: var(--s3); }
+  .tcard { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); padding: var(--s3) var(--s4); display: flex; flex-direction: column; gap: var(--s2); min-width: 0; }
+  .tcard-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s2); }
+  .tcard-name { font-weight: 600; line-height: 1.3; }
+  .tcard-sub { font-size: var(--fs-sm); color: var(--muted); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .tcard-hyp { color: var(--ink-2); font-size: var(--fs-sm); }
+  .bench { font-size: var(--fs-sm); font-weight: 600; padding: 6px var(--s2); border-radius: var(--r); background: var(--surface-2); border: 1px solid var(--line); }
+  .tstats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s2); }
+  .tstat-label { font-size: var(--fs-xs); color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+  .tstat-value { font-size: var(--fs-lg); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .tprog { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: var(--s2); align-items: center; font-size: var(--fs-sm); color: var(--ink-2); }
+  .tprog .num { color: var(--muted); }
+  .verdict { font-size: var(--fs-sm); padding: 6px var(--s2); border-radius: var(--r); border: 1px solid var(--line); background: var(--surface-2); }
+  .verdict.on_track { border-color: var(--good-line); background: var(--good-soft); color: var(--good); }
+  .verdict.failing { border-color: var(--bad-line); background: var(--bad-soft); color: var(--bad); }
+  .verdict.not_enough_data { border-color: var(--watch-line); background: var(--watch-soft); color: var(--watch); }
+  .tdone { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+  .tdone + .tdone { margin-top: var(--s2); }
+  .tdone > summary { cursor: pointer; padding: var(--s2) var(--s3); display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; list-style: none; }
+  .tdone > summary::-webkit-details-marker { display: none; }
+  .tdone > summary .tdone-name { font-weight: 600; flex: 1; min-width: 180px; }
+  .tdone > summary .tdone-result { color: var(--ink-2); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+  .tdone-body { padding: 0 var(--s3) var(--s3); display: flex; flex-direction: column; gap: var(--s2); }
+  .section-label { font-size: var(--fs-sm); font-weight: 600; color: var(--ink-2); margin: 0 0 var(--s2); }
+
   /* 6. Lessons */
   .mg-lesson-form { display: grid; grid-template-columns: minmax(0, 1fr) 220px auto; gap: var(--s2); align-items: start; padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); background: var(--surface-2); }
   .mg-lesson-form .textarea { min-height: 30px; height: 30px; padding: 5px var(--s2); }
@@ -105,7 +115,8 @@
   .mg-chip:hover { border-color: var(--line-strong); color: var(--ink); }
   .mg-chip.active { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
   .mg-chip .c { color: var(--muted); font-variant-numeric: tabular-nums; }
-  .mg-lessons { list-style: none; margin: 0; padding: var(--s2) var(--s4) var(--s3); }
+  /* The one allowed inner scroll on the site: the lessons log is capped and scrolls inside itself. */
+  .mg-lessons { list-style: none; margin: 0; padding: var(--s2) var(--s4) var(--s3); max-height: 360px; overflow-y: auto; overscroll-behavior: contain; }
   .mg-lessons li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: var(--s3); padding: var(--s2) 0; border-bottom: 1px solid var(--line); }
   .mg-lessons li:last-child { border-bottom: 0; }
   .mg-lessons .when { color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; padding-top: 1px; }
@@ -121,32 +132,20 @@
   .mg-activity .ts { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .mg-activity .act { font-family: var(--mono); font-size: var(--fs-xs); color: var(--ink-2); padding-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  .mg-two { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--s4); align-items: start; }
   .mg-loading { padding: var(--s5); }
 
-  @media (max-width: 1100px) {
-    .mg-two { grid-template-columns: minmax(0, 1fr); }
-  }
   @media (max-width: 900px) {
     .mg-check-grid { grid-template-columns: minmax(0, 1fr); }
     .mg-check-grid > div + div { border-left: 0; border-top: 1px solid var(--line); border-radius: 0 0 var(--r-lg) var(--r-lg); }
     .mg-lesson-form { grid-template-columns: minmax(0, 1fr) 160px auto; }
-    #mg-inplay .table thead { display: none; }
-    #mg-inplay .table, #mg-inplay .table tbody, #mg-inplay .table tr, #mg-inplay .table td { display: block; width: auto; }
-    #mg-inplay .table tr { border-bottom: 1px solid var(--line); padding: var(--s2) var(--s3); }
-    #mg-inplay .table td { border: 0; padding: 2px 0; text-align: left; min-width: 0; }
-    #mg-inplay .table td:empty { display: none; }
-    #mg-inplay .table td[data-l]::before { content: attr(data-l); display: inline-block; min-width: 128px; color: var(--muted); font-size: var(--fs-sm); font-weight: 500; }
-    #mg-inplay .table td.mg-camp, #mg-inplay .table td.mg-why { min-width: 0; }
-    #mg-inplay .table td.actions .mg-row-actions { justify-content: flex-start; padding-top: 4px; }
-    #mg-inplay .mg-group-row td { background: transparent !important; }
-    #mg-inplay .table tr.mg-group-row { background: var(--surface-2); }
   }
   @media (max-width: 640px) {
     .mg-rail { grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 4px; }
     .mg-day .d-ct { display: none; }
     .mg-rail, .mg-pane-head, .mg-items, .mg-filter, .mg-lessons, .mg-activity, .mg-sub-head { padding-left: var(--s3); padding-right: var(--s3); }
     .mg-tests { grid-template-columns: minmax(0, 1fr); padding: var(--s3); }
+    .tests-grid { grid-template-columns: minmax(0, 1fr); }
+    details.mg-schedule > summary { padding: var(--s3); }
     .mg-lesson-form { grid-template-columns: minmax(0, 1fr); padding: var(--s3); }
     .mg-lesson-form .textarea { height: 60px; }
     .mg-activity li { grid-template-columns: 80px minmax(0, 1fr); }
@@ -159,10 +158,38 @@
 </style>
 {% endblock %}
 
-{% block subtitle %}<p class="page-sub">Today&rsquo;s checklist, what needs a decision, and what is in play. Day-by-day plan for the November build; cost per trial is PostHog-attributed against the {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }} band.</p>{% endblock %}
+{% block subtitle %}<p class="page-sub">What needs a decision, the test scoreboard and testing schedule, today&rsquo;s checklist and tracking. Campaign controls live on Campaigns. Day-by-day plan for the November build; cost per trial is PostHog-attributed against the {{ "${:,.0f}".format(meta.cpa_target[0]) }}&ndash;{{ "${:,.0f}".format(meta.cpa_target[1]) }} band.</p>{% endblock %}
 {% block actions %}<button class="btn btn-sm" id="mg-refresh" type="button">Refresh</button>{% endblock %}
 
 {% block content %}
+<section class="card" id="mg-actions" aria-labelledby="mg-actions-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-actions-title">Needs action</h2><span class="card-sub" id="mg-actions-sub">Overdue, final approvals and Vin feedback</span></div>
+  </div>
+  <div id="mg-action-list"><div class="card-body"><div class="skeleton" style="height:64px"></div></div></div>
+</section>
+
+<section class="card" id="mg-tests" aria-labelledby="mg-tests-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-tests-title">Tests scoreboard</h2><span class="card-sub" id="mg-tests-sub"></span></div>
+  </div>
+  <div class="mg-tests" id="mg-running"></div>
+  <div class="mg-sub-head"><h3>Win / loss ledger</h3><div class="mg-ledger-tally" id="mg-tally"></div></div>
+  <div class="table-wrap" style="border:0;margin-top:var(--s2)">
+    <table class="table compact">
+      <thead><tr><th>Result</th><th>Test</th><th>Campaign</th><th class="num">Benchmark</th><th class="num">Result</th><th class="num">Spend</th><th class="num">Trials</th><th>Ended</th><th>What it taught</th></tr></thead>
+      <tbody id="mg-ledger"></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card" id="mg-schedule-card">
+  <details class="mg-schedule" id="mg-schedule-fold">
+    <summary><h2 class="card-title" id="mg-schedule-title">Testing schedule</h2><span class="card-sub" id="mg-schedule-sub"></span></summary>
+    <div class="card-body stack" id="mg-schedule" aria-labelledby="mg-schedule-title"><div class="skeleton" style="height:160px"></div></div>
+  </details>
+</section>
+
 <section class="card" id="mg-checklist" aria-labelledby="mg-checklist-title">
   <div class="card-head">
     <div class="mg-section-title"><h2 class="card-title" id="mg-checklist-title">Daily checklist</h2><span class="card-sub" id="mg-checklist-sub"></span></div>
@@ -181,42 +208,6 @@
   </div>
 </section>
 
-<section class="card" id="mg-actions" aria-labelledby="mg-actions-title">
-  <div class="card-head">
-    <div class="mg-section-title"><h2 class="card-title" id="mg-actions-title">Needs action</h2><span class="card-sub" id="mg-actions-sub">Overdue, final approvals and Vin feedback</span></div>
-  </div>
-  <div id="mg-action-list"><div class="card-body"><div class="skeleton" style="height:64px"></div></div></div>
-</section>
-
-<section class="card" id="mg-inplay" aria-labelledby="mg-inplay-title">
-  <div class="card-head">
-    <div class="mg-section-title"><h2 class="card-title" id="mg-inplay-title">In play</h2><span class="card-sub">active campaigns, trailing 7 days</span></div>
-    <div class="mg-reads" id="mg-read-counts"></div>
-  </div>
-  <div class="table-wrap">
-    <table class="table compact">
-      <thead><tr><th>Campaign</th><th class="num">Budget / day</th><th class="num">Spend (7d)</th><th class="num">Cost / trial (7d)</th><th class="num">PostHog trials (7d)</th><th>Read</th><th>Evidence</th><th class="actions"><span class="sr-only">Actions</span></th></tr></thead>
-      <tbody id="mg-inplay-body"><tr><td colspan="8" class="table-empty">Loading&hellip;</td></tr></tbody>
-    </table>
-  </div>
-  <details class="mg-fold" id="mg-paused"><summary>Paused campaigns</summary><div id="mg-paused-body"></div></details>
-  <details class="mg-fold"><summary>How the read is computed</summary><dl class="mg-rule" id="mg-rule"></dl></details>
-</section>
-
-<section class="card" id="mg-tests" aria-labelledby="mg-tests-title">
-  <div class="card-head">
-    <div class="mg-section-title"><h2 class="card-title" id="mg-tests-title">Tests scoreboard</h2><span class="card-sub" id="mg-tests-sub"></span></div>
-  </div>
-  <div class="mg-tests" id="mg-running"></div>
-  <div class="mg-sub-head"><h3>Win / loss ledger</h3><div class="mg-ledger-tally" id="mg-tally"></div></div>
-  <div class="table-wrap" style="border:0;margin-top:var(--s2)">
-    <table class="table compact">
-      <thead><tr><th>Result</th><th>Test</th><th>Campaign</th><th class="num">Benchmark</th><th class="num">Result</th><th class="num">Spend</th><th class="num">Trials</th><th>Ended</th><th>What it taught</th></tr></thead>
-      <tbody id="mg-ledger"></tbody>
-    </table>
-  </div>
-</section>
-
 <section class="card" id="mg-tracking" aria-labelledby="mg-tracking-title">
   <div class="card-head">
     <div class="mg-section-title"><h2 class="card-title" id="mg-tracking-title">Tracking status</h2><span class="card-sub">PostHog is the source of truth</span></div>
@@ -229,30 +220,28 @@
   </div>
 </section>
 
+<section class="card" id="mg-activity-card" aria-labelledby="mg-activity-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-activity-title">Recent activity</h2><span class="card-sub">last 20 changes</span></div>
+  </div>
+  <ul class="mg-activity" id="mg-activity"></ul>
+</section>
 
-<div class="mg-two">
-  <section class="card" id="mg-lessons-card" aria-labelledby="mg-lessons-title">
-    <div class="card-head">
-      <div class="mg-section-title"><h2 class="card-title" id="mg-lessons-title">Lessons log</h2><span class="card-sub" id="mg-lessons-sub"></span></div>
-    </div>
-    <form class="mg-lesson-form" id="mg-lesson-form" autocomplete="off">
-      <label class="sr-only" for="mg-lesson-text">Lesson</label>
-      <textarea class="textarea" id="mg-lesson-text" name="text" placeholder="What did we learn? One sentence, with the number." required maxlength="600"></textarea>
-      <label class="sr-only" for="mg-lesson-tags">Tags</label>
-      <input class="input" id="mg-lesson-tags" name="tags" placeholder="tags, comma separated" list="mg-tag-list">
-      <datalist id="mg-tag-list"></datalist>
-      <button class="btn btn-primary" type="submit" id="mg-lesson-submit">Add lesson</button>
-    </form>
-    <div class="mg-filter" id="mg-tag-filter" aria-label="Filter lessons by tag"></div>
-    <ul class="mg-lessons" id="mg-lessons"></ul>
-  </section>
-  <section class="card" id="mg-activity-card" aria-labelledby="mg-activity-title">
-    <div class="card-head">
-      <div class="mg-section-title"><h2 class="card-title" id="mg-activity-title">Recent activity</h2><span class="card-sub">last 20 changes</span></div>
-    </div>
-    <ul class="mg-activity" id="mg-activity"></ul>
-  </section>
-</div>
+<section class="card" id="mg-lessons-card" aria-labelledby="mg-lessons-title">
+  <div class="card-head">
+    <div class="mg-section-title"><h2 class="card-title" id="mg-lessons-title">Lessons log</h2><span class="card-sub" id="mg-lessons-sub"></span></div>
+  </div>
+  <form class="mg-lesson-form" id="mg-lesson-form" autocomplete="off">
+    <label class="sr-only" for="mg-lesson-text">Lesson</label>
+    <textarea class="textarea" id="mg-lesson-text" name="text" placeholder="What did we learn? One sentence, with the number." required maxlength="600"></textarea>
+    <label class="sr-only" for="mg-lesson-tags">Tags</label>
+    <input class="input" id="mg-lesson-tags" name="tags" placeholder="tags, comma separated" list="mg-tag-list">
+    <datalist id="mg-tag-list"></datalist>
+    <button class="btn btn-primary" type="submit" id="mg-lesson-submit">Add lesson</button>
+  </form>
+  <div class="mg-filter" id="mg-tag-filter" aria-label="Filter lessons by tag"></div>
+  <ul class="mg-lessons" id="mg-lessons"></ul>
+</section>
 {% endblock %}
 
 {% block scripts %}

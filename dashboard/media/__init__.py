@@ -12,8 +12,10 @@ only, no FastAPI. The three functions planning relies on:
     mark_published(asset_id, platform, ref_dict) -> asset
 
 Asset lifecycle: ``requested`` (brief, no file) -> upload -> ``in_review``
--> approve -> ``approved``; reject sends ``in_review`` back to ``requested``
-with a note. IDs are per kind: ``IMG-0001``, ``VID-0001``, ``H5-0001``.
+-> approve -> ``approved`` -> activate -> ``active`` (in use in the accounts);
+deactivate sends ``active`` back to ``approved``; reject sends ``in_review`` back
+to ``requested`` with a note. ``approved`` and ``active`` are both usable
+(USABLE_STATUSES): taggable in Plan & Adapt briefs and publishable. IDs are per kind: ``IMG-0001``, ``VID-0001``, ``H5-0001``.
 
 Path constants are module level so tests can repoint them at temp copies.
 """
@@ -40,8 +42,10 @@ LIBRARY_URL = "/static/media/library"
 UPLOAD_URL = LIBRARY_URL + "/uploads"
 
 KINDS = ("image", "video", "html5")
-STATUSES = ("requested", "in_review", "approved")
-STATUS_LABELS = {"requested": "Requests", "in_review": "Ready for review", "approved": "Approved"}
+STATUSES = ("requested", "in_review", "approved", "active")
+STATUS_LABELS = {"requested": "Creative requests", "in_review": "Ready for review", "approved": "Approved",
+                 "active": "Active / in use"}
+USABLE_STATUSES = ("approved", "active")
 KIND_PREFIX = {"image": "IMG", "video": "VID", "html5": "H5"}
 PREFIX_KIND = {v: k for k, v in KIND_PREFIX.items()}
 PLATFORMS = ("meta", "google")
@@ -247,15 +251,31 @@ def blank_asset(asset_id, kind, title):
 
 # ------------------------------------------------------------- public reads
 
-def list_assets(status=None, kind=None):
-    # type: (Optional[str], Optional[str]) -> List[Dict[str, Any]]
-    """All assets (copies), optionally filtered by status and/or kind, ordered by id within kind."""
-    if status is not None and status not in STATUSES:
+def _statuses(status):
+    # type: (Any) -> Optional[Tuple[str, ...]]
+    """None, one status, a comma-separated string or a list/tuple of statuses -> tuple (validated)."""
+    if status is None:
+        return None
+    if isinstance(status, str):
+        wanted = tuple(s.strip() for s in status.split(",") if s.strip())
+    elif isinstance(status, (list, tuple)):
+        wanted = tuple(status)
+    else:
+        raise store.BadInput("status must be text")
+    bad = [s for s in wanted if s not in STATUSES]
+    if bad or not wanted:
         raise store.BadInput("status must be one of %s" % ", ".join(STATUSES))
+    return wanted
+
+
+def list_assets(status=None, kind=None):
+    # type: (Any, Optional[str]) -> List[Dict[str, Any]]
+    """All assets (copies), optionally filtered by status (one, comma-separated, or a list) and/or kind."""
+    wanted = _statuses(status)
     if kind is not None and kind not in KINDS:
         raise store.BadInput("kind must be one of %s" % ", ".join(KINDS))
     out = [a for a in load()["assets"]
-           if (status is None or a.get("status") == status) and (kind is None or a.get("kind") == kind)]
+           if (wanted is None or a.get("status") in wanted) and (kind is None or a.get("kind") == kind)]
     return copy.deepcopy(out)
 
 
@@ -343,7 +363,7 @@ def attach_file(asset_id, filename, content_type, data):
         raise store.BadInput("file is larger than 50 MB")
     asset = get_asset(asset_id)
     if asset["status"] not in ("requested", "in_review"):
-        raise store.BadInput("%s is already approved; create a new request for a new file" % asset_id)
+        raise store.BadInput("%s is already %s; create a new request for a new file" % (asset_id, asset["status"]))
     file_kind = MIME_KIND[mime]
     if file_kind != asset["kind"]:
         raise store.BadInput("%s is a %s request; a %s file does not fit it" % (asset_id, asset["kind"], mime))
@@ -397,6 +417,38 @@ def approve(asset_id, note=""):
 
     out = _mutate(asset_id, apply)
     _log("media.approve", asset_id, note)
+    return out
+
+
+def activate(asset_id, note=""):
+    # type: (str, Any) -> Dict[str, Any]
+    """Mark an approved asset as active (in use in the ad accounts)."""
+    note = _text(note, "note")
+
+    def apply(a, doc):
+        if a["status"] != "approved":
+            raise store.BadInput("%s is %s; only approved assets can be marked active" % (asset_id, a["status"]))
+        a["status"] = "active"
+        _history(a, "marked active", note)
+
+    out = _mutate(asset_id, apply)
+    _log("media.activate", asset_id, note)
+    return out
+
+
+def deactivate(asset_id, note=""):
+    # type: (str, Any) -> Dict[str, Any]
+    """Take an active asset out of use; it goes back to approved."""
+    note = _text(note, "note")
+
+    def apply(a, doc):
+        if a["status"] != "active":
+            raise store.BadInput("%s is %s; only active assets can be taken out of use" % (asset_id, a["status"]))
+        a["status"] = "approved"
+        _history(a, "taken out of use", note)
+
+    out = _mutate(asset_id, apply)
+    _log("media.deactivate", asset_id, note)
     return out
 
 
@@ -479,8 +531,8 @@ def mark_published(asset_id, platform, ref_dict):
     refs = {str(k): v for k, v in ref_dict.items()}
 
     def apply(a, doc):
-        if a["status"] != "approved":
-            raise store.BadInput("%s is %s; only approved media can be published" % (asset_id, a["status"]))
+        if a["status"] not in USABLE_STATUSES:
+            raise store.BadInput("%s is %s; only approved or active media can be published" % (asset_id, a["status"]))
         a.setdefault("platform_refs", {}).setdefault(platform, {}).update(refs)
         _history(a, "published", "%s %s" % (platform, ", ".join("%s=%s" % (k, v) for k, v in refs.items())))
 

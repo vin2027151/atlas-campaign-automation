@@ -1,4 +1,4 @@
-"""Campaign planning layer: state snapshots, plan comparison, changesets, executor.
+"""Plan & Adapt layer: state snapshots, plan comparison, changesets, executor.
 
 The one rule: the LLM never touches an ad account. ``planning.llm`` reads a state
 document and writes a proposal; ``planning.executor`` (deterministic, no LLM) is the
@@ -12,9 +12,14 @@ read it at call time, so tests can repoint it at a temp directory.
 """
 
 import os
+import threading
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data", "planning")
+
+# Held for the whole check-then-apply of any account write (a changeset publish or a
+# direct Campaigns-page control), so two browsers can't interleave their requests.
+ACCOUNT_LOCK = threading.RLock()
 
 
 def data_path(*parts):

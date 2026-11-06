@@ -5,6 +5,7 @@ data/media.json; the real files are never written.
 Run from dashboard/: .venv/bin/python -m unittest tests.test_planning_api -v   (or pytest)
 """
 
+import json
 import os
 import shutil
 import sys
@@ -210,7 +211,19 @@ class PlanningApiTest(unittest.TestCase):
         self.assertEqual(errors, [], v1["validation"])
         self.assertEqual(cs["status"], "ready")
         self.assertEqual(cs["current_version"], 1)
-        self.assertIn(v1["snapshot_id"], v1["yaml"])
+        self.assertNotIn("yaml", v1)
+        self.assertEqual(json.loads(v1["changeset_json"])["changeset"]["based_on_snapshot"], v1["snapshot_id"])
+        # every op is rendered as the exact HTTP request, numbered in run order
+        reqs = v1["requests"]
+        n_ops = len(json.loads(v1["changeset_json"])["operations"])
+        self.assertEqual([q["step"] for q in reqs], list(range(1, n_ops + 1)))
+        for q in reqs:
+            self.assertEqual(q["method"], "POST")
+            self.assertTrue(q["url"].startswith(("https://googleads.googleapis.com/v26/customers/4445556666/",
+                                                 "https://graph.facebook.com/v27.0/")), q["url"])
+            self.assertEqual(q["headers"]["Authorization"], "Bearer \u2039redacted\u203a")
+            self.assertNotIn("EXAMPLE", json.dumps(q))
+            self.assertIn("curl -X POST", q["curl"])
         self.assertTrue(v1["diff"]["rows"])
         self.assertNotIn("after", v1["diff"])
         self.assertTrue(v1["summary"])
@@ -229,7 +242,8 @@ class PlanningApiTest(unittest.TestCase):
         self.assertEqual(len(cs["versions"]), 2)
         self.assertEqual(cs["versions"][1]["revision_note"], "Cut brand a bit more.")
         self.assertEqual(cs["status"], "ready", cs["versions"][1]["validation"])
-        self.assertNotEqual(cs["versions"][0]["yaml"], cs["versions"][1]["yaml"])
+        self.assertNotEqual(cs["versions"][0]["changeset_json"], cs["versions"][1]["changeset_json"])
+        self.assertNotEqual(cs["versions"][0]["requests"], cs["versions"][1]["requests"])
 
         url = "%s/changesets/%s/publish" % (API, cs["id"])
         # refusals: no confirm, confirm false, stale version, string version
@@ -248,6 +262,12 @@ class PlanningApiTest(unittest.TestCase):
         self.assertTrue(pub["ok"], pub["publish"])
         self.assertEqual(pub["publish"]["drift"], [])
         self.assertTrue(all(x["status"] == "applied" for x in pub["publish"]["results"]), pub["publish"]["results"])
+        # what ran is what was reviewed (refs filled in from earlier responses)
+        reviewed = cs["versions"][1]["requests"]
+        for q, res in zip(reviewed, pub["publish"]["results"]):
+            self.assertEqual((res["request"]["method"], res["request"]["url"]), (q["method"], q["url"]))
+            if not q["depends_on"]:
+                self.assertEqual(res["request"]["body"], q["body"])
         self.assertEqual(pub["changeset"]["status"], "published")
         self.assertEqual(pub["changeset"]["published"]["version"], 2)
         acts = [a["action"] for a in store.get_state()["activity"][-20:]]
@@ -282,7 +302,11 @@ class PlanningApiTest(unittest.TestCase):
         def flaky(*a, **kw):
             calls["n"] += 1
             if calls["n"] == 1:
-                return '{"yaml": "changeset: {title: bad}\\noperations:\\n  - ref: op1\\n    platform: google\\n    service: NopeService\\n    method: mutateNope\\n    operation: update\\n    resource_name: customers/0/nope/1\\n    fields: {x: 1}\\n", "summary": ["bad"], "assumptions": [], "questions": []}'
+                return json.dumps({"changeset": {"title": "bad", "based_on_snapshot": "SNAP-x"},
+                                   "operations": [{"ref": "op1", "platform": "google", "service": "NopeService",
+                                                   "method": "mutateNope", "operation": "update",
+                                                   "resource_name": "customers/0/nope/1", "fields": {"x": 1}}],
+                                   "summary": ["bad"], "assumptions": [], "questions": []})
             return real(*a, **kw)
 
         with mock.patch.object(fixtures, "changeset", flaky):

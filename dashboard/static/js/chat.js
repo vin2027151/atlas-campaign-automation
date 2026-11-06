@@ -61,11 +61,17 @@ function empty() {
     <div class="qc-starters">${STARTERS.map(s => `<button type="button" class="btn btn-sm btn-ghost" data-starter="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`;
 }
 
+// The log grows with the conversation (no inner scroll region); keep the newest turn and the input in view.
+function reveal() {
+  const last = log.lastElementChild;
+  if (last) last.scrollIntoView({ block: "nearest" });
+  form.scrollIntoView({ block: "nearest" });
+}
+
 function draw() {
   if (!history.length) { empty(); return; }
   log.innerHTML = "";
   history.forEach(m => log.appendChild(bubble(m)));
-  log.scrollTop = log.scrollHeight;
 }
 
 function payload() {
@@ -84,7 +90,7 @@ async function ask(text) {
   const typing = document.createElement("div");
   typing.className = "qc-msg qc-assistant qc-typing";
   typing.innerHTML = `<div class="qc-who">Quick Chat</div><div class="qc-text"><span class="qc-dots"><i></i><i></i><i></i></span></div>`;
-  log.appendChild(typing); log.scrollTop = log.scrollHeight;
+  log.appendChild(typing); reveal();
   try {
     const res = await api("/api/chat/send", { method: "POST", body: { messages: payload() } });
     typing.remove();
@@ -102,7 +108,7 @@ async function ask(text) {
     input.value = text; count();
     toast("Quick Chat could not answer", "error");
   } finally {
-    busy = false; sendBtn.disabled = false; log.scrollTop = log.scrollHeight; input.focus();
+    busy = false; sendBtn.disabled = false; reveal(); input.focus({ preventScroll: true });
   }
 }
 
@@ -127,13 +133,9 @@ window.addEventListener("storage", e => { if (e.key === KEY) { history = load();
 
 (async function init() {
   draw(); count();
+  // Only warn when the server cannot answer; model, effort and context details stay off the page.
   try {
     const info = await api("/api/chat/");
-    const c = info.context || {};
-    const when = c.snapshot_taken_at ? new Date(c.snapshot_taken_at).toLocaleString() : (c.snapshot_note || "not pulled yet");
-    $("#qc-meta").innerHTML = `Sonnet 5.5 · effort ${esc(info.effort)} · account state ${esc(c.snapshot_id || "")} from ${esc(when)} · context ${Math.round((c.chars || 0) / 1000)}K characters`
-      + (info.llm_configured ? "" : ` · <strong>model not configured on this server</strong>`);
-  } catch (e) {
-    $("#qc-meta").textContent = "Context unavailable right now.";
-  }
+    $("#qc-config").hidden = !!info.llm_configured;
+  } catch (e) { /* the send path reports errors */ }
 })();

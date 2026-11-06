@@ -20,11 +20,13 @@ import re
 import uuid
 from typing import Any, Dict
 
-from planning.adapters import LiveRefused, live_allowed, mask
+from planning.adapters import LiveRefused, live_allowed
 from planning.adapters.base import Adapter, AdapterError, media_asset, resolve_refs
 from planning.adapters.live_google import _asset_file
 
 ENDPOINT = "https://graph.facebook.com"
+DEFAULT_VERSION = "v27.0"  # confirmed 2026-11-06 on developers.facebook.com/docs/marketing-api/marketing-api-changelog
+REDACTED = "\u2039redacted\u203a"
 EDGE_RE = re.compile(r"^/(act_\d+)/(adimages|advideos|adcreatives|ads)$")
 NODE_RE = re.compile(r"^/(\d+)$")
 
@@ -92,9 +94,9 @@ def build_meta_request(op, ctx, cfg, secrets_visible=False, inline_bytes=False):
     m = cfg.get("meta") or {}
     method = str(op.get("method") or "POST").upper()
     path = normalize_path(op.get("path"))
-    url = "%s/%s%s" % (ENDPOINT, m.get("api_version", "v24.0"), path)
+    url = "%s/%s%s" % (ENDPOINT, m.get("api_version") or DEFAULT_VERSION, path)
     token = m.get("access_token")
-    headers = {"Authorization": "Bearer %s" % (token if secrets_visible else mask(token)),
+    headers = {"Authorization": "Bearer %s" % (token if secrets_visible else REDACTED),
                "Content-Type": "application/x-www-form-urlencoded"}
     return {"method": method, "url": url, "headers": headers, "body": api_params(op, ctx, inline_bytes)}
 
@@ -155,3 +157,11 @@ class LiveMetaAdapter(Adapter):
             if not multipart:
                 raise AdapterError("media %s has no local file to upload" % media_id)
         return _send(req, multipart)
+
+    def execute_request(self, req, ctx):
+        """Send a rendered request (planning.api_requests). It is parsed back into its op and
+        rebuilt by the same builder with real secrets (and media bytes) filled in, so the
+        wire request is the reviewed one plus credentials. ``execute`` keeps the live gate."""
+        from planning import api_requests
+        op = api_requests.to_op(api_requests.resolve(req, (ctx or {}).get("outputs") or {}))
+        return self.execute(op, dict(ctx or {}, outputs={}))

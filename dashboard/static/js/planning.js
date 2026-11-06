@@ -1,4 +1,4 @@
-// Campaign planning page: analyze -> command brief -> review the diff -> publish by hand.
+// Plan & Adapt page: analyze -> command brief -> review the diff -> publish by hand.
 //
 // Talks to /api/planning (api/planning.py) and, for the media picker, /api/media.
 // `?mock=1` swaps the network for the inline fixtures at the bottom of this file so
@@ -9,7 +9,7 @@
 //   ?mock=1&slow=1      jobs overrun their estimate
 //   ?mock=1&media=404   media library endpoint missing
 //   ?mock=1&empty=1     no analysis, no changesets yet
-import { api as realApi, fmt, toast, confirmButton, platformChip, tabs, esc, $, $$ } from "/static/js/common.js";
+import { api as realApi, fmt, toast, confirmButton, platformChip, esc, $, $$ } from "/static/js/common.js";
 
 const BASE = "/api/planning";
 const QS = new URLSearchParams(location.search);
@@ -27,7 +27,6 @@ const S = {
   changesets: [],           // summaries
   cs: null,                 // full selected changeset
   view: null,               // version number shown
-  reviewTab: "yaml",
   reviewed: false,          // the "I reviewed the diff" checkbox
   lastPublish: {},          // changeset id -> publish result from this session (refusals included)
   media: [], mediaState: "loading", mediaErr: "", mediaSel: [], mediaQ: "",
@@ -107,8 +106,9 @@ async function selectCs(id, { version, quiet } = {}) {
 
 async function loadMedia() {
   try {
-    const d = await call("/api/media/?status=approved");
-    S.media = (d.assets || []).filter((a) => !a.status || a.status === "approved");
+    // Approved and active (in use) media are both taggable.
+    const d = await call("/api/media/?status=approved,active");
+    S.media = (d.assets || []).filter((a) => !a.status || a.status === "approved" || a.status === "active");
     S.mediaState = "ok";
   } catch (e) {
     S.mediaState = e.status === 404 ? "missing" : "error";
@@ -482,7 +482,7 @@ function renderMedia() {
   }
   if (!S.media.length) {
     filter.hidden = true;
-    box.innerHTML = `<p class="muted small mt-0">No approved media yet. Approve assets on the <a href="/media">Media</a> page to tag them here.</p>`;
+    box.innerHTML = `<p class="muted small mt-0">No approved or active media yet. Approve assets on the <a href="/media">Media</a> page to tag them here.</p>`;
     renderMediaChips();
     return;
   }
@@ -498,7 +498,7 @@ function renderMedia() {
       <span class="t">${esc(m.title || "")}</span>
       <span class="muted small">${esc([m.kind, m.aspect].filter(Boolean).join(" · "))}</span>
     </button>`;
-  }).join("") : `<p class="muted small mt-0">No approved media match "${esc(S.mediaQ)}".</p>`;
+  }).join("") : `<p class="muted small mt-0">No approved or active media match "${esc(S.mediaQ)}".</p>`;
   renderMediaChips();
 }
 
@@ -592,27 +592,64 @@ function renderReview() {
       ${totalsHTML(diff)}
       ${diffTableHTML(diff.rows || [])}
     </div>
-    <div class="pl-review-tabs">
-      <div class="tabs" role="tablist" aria-label="Changeset detail">
-        <button class="tab${S.reviewTab === "yaml" ? " active" : ""}" type="button" data-tab="yaml" id="rv-tab-yaml" aria-controls="rv-panel-yaml">API changes (YAML)</button>
-        <button class="tab${S.reviewTab === "text" ? " active" : ""}" type="button" data-tab="text" id="rv-tab-text" aria-controls="rv-panel-text">State diff</button>
-      </div>
-      <div class="mt-2" data-panel="yaml" id="rv-panel-yaml" role="tabpanel" aria-labelledby="rv-tab-yaml">
-        <div class="pl-code-tools"><button class="btn btn-sm" type="button" data-copy-yaml>Copy YAML</button></div>
-        <pre class="pl-code" tabindex="0" aria-label="Changeset YAML, version ${v.n}"><code>${esc(v.yaml || "")}</code></pre>
-      </div>
-      <div class="mt-2" data-panel="text" id="rv-panel-text" role="tabpanel" aria-labelledby="rv-tab-text">
-        ${diff.text_diff ? `<pre class="pl-code" tabindex="0" aria-label="State document diff"><code class="pl-diff-lines">${textDiffHTML(diff.text_diff)}</code></pre>`
-          : `<p class="muted small mt-0">No state differences.</p>`}
-      </div>
-    </div>
+    ${requestsSectionHTML(v)}
     <div class="row">
       <button class="btn" type="button" data-revise-open ${canRevise() && !S.job ? "" : "disabled"}>Revise</button>
-      <span class="muted small">${canRevise() ? "Notes plus this YAML go back to Opus 5.5 and come back as a new version." : `This changeset is ${esc(cs.status)}; it can't be revised.`}</span>
+      <span class="muted small">${canRevise() ? "Notes plus this changeset go back to Opus 5.5 and come back as a new version." : `This changeset is ${esc(cs.status)}; it can't be revised.`}</span>
     </div>
   </div>`;
   if (!canRevise()) show($("#rv-form"), false);
-  tabs($(".pl-review-tabs", box), (name) => { S.reviewTab = name; });
+}
+
+// --- the exact HTTP requests publish sends, in run order
+function requestText(q) {
+  const h = Object.entries(q.headers || {}).map(([k, val]) => `${k}: ${val}`).join("\n");
+  let body;
+  if (q.content_type === "application/x-www-form-urlencoded") {
+    body = Object.entries(q.body || {}).map(([k, val]) => `${k}=${typeof val === "string" ? val : JSON.stringify(val)}`).join("\n");
+  } else {
+    body = JSON.stringify(q.body, null, 2);
+  }
+  return `${q.method} ${q.url}\n${h}\n\n${body}`;
+}
+
+function refNote(q, reqs) {
+  const deps = q.depends_on || [];
+  if (!deps.length) return "";
+  const steps = deps.map((ref) => {
+    const r = reqs.find((x) => x.op === ref);
+    return r ? `step ${r.step} (${ref})` : ref;
+  });
+  return `<div class="small muted mt-2">Values written <code>$ref:&lt;op&gt;.&lt;field&gt;</code> are filled in from the response of ${esc(steps.join(", "))} when it runs.</div>`;
+}
+
+function requestsSectionHTML(v) {
+  const reqs = v.requests || [];
+  if (!reqs.length) return `<div><h3 class="pl-sub-h">API requests</h3><p class="muted small mt-0">No requests: the changeset did not parse.</p></div>`;
+  const items = reqs.map((q, i) => {
+    if (q.error) {
+      return `<li class="pl-req is-error"><div class="pl-req-head"><span class="pl-req-n">${esc(q.step || i + 1)}</span>
+        <span class="op">${esc(q.op || "")}</span><span class="tone-bad small">${esc(q.error)}</span></div></li>`;
+    }
+    return `<li class="pl-req">
+      <div class="pl-req-head">
+        <span class="pl-req-n" aria-label="Step ${esc(q.step)}">${esc(q.step)}</span>
+        ${platformChip(q.platform)}
+        <span class="pl-req-line"><b>${esc(q.method)}</b> ${esc(q.url)}</span>
+        <span class="op muted mono small">${esc(q.op || "")}</span>
+        <button class="btn btn-sm" type="button" data-copy-curl="${i}">Copy curl</button>
+      </div>
+      ${q.reason ? `<div class="small muted">${esc(q.reason)}</div>` : ""}
+      <pre class="pl-code sm" tabindex="0" aria-label="Request ${esc(q.step)}: ${esc(q.method)} ${esc(q.url)}"><code>${esc(requestText(q))}</code></pre>
+      ${refNote(q, reqs)}
+    </li>`;
+  }).join("");
+  return `<div>
+    <div class="row-between"><h3 class="pl-sub-h mt-0">API requests &middot; ${plural(reqs.length, "call")}, run in this order</h3>
+      <button class="btn btn-sm" type="button" data-copy-all-curl>Copy all as curl</button></div>
+    <p class="muted small mt-0">Publish sends exactly these requests, in this order, and stops at the first failure. Secrets are redacted: the curl copies read them from <code>$GOOGLE_ADS_ACCESS_TOKEN</code> / <code>$META_ACCESS_TOKEN</code>. In ${esc(S.mode)} mode the same requests are applied to the sample account.</p>
+    <ol class="pl-reqs">${items}</ol>
+  </div>`;
 }
 
 function totalsHTML(diff) {
@@ -664,17 +701,6 @@ function diffTableHTML(rows) {
     <caption class="sr-only">Changes by platform: entity, field, before, after and action</caption>
     <thead><tr><th scope="col">Entity</th><th scope="col">Field</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">Action</th></tr></thead>
     <tbody>${body}</tbody></table></div>`;
-}
-
-function textDiffHTML(text) {
-  return String(text).split("\n").map((line) => {
-    let cls = "ln";
-    if (line.startsWith("+++") || line.startsWith("---")) cls = "ln ln-file";
-    else if (line.startsWith("@@")) cls = "ln ln-hunk";
-    else if (line.startsWith("+")) cls = "ln ln-add";
-    else if (line.startsWith("-")) cls = "ln ln-del";
-    return `<span class="${cls}">${line ? esc(line) : " "}</span>`;
-  }).join("");
 }
 
 // --- 4. publish
@@ -768,14 +794,14 @@ function resultRowHTML(r) {
   return `<li>
     <div class="pl-res-head">
       <span class="badge ${esc(st)}">${esc(st)}</span>
-      <span class="op">${esc(r.op || "")}</span>
+      <span class="op">${r.step ? esc(r.step) + ". " : ""}${esc(r.op || "")}</span>
       <span class="req">${esc(req.method || "")} ${esc(req.url || "")}</span>
     </div>
     ${r.message ? `<div class="small ${st === "failed" ? "tone-bad" : "muted"} mt-2">${esc(r.message)}</div>` : ""}
     <details class="pl-details">
       <summary>Request and response</summary>
       <div class="stack-sm">
-        <div><div class="label">Request</div><pre class="pl-code sm"><code>${esc(req.method || "")} ${esc(req.url || "")}${req.headers ? "\n" + json(req.headers) : ""}${req.body !== undefined ? "\n\n" + json(req.body) : ""}</code></pre></div>
+        <div><div class="label">Request sent</div><pre class="pl-code sm"><code>${req.url ? esc(requestText(req)) : "(not sent)"}</code></pre></div>
         <div><div class="label">Response</div><pre class="pl-code sm"><code>${r.response !== undefined && r.response !== null ? json(r.response) : "(none)"}</code></pre></div>
       </div>
     </details>
@@ -888,9 +914,17 @@ function wire() {
       $("#rv-text").focus();
       return;
     }
-    if (e.target.closest("[data-copy-yaml]")) {
+    const cb = e.target.closest("[data-copy-curl]");
+    if (cb) {
       const v = currentVersion();
-      try { await copyText(v ? v.yaml || "" : ""); toast("YAML copied"); } catch (err) { toast("Copy failed: " + err.message, "error"); }
+      const q = v && (v.requests || [])[Number(cb.dataset.copyCurl)];
+      try { await copyText(q ? q.curl || "" : ""); toast(`curl for step ${q ? q.step : ""} copied`); } catch (err) { toast("Copy failed: " + err.message, "error"); }
+      return;
+    }
+    if (e.target.closest("[data-copy-all-curl]")) {
+      const v = currentVersion();
+      const all = ((v && v.requests) || []).filter((q) => q.curl).map((q) => `# ${q.step}. ${q.op}${q.reason ? ": " + q.reason : ""}\n${q.curl}`).join("\n\n");
+      try { await copyText(all); toast("All requests copied as curl"); } catch (err) { toast("Copy failed: " + err.message, "error"); }
     }
   });
   $("#sec-publish").addEventListener("click", (e) => {
@@ -990,7 +1024,8 @@ function mockApi(path, { method, body } = {}) {
     if (p === "/api/media/") {
       if (QS.get("media") === "404") throw fail(404, "Not Found");
       const st = q.get("status");
-      return { ok: true, assets: M.media.filter((a) => !st || a.status === st), counts: {} };
+      const sts = st ? st.split(",") : null;
+      return { ok: true, assets: M.media.filter((a) => !sts || sts.includes(a.status)), counts: {} };
     }
     if (p === `${BASE}/` && method === "GET") {
       return { ok: true, mode: "sample", config: M.config, latest_snapshot: M.snapshots[M.snapshots.length - 1] || null,
@@ -1308,14 +1343,29 @@ function mockVersion(n, snapId, o) {
   if (o.err) validation.push({ op: "op1", level: "error", message: `Budget change of -${Math.round((1 - o.brand / 450) * 100)}% on Search_Brand_US budget is beyond the ±50% limit for one changeset.` });
   if (o.err || o.warn) validation.push({ op: "op2", level: "warn", message: `Search_NonBrand_US budget rises ${Math.round(((450 - o.brand) / 953) * 100)}%, above the ±20% warning line.` });
   if (o.warn) validation.push({ op: null, level: "warn", message: "IMG-0002 is approved for Meta feed placements only; Stories will crop it." });
-  const yaml = o.small
-    ? `changeset:\n  title: "Pause Prospecting_Broad and add two negatives"\n  based_on_snapshot: ${snapId}\n  rationale:\n    - "Broad_US: $1,140 for 2 trials in 7 days"\noperations:\n  - ref: op1\n    platform: meta\n    method: POST\n    path: /120210000000000101\n    params: {status: PAUSED}\n    reason: "legacy ad set over CPA band"\n  - ref: op2\n    platform: google\n    service: CampaignCriterionService\n    method: mutateCampaignCriteria\n    operation: create\n    fields:\n      campaign: customers/4445556666/campaigns/102\n      negative: true\n      keyword: {text: seo jobs, match_type: PHRASE}\n    reason: "search term with zero trials"\n`
-    : `changeset:\n  title: "Shift budget from Brand US to NonBrand US"\n  based_on_snapshot: ${snapId}\n  rationale:\n    - "Brand US runs at 4.5x its planned daily budget"\n    - "NonBrand US is inside the CPA band and budget-limited"\noperations:\n  - ref: op1\n    platform: google\n    service: CampaignBudgetService\n    method: mutateCampaignBudgets\n    operation: update\n    resource_name: customers/4445556666/campaignBudgets/201\n    fields: {amount_micros: ${o.brand * 1000000}}\n    update_mask: [amount_micros]\n    reason: "plan rule: brand at $3K/month"\n  - ref: op2\n    platform: google\n    service: CampaignBudgetService\n    method: mutateCampaignBudgets\n    operation: update\n    resource_name: customers/4445556666/campaignBudgets/202\n    fields: {amount_micros: ${(953 + 450 - o.brand) * 1000000}}\n    update_mask: [amount_micros]\n  - ref: op5\n    platform: meta\n    method: POST\n    path: /120210000000000101\n    params: {status: PAUSED}\n  - ref: op6\n    platform: meta\n    method: POST\n    path: /act_7778889999/adimages\n    params: {media_id: ${o.media || "IMG-0002"}}\n  - ref: op7\n    platform: meta\n    method: POST\n    path: /act_7778889999/adcreatives\n    params:\n      name: Core_TrialOffer_4x5\n      object_story_spec:\n        page_id: "123456789012345"\n        link_data: {image_hash: "$ref:op6.hash", link: "https://searchatlas.com/trial", message: "Start your 7-day trial", call_to_action: {type: SIGN_UP}}\n  - ref: op8\n    platform: meta\n    method: POST\n    path: /act_7778889999/ads\n    params: {name: Core_TrialOffer_4x5 ad, adset_id: "120210000000000105", creative: {creative_id: "$ref:op7.id"}, status: PAUSED}\n`;
+  const g = (res, op) => ({ platform: "google", method: "POST", url: `https://googleads.googleapis.com/v26/customers/4445556666/${res}:mutate`,
+    headers: { "Content-Type": "application/json", Authorization: "Bearer \u2039redacted\u203a", "login-customer-id": "1112223333" },
+    content_type: "application/json", body: { operations: [op], partialFailure: false, validateOnly: false }, depends_on: [] });
+  const m = (path, body, deps) => ({ platform: "meta", method: "POST", url: `https://graph.facebook.com/v27.0${path}`,
+    headers: { Authorization: "Bearer \u2039redacted\u203a", "Content-Type": "application/x-www-form-urlencoded" },
+    content_type: "application/x-www-form-urlencoded", body, depends_on: deps || [] });
+  const reqList = o.small
+    ? [m("/120210000000000101", { status: "PAUSED" }),
+      g("campaignCriteria", { create: { campaign: "customers/4445556666/campaigns/102", negative: true, keyword: { text: "seo jobs", matchType: "PHRASE" } } })]
+    : [g("campaignBudgets", { update: { resourceName: "customers/4445556666/campaignBudgets/201", amountMicros: o.brand * 1000000 }, updateMask: "amountMicros" }),
+      g("campaignBudgets", { update: { resourceName: "customers/4445556666/campaignBudgets/202", amountMicros: (953 + 450 - o.brand) * 1000000 }, updateMask: "amountMicros" }),
+      m("/120210000000000101", { status: "PAUSED" }),
+      m("/act_7778889999/adimages", { bytes: `<base64 bytes of ${o.media || "IMG-0002"}>`, name: o.media || "IMG-0002" }),
+      m("/act_7778889999/adcreatives", { name: "Core_TrialOffer_4x5", object_story_spec: { page_id: "123456789012345", link_data: { image_hash: "$ref:op6.hash", link: "https://searchatlas.com/trial", message: "Start your 7-day trial", call_to_action: { type: "SIGN_UP" } } } }, ["op6"]),
+      m("/act_7778889999/ads", { name: "Core_TrialOffer_4x5 ad", adset_id: "120210000000000105", creative: { creative_id: "$ref:op7.id" }, status: "PAUSED" }, ["op7"])];
+  const refs = o.small ? ["op1", "op2"] : ["op1", "op2", "op5", "op6", "op7", "op8"];
+  const requests = reqList.map((q, i) => Object.assign(q, { step: i + 1, op: refs[i], reason: "",
+    curl: `curl -X POST '${q.url}' \\\n  -H "Authorization: Bearer \${${q.platform === "google" ? "GOOGLE_ADS" : "META"}_ACCESS_TOKEN}"` }));
   const text_diff = o.small
     ? `--- ${snapId}.yaml (before)\n+++ ${snapId}.yaml (after)\n@@ -88,7 +88,7 @@\n     - id: as_broad_us\n       name: Broad_US\n-      status: ACTIVE\n+      status: PAUSED\n@@ -31,6 +31,7 @@\n     negatives:\n     - {text: jobs, match: PHRASE}\n+    - {text: seo jobs, match: PHRASE}`
     : `--- ${snapId}.yaml (before)\n+++ ${snapId}.yaml (after)\n@@ -14,7 +14,7 @@\n     bidding: {strategy: TARGET_CPA, target_cpa: 150.0}\n-    budget: {daily: 450.0, amount_micros: 450000000}\n+    budget: {daily: ${o.brand}.0, amount_micros: ${o.brand * 1000000}}\n     geo: [US]\n@@ -40,8 +40,9 @@\n   - id: g_search_nonbrand_us\n-    budget: {daily: 953.0, amount_micros: 953000000}\n+    budget: {daily: ${953 + 450 - o.brand}.0, amount_micros: ${(953 + 450 - o.brand) * 1000000}}\n     negatives:\n+    - {text: free seo tool, match: PHRASE}\n     keywords:\n-    - {text: seo software cheap, match: BROAD}\n@@ -88,7 +89,12 @@\n     - id: as_broad_us\n-      status: ACTIVE\n+      status: PAUSED\n+    ads:\n+    - name: Core_TrialOffer_4x5 ad\n+      status: PAUSED\n+      media_id: ${o.media || "IMG-0002"}`;
   return {
-    n, created_at: new Date(Date.now() - (3 - n) * 600000).toISOString(), snapshot_id: snapId, yaml,
+    n, created_at: new Date(Date.now() - (3 - n) * 600000).toISOString(), snapshot_id: snapId, requests,
     summary: o.small ? ["Pause Broad_US (legacy) on Meta", "Negate \"seo jobs\" on Search_NonBrand_US"]
       : [`Search_Brand_US budget $450 -> $${o.brand}/day`, `Search_NonBrand_US budget $953 -> $${953 + 450 - o.brand}/day`, "Pause Broad_US; launch a paused trial-offer ad in Prospecting_Core", "Negate \"free seo tool\"; remove \"seo software cheap\" (BROAD)"],
     assumptions: o.small ? [] : ["\"Prospecting_Core\" means the Core_US ad set (the only one in that campaign).", "The new ad starts PAUSED; Vin enables it after review."],

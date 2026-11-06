@@ -1,11 +1,13 @@
 """Media library API (prefix /api/media). Thin HTTP layer over the ``media`` module.
 
-GET  /                      ?status=&kind=  -> {ok, assets, counts, statuses, kinds, campaigns}
+GET  /                      ?status=&kind=  (status may be comma separated, e.g. approved,active)  -> {ok, assets, counts, statuses, kinds, campaigns}
 GET  /{id}                  -> {ok, asset}
 POST /requests              {title, description, kind, brief, due, platforms, placements} -> {ok, asset}  (requested)
 POST /{id}/upload           multipart `file` (png/jpeg/webp/gif, mp4/mov, html/zip; <= 50 MB) -> {ok, asset}  (in_review)
 POST /{id}/approve          {note?} -> {ok, asset}  (approved)
 POST /{id}/reject           {note} (required) -> {ok, asset}  (back to requested)
+POST /{id}/activate         {note?} -> {ok, asset}  (approved -> active, in use)
+POST /{id}/deactivate       {note?} -> {ok, asset}  (active -> approved)
 POST /{id}                  {title, description, brief, tags, due, platforms, placements} -> {ok, asset}
 Every mutation is logged through store.log_activity by the media module.
 """
@@ -31,7 +33,7 @@ def list_media(status: Optional[str] = None, kind: Optional[str] = None):
     # type: (Optional[str], Optional[str]) -> Dict[str, Any]
     assets = media.list_assets(status=status or None, kind=kind or None)
     return {"ok": True, "assets": assets, "counts": media.counts(), "statuses": list(media.STATUSES),
-            "status_labels": media.STATUS_LABELS, "kinds": list(media.KINDS), "campaigns": _campaigns(),
+            "status_labels": media.STATUS_LABELS, "usable_statuses": list(media.USABLE_STATUSES), "kinds": list(media.KINDS), "campaigns": _campaigns(),
             "max_upload_bytes": media.MAX_UPLOAD_BYTES, "mimes": sorted(media.MIME_KIND)}
 
 
@@ -73,6 +75,20 @@ async def upload(asset_id: str, file: UploadFile = File(...)):
 def approve(asset_id: str, body: Optional[Dict[str, Any]] = Body(None)):
     note = (body or {}).get("note", "") if isinstance(body, dict) else ""
     return {"ok": True, "asset": media.approve(asset_id, note)}
+
+
+def _note(body):
+    return (body or {}).get("note", "") if isinstance(body, dict) else ""
+
+
+@router.post("/{asset_id}/activate")
+def activate(asset_id: str, body: Optional[Dict[str, Any]] = Body(None)):
+    return {"ok": True, "asset": media.activate(asset_id, _note(body))}
+
+
+@router.post("/{asset_id}/deactivate")
+def deactivate(asset_id: str, body: Optional[Dict[str, Any]] = Body(None)):
+    return {"ok": True, "asset": media.deactivate(asset_id, _note(body))}
 
 
 @router.post("/{asset_id}/reject")

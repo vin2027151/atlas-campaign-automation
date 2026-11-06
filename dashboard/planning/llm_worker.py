@@ -37,26 +37,40 @@ def _text(msg):
     return "".join(parts)
 
 
-ALLOWED_MODELS = {"claude-opus-5-5": "Opus 5.5", "claude-sonnet-5-5": "Sonnet 5.5"}
+ALLOWED_MODELS = {"claude-opus-5-5": "Opus 5.5", "claude-sonnet-5-5": "Sonnet 5.5", "claude-haiku-5-5": "Haiku 5.5"}
+# Models with a server-side refusal fallback (beta server-side-fallback + fallbacks="default").
+# Haiku 5.5 has none: with fallbacks="default" a declined request stays declined, so it is sent without them.
+FALLBACK_MODELS = ("claude-opus-5-5", "claude-sonnet-5-5")
+
+
+def request_kwargs(req):
+    # type: (dict) -> tuple
+    """(stream kwargs, body extras) for one request; whitelists model and effort."""
+    model = req.get("model") if req.get("model") in ALLOWED_MODELS else MODEL
+    effort = req.get("effort") if req.get("effort") in ("low", "medium", "high") else EFFORT
+    kwargs = dict(model=model, max_tokens=int(req.get("max_tokens") or 32000),
+                  system=req["system"], messages=req["messages"])
+    extras = {"output_config": {"effort": effort}}   # effort is GA on Opus 5.5, Sonnet 5.5 and Haiku 5.5
+    if model in FALLBACK_MODELS:
+        kwargs["betas"] = [FALLBACK_BETA]
+        extras["fallbacks"] = "default"
+    return kwargs, extras
 
 
 def run(req):
     import anthropic  # imported only here, inside the worker process
 
     client = anthropic.Anthropic()  # key from env ANTHROPIC_API_KEY
-    # Optional per-call model/effort (Quick Chat uses Sonnet 5.5 at low); whitelisted.
-    model = req.get("model") if req.get("model") in ALLOWED_MODELS else MODEL
-    effort = req.get("effort") if req.get("effort") in ("low", "medium", "high") else EFFORT
+    # Optional per-call model/effort (Quick Chat uses Haiku 5.5 at low); whitelisted.
+    kwargs, extras = request_kwargs(req)
+    model = kwargs["model"]
     label = ALLOWED_MODELS.get(model, "the model")
-    kwargs = dict(model=model, max_tokens=int(req.get("max_tokens") or 32000),
-                  betas=[FALLBACK_BETA], system=req["system"], messages=req["messages"])
     t0 = time.time()
     try:
-        stream_cm = client.beta.messages.stream(fallbacks="default", output_config={"effort": effort}, **kwargs)
+        stream_cm = client.beta.messages.stream(**dict(kwargs, **extras))
     except TypeError:
         # older SDK without the typed kwargs: send them in the raw body
-        stream_cm = client.beta.messages.stream(
-            extra_body={"fallbacks": "default", "output_config": {"effort": effort}}, **kwargs)
+        stream_cm = client.beta.messages.stream(extra_body=extras, **kwargs)
     with stream_cm as stream:
         msg = stream.get_final_message()
     seconds = round(time.time() - t0, 2)

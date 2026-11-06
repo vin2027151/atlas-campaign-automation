@@ -38,6 +38,26 @@ class QuickChatTests(unittest.TestCase):
         self.assertIn("$199/mo", doc)
         self.assertTrue(meta["snapshot_id"])
 
+    def test_model_haiku_low(self):
+        from planning import llm_worker
+        self.assertEqual(quickchat.MODEL, "claude-haiku-5-5")
+        self.assertEqual(quickchat.EFFORT, "low")
+        self.assertIn("claude-haiku-5-5", llm_worker.ALLOWED_MODELS)
+        base = {"system": "s", "messages": [{"role": "user", "content": "q"}], "max_tokens": 100}
+        # Haiku 5.5: effort low, no server-side fallback (it has none), so no beta header and no fallbacks
+        kw, extras = llm_worker.request_kwargs(dict(base, model=quickchat.MODEL, effort=quickchat.EFFORT))
+        self.assertEqual(kw["model"], "claude-haiku-5-5")
+        self.assertEqual(extras, {"output_config": {"effort": "low"}})
+        self.assertNotIn("betas", kw)
+        # Opus 5.5 (planning default) keeps the fallback beta and fallbacks="default"
+        kw, extras = llm_worker.request_kwargs(base)
+        self.assertEqual(kw["model"], "claude-opus-5-5")
+        self.assertEqual(kw["betas"], [llm_worker.FALLBACK_BETA])
+        self.assertEqual(extras, {"output_config": {"effort": "medium"}, "fallbacks": "default"})
+        # unknown models fall back to the default
+        kw, _ = llm_worker.request_kwargs(dict(base, model="claude-nope"))
+        self.assertEqual(kw["model"], llm_worker.MODEL)
+
     def test_api_and_rate_limit(self):
         c = TestClient(app.app)
         r = c.post("/api/chat/send", json={"messages": [{"role": "user", "content": "hi"}]}, headers={"cf-connecting-ip": "203.0.113.9"})

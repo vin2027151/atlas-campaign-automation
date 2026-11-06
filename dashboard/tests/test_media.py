@@ -123,6 +123,41 @@ class MediaApiTest(unittest.TestCase):
         self.assertEqual(self.client.post("/api/media/%s/approve" % a["id"], json={}).status_code, 400)
         self.assertEqual(self.upload(a["id"], tiny_png()).status_code, 400)
 
+    def test_active_lifecycle(self):
+        a = self.new_request("image")
+        # only approved assets can be marked active
+        self.assertEqual(self.client.post("/api/media/%s/activate" % a["id"], json={}).status_code, 400)
+        self.upload(a["id"], tiny_png())
+        self.assertEqual(self.client.post("/api/media/%s/activate" % a["id"], json={}).status_code, 400)
+        self.client.post("/api/media/%s/approve" % a["id"], json={})
+        self.assertEqual(self.client.post("/api/media/%s/deactivate" % a["id"], json={}).status_code, 400)
+        r = self.client.post("/api/media/%s/activate" % a["id"], json={"note": "running in Prospecting_Core"})
+        self.assertEqual(r.status_code, 200, r.text)
+        act = r.json()["asset"]
+        self.assertEqual(act["status"], "active")
+        self.assertEqual(act["history"][-1]["action"], "marked active")
+        self.assertTrue(any(x["action"] == "media.activate" and x["target"] == a["id"] for x in store.recent_activity(5)))
+        # activating twice is a 400; uploading over an active asset is a 400
+        self.assertEqual(self.client.post("/api/media/%s/activate" % a["id"], json={}).status_code, 400)
+        self.assertEqual(self.upload(a["id"], tiny_png()).status_code, 400)
+        # active stays usable: listed with approved, publishable, and taggable in Plan & Adapt briefs
+        usable = self.client.get("/api/media/?status=approved,active").json()["assets"]
+        self.assertIn(a["id"], [x["id"] for x in usable])
+        self.assertTrue(all(x["status"] in media.USABLE_STATUSES for x in usable))
+        self.assertEqual([x["id"] for x in self.client.get("/api/media/?status=active").json()["assets"]], [a["id"]])
+        self.assertEqual(self.client.get("/api/media/").json()["counts"]["by_status"]["active"], 1)
+        self.assertEqual(self.client.get("/api/media/?status=approved,bogus").status_code, 400)
+        out = media.mark_published(a["id"], "meta", {"image_hash": "abc"})
+        self.assertEqual(out["status"], "active")
+        from planning import jobs
+        self.assertIn(a["id"], [x["id"] for x in jobs.approved_media()])
+        # and back to approved
+        r = self.client.post("/api/media/%s/deactivate" % a["id"], json={})
+        self.assertEqual(r.status_code, 200, r.text)
+        self.assertEqual(r.json()["asset"]["status"], "approved")
+        self.assertEqual(r.json()["asset"]["history"][-1]["action"], "taken out of use")
+        self.assertEqual(self.client.post("/api/media/IMG-9999/activate", json={}).status_code, 404)
+
     def test_reject_requires_note(self):
         a = self.new_request("image")
         self.upload(a["id"], tiny_png())

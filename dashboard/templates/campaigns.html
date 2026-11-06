@@ -31,7 +31,7 @@
       <button class="tab" role="tab" aria-selected="false" data-platform="meta">Meta <span class="count" data-count="meta"></span></button>
     </div>
     <div class="spacer"></div>
-    <span class="card-sub">Click a row for its ad sets and ads; click a budget to edit it</span>
+    <span class="card-sub">Click a row for its ad sets and ads; click a budget or bid to change it. Every change is sent as the API request shown in its toast.</span>
   </div>
   <div class="table-wrap">
     <table class="table cmp-table" id="cmp-table">
@@ -40,7 +40,8 @@
           <th><span class="sr-only">Expand</span></th>
           <th class="sortable" data-key="name">Campaign</th>
           <th class="sortable" data-key="status">Status</th>
-          <th class="sortable num" data-key="daily_budget" title="Click a budget to edit it">Budget / day</th>
+          <th class="sortable num" data-key="daily_budget" title="Click a budget to raise or lower it">Budget / day</th>
+          <th class="num" title="The bid this campaign's strategy uses (target CPA, max CPC, cost cap or bid cap). Click to raise or lower it.">Bid</th>
           <th class="sortable num" data-key="spend" id="th-spend" title="Spend in the selected window; below it, average spend per live day as a share of today's daily budget">Spend</th>
           <th class="sortable num" data-key="trials" id="th-trials">Trials</th>
           <th class="sortable num monitor-head" data-key="cpt_3d" title="Trailing 3 days ending today, whatever the window">Cost / trial 3d</th>
@@ -48,7 +49,7 @@
           <th class="actions"><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
-      <tbody id="cmp-body"><tr><td colspan="9" class="table-empty">Loading campaigns&hellip;</td></tr></tbody>
+      <tbody id="cmp-body"><tr><td colspan="10" class="table-empty">Loading campaigns&hellip;</td></tr></tbody>
     </table>
   </div>
   <div class="card-foot" id="cmp-foot"></div>

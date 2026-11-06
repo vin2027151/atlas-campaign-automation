@@ -1,16 +1,18 @@
 """Publish a reviewed changeset. Deterministic, no LLM: a human triggers this by hand.
 
-    publish(doc, expected_rows, base_snapshot_id) -> {
+    publish(doc, expected_rows, base_snapshot_id, expected_requests=None) -> {
         "ok", "mode", "pre_snapshot_id", "post_snapshot_id",
         "drift": [{"op", "field", "expected_before", "actual"}],   # non-empty => nothing applied
-        "results": [{"op", "status": "applied"|"failed"|"skipped", "request": {method, url, body},
-                     "response", "message"}],
+        "results": [{"op", "step", "status": "applied"|"failed"|"skipped",
+                     "request": {method, url, headers, body, curl}, "response", "message"}],
         "verified": bool,                                          # post snapshot matches the dry run
         "error": str | None }
-    preview_requests(doc, snapshot=None) -> [{"op", "platform", "request"}]
+    preview_requests(doc, snapshot=None) -> [rendered request]     # planning.api_requests.render_all
 
-Order: re-validate -> fresh snapshot -> drift check -> apply ops in order through the
-adapter (stop at the first failure, mark the rest skipped) -> post snapshot -> verify.
+Order: re-validate -> fresh snapshot -> drift check (values AND the rendered requests the
+reviewer saw) -> send each rendered request in order through the adapter (stop at the first
+failure, mark the rest skipped) -> post snapshot -> verify. What runs is the rendered request:
+the sample adapter parses it back and applies it, a live adapter sends it.
 
 Never imports planning.llm, planning.llm_worker, planning.prompts or anthropic.
 """
@@ -18,8 +20,9 @@ Never imports planning.llm, planning.llm_worker, planning.prompts or anthropic.
 import copy
 from typing import Any, Dict, List, Optional
 
+import planning
 import store
-from planning import adapters, changeset, snapshot
+from planning import adapters, api_requests, changeset, snapshot
 from planning.adapters.base import outputs_from_response
 
 FLOAT_TOL = 0.005
@@ -136,27 +139,33 @@ def _entity_label(op, rows):
     return str(op.get("resource_name") or op.get("path") or op.get("ref"))
 
 
-def _request_view(req):
-    return {"method": req.get("method"), "url": req.get("url"), "body": req.get("body")}
-
-
 def preview_requests(doc, snap=None):
     # type: (Any, Optional[Dict[str, Any]]) -> List[Dict[str, Any]]
-    """The REST request each op would send (headers masked). Refs show as $ref text."""
+    """The exact request each op sends, numbered in run order (secrets redacted, refs as $ref text)."""
     d, _errors = _as_doc(doc)
-    cfg = adapters.load_config()
+    return api_requests.render_all(d or {}, snap)
+
+
+def _request_mismatch(expected, fresh):
+    # type: (List[Dict[str, Any]], List[Dict[str, Any]]) -> List[Dict[str, Any]]
     out = []
-    for op in (d or {}).get("operations") or []:
-        try:
-            req = adapters.get_adapter(op.get("platform"), cfg).build_request(op, _ctx(cfg, snap, {}))
-        except Exception as exc:
-            req = {"error": str(exc)}
-        out.append({"op": op.get("ref"), "platform": op.get("platform"), "request": req})
+    by_op = dict((r.get("op"), r) for r in fresh)
+    for r in expected or []:
+        f = by_op.get(r.get("op"))
+        if f is None or f.get("error") or not api_requests.same_call(r, f):
+            out.append({"op": r.get("op"), "field": "request",
+                        "expected_before": "%s %s" % (r.get("method"), r.get("url")),
+                        "actual": (f or {}).get("error") or ("request differs from the reviewed one" if f else "op missing")})
     return out
 
 
-def publish(doc, expected_rows, base_snapshot_id):
-    # type: (Any, Optional[List[Dict[str, Any]]], Optional[str]) -> Dict[str, Any]
+def publish(doc, expected_rows, base_snapshot_id, expected_requests=None):
+    # type: (Any, Optional[List[Dict[str, Any]]], Optional[str], Optional[List[Dict[str, Any]]]) -> Dict[str, Any]
+    with planning.ACCOUNT_LOCK:
+        return _publish(doc, expected_rows, base_snapshot_id, expected_requests)
+
+
+def _publish(doc, expected_rows, base_snapshot_id, expected_requests):
     cfg = adapters.load_config()
     res = {"ok": False, "mode": cfg["mode"], "pre_snapshot_id": None, "post_snapshot_id": None,
            "drift": [], "results": [], "verified": False, "error": None}  # type: Dict[str, Any]
@@ -199,35 +208,42 @@ def publish(doc, expected_rows, base_snapshot_id):
             "%s: %s" % (i["op"], i["message"]) for i in errs)
         return res
 
-    # 3. drift
+    # 3. drift: the values the diff showed, and the requests the reviewer read
     fresh = changeset.dry_run(d, pre)
     res["drift"] = _drift(expected_rows, fresh["rows"])
+    rendered = api_requests.render_all(d, pre, cfg)
+    if expected_requests:
+        res["drift"] += _request_mismatch(expected_requests, rendered)
     if res["drift"]:
         res["error"] = "account changed since the diff was reviewed; nothing applied"
         return res
 
-    # 4. apply in order
+    # 4. send the rendered requests in order
     outputs = {}  # type: Dict[str, Dict[str, Any]]
     stopped = False
-    for op in ops:
+    for op, req in zip(ops, rendered):
         ref = op.get("ref")
-        entry = {"op": ref, "status": "skipped", "request": None, "response": None, "message": ""}
+        entry = {"op": ref, "step": req.get("step"), "status": "skipped", "request": None, "response": None,
+                 "message": ""}
         res["results"].append(entry)
-        try:
-            adapter = adapters.get_adapter(op.get("platform"), cfg)
-            ctx = _ctx(cfg, pre, outputs)
-            entry["request"] = _request_view(adapter.build_request(op, ctx))
-        except Exception as exc:
-            entry["message"] = "could not build request: %s" % exc
-            if not stopped:
-                entry["status"] = "failed"
-                stopped = True
-            continue
         if stopped:
+            entry["request"] = req if not req.get("error") else None
             entry["message"] = "skipped after an earlier failure"
             continue
         try:
-            response = adapter.execute(op, ctx)
+            if req.get("error"):
+                raise ValueError(req["error"])
+            adapter = adapters.get_adapter(op.get("platform"), cfg)
+            ctx = _ctx(cfg, pre, outputs)
+            sent = api_requests.resolve(req, outputs)
+            entry["request"] = sent
+        except Exception as exc:
+            entry["status"] = "failed"
+            entry["message"] = "could not build request: %s" % exc
+            stopped = True
+            continue
+        try:
+            response = adapter.execute_request(req, ctx)
         except Exception as exc:
             entry["status"] = "failed"
             entry["message"] = str(exc)
@@ -238,8 +254,7 @@ def publish(doc, expected_rows, base_snapshot_id):
         entry["message"] = op.get("reason") or ""
         outputs[ref] = outputs_from_response(op, response)
         label = _entity_label(op, fresh["rows"])
-        detail = "%s %s %s" % (ref, op.get("method"), op.get("resource_name") or op.get("path") or "")
-        store.log_activity("api publish", label, detail.strip(), actor="vin")
+        store.log_activity("api publish", label, "%s %s" % (ref, api_requests.log_line(sent)), actor="vin")
 
     # 5. post snapshot + verify
     try:
